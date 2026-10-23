@@ -1,0 +1,42 @@
+// Quick screenshots of the quick-play screens (dev aid).
+import { chromium } from 'playwright-core';
+const OUT = process.argv[2] || '/tmp/claude-0/qp';
+const browser = await chromium.launch({ executablePath: '/opt/pw-browsers/chromium-1243/chrome-linux64/chrome' });
+const page = await (await browser.newContext({ viewport: { width: 390, height: 844 }, deviceScaleFactor: 2, hasTouch: true, isMobile: true })).newPage();
+const errors = [];
+page.on('pageerror', (e) => errors.push(e.message));
+page.on('console', (m) => m.type() === 'error' && errors.push(m.text()));
+await page.goto('file://' + new URL('../dist/index.html', import.meta.url).pathname);
+await page.waitForSelector('[data-testid=play]');
+await page.waitForTimeout(700);
+await page.screenshot({ path: OUT + '/1-home.png' });
+await page.click('[data-testid=play]');
+await page.waitForTimeout(600);
+await page.screenshot({ path: OUT + '/2-intro.png' });
+await page.evaluate(() => window.__LW.current.startNow());
+// play with the bot by driving inputs through the game directly for a moment, then screenshot mid-burn
+const shotWhen = async (fn, name, ms = 30000) => { await page.waitForFunction(fn, null, { timeout: ms }); await page.screenshot({ path: OUT + '/' + name + '.png' }); };
+await page.evaluate(() => { const s = window.__LW.current; s.__bot = setInterval(() => { const b = s.game.bot(); const btn = document.querySelector('[data-testid=main-btn]'); const ev = (t) => btn.dispatchEvent(new PointerEvent(t, { bubbles: true })); if (b.hold && !s.__h) { ev('pointerdown'); s.__h = 1; } else if (!b.hold && s.__h) { ev('pointerup'); s.__h = 0; } }, 16); });
+await shotWhen(() => window.__LW.current.game.burning, '3-burning');
+await shotWhen(() => document.querySelector('.result-card'), '4-win');
+await page.waitForTimeout(1800);
+await page.screenshot({ path: OUT + '/4b-win-stars.png' });
+await page.click('[data-testid=continue]');
+await page.waitForTimeout(300);
+await page.screenshot({ path: OUT + '/5-quiz.png' });
+await page.click('[data-testid=quiz-0]');
+await page.waitForTimeout(300);
+await page.screenshot({ path: OUT + '/6-quiz-answer.png' });
+await page.click('[data-testid=quiz-next]');
+await page.waitForTimeout(800);
+await page.screenshot({ path: OUT + '/7-level2.png' });
+// lose quickly: start and do nothing until fail
+await page.evaluate(() => window.__LW.current.startNow());
+await shotWhen(() => document.querySelector('.result-card'), '8-lose', 60000);
+await page.goto('file://' + new URL('../dist/index.html', import.meta.url).pathname);
+await page.waitForSelector('[data-testid=hangar]');
+await page.click('[data-testid=hangar]');
+await page.waitForTimeout(400);
+await page.screenshot({ path: OUT + '/9-hangar.png', fullPage: true });
+console.log('errors', errors);
+await browser.close();

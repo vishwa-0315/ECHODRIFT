@@ -22,12 +22,53 @@ const shot = (name) => page.screenshot({ path: `${OUT}/${String(++n).padStart(2,
 const wait = (ms) => page.waitForTimeout(ms);
 const log = (...a) => console.log('•', ...a);
 await page.goto('file://' + new URL('../dist/index.html', import.meta.url).pathname);
-await page.waitForSelector('[data-testid=mission-chandrayaan3]');
+await page.waitForSelector('[data-testid=play]');
 await wait(500);
 await shot('home');
+const result = {};
+
+/* ---------- quick play: level 1 with real button presses, then every level flown by Vyom ---------- */
+if (!ONLY || ONLY === 'quick') {
+  await page.click('[data-testid=play]');
+  await page.waitForSelector('[data-testid=main-btn]');
+  await page.click('[data-testid=main-btn]'); // first press skips the intro
+  await page.evaluate(() => {
+    const s = window.__LW.current;
+    const btn = document.querySelector('[data-testid=main-btn]');
+    let held = false;
+    s.__bot = setInterval(() => {
+      const b = s.game.bot();
+      if (b.hold && !held) (btn.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true })), (held = true));
+      if (!b.hold && held) (btn.dispatchEvent(new PointerEvent('pointerup', { bubbles: true })), (held = false));
+    }, 16);
+  });
+  await page.waitForSelector('.result-card', { timeout: 60000 });
+  await wait(1800);
+  await shot('quick-raise-win');
+  result['quick-raise (real button)'] = await page.evaluate(() => window.__LW.current.game.status + ' ' + window.__LW.current.game.stars + '★');
+  await page.click('[data-testid=continue]');
+  await page.waitForSelector('[data-testid=quiz-0]');
+  await shot('quick-quiz');
+  await page.click('[data-testid=quiz-1]');
+  await page.click('[data-testid=quiz-next]');
+  await page.waitForSelector('[data-testid=main-btn]');
+  for (const id of ['moonshot', 'catchmoon', 'vikram', 'window', 'marscapture', 'terror', 'slingshot']) {
+    await page.evaluate((id) => window.__LW.go('play', { id, demo: true }), id);
+    await page.waitForSelector('.result-card', { timeout: 120000 });
+    result['quick-' + id] = await page.evaluate(() => window.__LW.current.game.status + ' ' + window.__LW.current.game.stars + '★');
+    log('quick', id, result['quick-' + id]);
+  }
+  await page.evaluate(() => window.__LW.go('hangar'));
+  await wait(300);
+  await shot('hangar');
+  await page.evaluate(() => window.__LW.go('home'));
+  await page.waitForSelector('[data-testid=expert]');
+}
+await page.click('[data-testid=expert]');
+await page.waitForSelector('[data-testid=mission-chandrayaan3]');
+await shot('expert');
 await page.evaluate(() => window.scrollTo(0, 2000));
 
-const result = {};
 async function closeToasts() {
   await page.evaluate(() => document.querySelectorAll('.toast').forEach((t) => t.remove()));
 }
@@ -191,6 +232,7 @@ if (!ONLY) {
   await shot('explorer-window');
   log('next Mars window:', (await page.innerText('.screen')).match(/Next cheapest[^\n]*/)?.[0]);
   await page.click('button[aria-label=Back]');
+  await page.waitForSelector('[data-testid=play]');
   await page.click('text=How the physics works');
   await wait(300);
   await shot('about');

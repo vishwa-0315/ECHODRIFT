@@ -23,7 +23,8 @@ export function createApp(root, content, screens) {
   } catch {
     save = null;
   }
-  save = { missions: {}, labs: {}, settings: { sound: true, reduceMotion: false, textSize: 1 }, ...(save || {}) };
+  save = { missions: {}, labs: {}, settings: { sound: true, music: true, reduceMotion: false, textSize: 1 }, ...(save || {}) };
+  save.settings = { sound: true, music: true, reduceMotion: false, textSize: 1, ...save.settings };
   let current = null;
   let actx = null;
 
@@ -104,7 +105,7 @@ export function createApp(root, content, screens) {
       );
     },
     beep(freq = 880, dur = 0.08, vol = 0.08, type = 'sine') {
-      if (!save.settings.sound) return;
+      if (save.settings.sound === false) return;
       try {
         actx ||= new (window.AudioContext || window.webkitAudioContext)();
         const o = actx.createOscillator();

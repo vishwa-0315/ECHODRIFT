@@ -1,0 +1,740 @@
+/**
+ * Quick-play levels. Eight short challenges from real missions, each with ONE
+ * main control, all running on real physics (see physics.js, core/lander.js,
+ * core/edl.js). Every level has a `bot` that wins it, used by the tests to
+ * prove each level can be completed, and by "Watch Vyom do it".
+ *
+ * Level object API (used by ui/screens/play.js and tests/arcade.test.js):
+ *   create() → game with:
+ *     update(dtReal, input)   input = { hold, tap, aim }  (aim −1…1)
+ *     status                  'play' | 'won' | 'lost'
+ *     stars (1–3 when won), reason (text when lost), result (lines when won)
+ *     hud()                   { fuel 0–1, info:[[label, value]…] (≤ 2), alert? }
+ *     scene()                 drawing description for the renderer
+ *     bot()                   the input a good pilot would give now
+ */
+import { createWorld, bodyState } from './physics.js';
+import { MU, RADIUS, AU, DAY, G0 } from '../core/constants.js';
+import { Lander } from '../core/lander.js';
+import { EntrySim } from '../core/edl.js';
+
+const km = (m) => m / 1000;
+const fmtKm = (m) => `${Math.round(km(m)).toLocaleString('en-US')} km`;
+const wetFor = (dry, dv, isp) => dry * Math.exp(dv / (isp * G0));
+
+/** Conic state at true anomaly nu (periapsis along +x, counter-clockwise motion). */
+function conicState(mu, rp, e, nu, rot = 0) {
+  const p = rp * (1 + e);
+  const r = p / (1 + e * Math.cos(nu));
+  const vr = Math.sqrt(mu / p) * e * Math.sin(nu);
+  const vt = Math.sqrt(mu / p) * (1 + e * Math.cos(nu));
+  const a = nu + rot;
+  const c = Math.cos(a), s = Math.sin(a);
+  return { x: r * c, y: r * s, vx: vr * c - vt * s, vy: vr * s + vt * c };
+}
+
+/** Clock: simulated seconds per real second, ∝ local orbital period (slow near planets). */
+const orbitClock = (mu, k) => (r) => (2 * Math.PI * Math.sqrt(r ** 3 / mu)) / k;
+
+/* ------------------------------------------------------------------ */
+/* Shared orbital game                                                 */
+/* ------------------------------------------------------------------ */
+function orbitalGame(cfg) {
+  const w = createWorld(cfg.world);
+  const g = {
+    kind: 'orbit',
+    w,
+    status: 'play',
+    stars: 0,
+    reason: '',
+    result: [],
+    pred: null,
+    predAt: -1,
+    realT: 0,
+    burning: false,
+    trail: [],
+    update(dt, input) {
+      if (g.status !== 'play') return;
+      g.realT += dt;
+      cfg.beforeStep?.(g, input);
+      const wantBurn = !!input.hold && w.fuel > 0 && !g.noEngine;
+      g.burning = wantBurn;
+      w.burn = wantBurn ? { dir: cfg.dir, ref: cfg.ref ?? null } : null;
+      const r = cfg.clockR(g);
+      const rate = cfg.clock(r) * (wantBurn ? cfg.burnSlow ?? 0.5 : 1);
+      w.advance(Math.min(dt, 0.05) * rate);
+      const last = g.trail[g.trail.length - 1];
+      if (!last || Math.hypot(w.y[0] - last[0], w.y[1] - last[1]) > (cfg.trailStep ?? 2e5)) g.trail.push([w.y[0], w.y[1]]);
+      if (g.trail.length > 1500) g.trail.splice(0, 500);
+      if (g.realT - g.predAt > (wantBurn ? 0.06 : 0.25)) {
+        g.pred = w.predict(cfg.horizon(g), 300);
+        g.predAt = g.realT;
+      }
+      if (w.status === 'hit') return cfg.onHit(g, w.hit);
+      cfg.check(g);
+    },
+    win(stars, lines) {
+      g.status = 'won';
+      g.stars = stars;
+      g.result = lines;
+      w.burn = null;
+    },
+    lose(reason) {
+      g.status = 'lost';
+      g.reason = reason;
+      w.burn = null;
+    },
+    hud: () => ({ fuel: cfg.noFuel ? null : w.fuel / w.fuel0, info: cfg.info(g), alert: cfg.alert?.(g) }),
+    scene: () => cfg.scene(g),
+    bot: () => cfg.bot(g),
+  };
+  g.pred = w.predict(cfg.horizon(g), 300);
+  return g;
+}
+
+/* ------------------------------------------------------------------ */
+/* 1. Raise the orbit (Chandrayaan-3)                                  */
+/* ------------------------------------------------------------------ */
+const L1 = {
+  id: 'raise',
+  title: 'Raise the orbit',
+  mission: 'Chandrayaan-3',
+  agency: 'ISRO',
+  year: 2023,
+  button: 'BOOST',
+  control: 'hold',
+  goal: 'Push the far end of your orbit out to the green ring.',
+  guide: ['Hold BOOST to fire the engine forwards.', 'Tip: burn when you are closest to Earth. The engine works best there!'],
+  fact: 'Chandrayaan-3 raised its orbit five times, always burning near perigee, before heading for the Moon.',
+  create() {
+    const mu = MU.earth, R = 6378e3;
+    const rp = R + 170e3, ra = R + 36500e3;
+    const e = (ra - rp) / (ra + rp);
+    const s = conicState(mu, rp, e, (-120 * Math.PI) / 180, -Math.PI / 2);
+    const target = R + 70000e3;
+    const dry = 2204, isp = 315;
+    const world = { central: { name: 'earth', mu, R }, bodies: [], ship: { ...s, mass: wetFor(dry, 900, isp), dry, thrust: 440, isp }, hmax: 600 };
+    let started = false;
+    return orbitalGame({
+      world,
+      dir: 'pro',
+      clock: orbitClock(mu, 9),
+      clockR: (g) => Math.hypot(g.w.y[0], g.w.y[1]),
+      horizon: (g) => Math.min(3 * DAY, g.w.orbitAbout('earth').period || DAY),
+      check(g) {
+        const o = g.w.orbitAbout('earth');
+        if (g.burning) started = true;
+        if (!g.burning && o.apo >= target) {
+          const dv = g.w.dvUsed;
+          return g.win(dv <= 360 ? 3 : dv <= 460 ? 2 : 1, [`Far point: ${fmtKm(o.apo - R)} up`, `Fuel used: ${Math.round(dv)} m/s of Δv`]);
+        }
+        if (g.w.fuel <= 0 && !g.burning) return g.lose('Out of fuel before reaching the ring. Burn closer to Earth, where each push counts most.');
+        if (g.w.t > 3.2 * DAY && !started) return g.lose('You never fired the engine! Hold BOOST as you swing close to Earth.');
+        if (g.w.t > 5 * DAY) return g.lose('Time is up. Burn when you are closest to Earth.');
+      },
+      onHit: (g) => g.lose('Crashed into Earth.'),
+      info(g) {
+        const o = g.w.orbitAbout('earth');
+        return [['Far point', fmtKm(o.apo - R)], ['Goal', fmtKm(target - R)]];
+      },
+      scene: (g) => ({ central: 'earth', bodies: [], rings: [{ body: 'earth', r: target, label: 'Goal' }], focus: [[0, 0], [g.w.y[0], g.w.y[1]], [target, 0], [-target, 0], [0, target * 0.6], [0, -target * 0.6]] }),
+      bot(g) {
+        const o = g.w.orbitAbout('earth');
+        const near = o.r < rp * 1.6;
+        return { hold: near && o.apo < target * 1.01 };
+      },
+    });
+  },
+};
+
+/* ------------------------------------------------------------------ */
+/* 2. Moon shot (Chandrayaan-3 trans-lunar injection)                  */
+/* ------------------------------------------------------------------ */
+const L2 = {
+  id: 'moonshot',
+  title: 'Moon shot',
+  mission: 'Chandrayaan-3',
+  agency: 'ISRO',
+  year: 2023,
+  button: 'BOOST',
+  control: 'hold',
+  goal: 'Stretch your path until it reaches the green zone around the Moon.',
+  guide: ['The Moon is moving! Your dotted path shows where you will go.', 'Hold BOOST near Earth until the dotted line touches the Moon zone.'],
+  fact: 'On 1 August 2023 Chandrayaan-3 fired its engine at perigee and left Earth orbit for the Moon.',
+  create() {
+    const mu = MU.earth, R = 6378e3;
+    const rp = R + 290e3, ra = R + 127600e3;
+    const e = (ra - rp) / (ra + rp);
+    const s = conicState(mu, rp, e, (-110 * Math.PI) / 180, -Math.PI / 2);
+    const aMoon = 384400e3;
+    const zone = 40000e3;
+    // place the Moon where a ~190 m/s burn around perigee will meet it (computed, not scripted):
+    // fly the same engine the player has, burning while close to Earth
+    const dry = 2204, isp = 315;
+    const cal = createWorld({ central: { name: 'earth', mu, R }, bodies: [], ship: { ...s, mass: wetFor(dry, 420, isp), dry, thrust: 440, isp }, hmax: 600 });
+    {
+      const nearR = rp * 1.35;
+      for (let i = 0; i < 20000 && cal.dvUsed < 190; i++) {
+        const near = Math.hypot(cal.y[0], cal.y[1]) < nearR;
+        cal.burn = near ? { dir: 'pro' } : null;
+        cal.advance(near ? 20 : 300);
+      }
+      cal.burn = null;
+      for (let i = 0; i < 20000 && Math.hypot(cal.y[0], cal.y[1]) < aMoon - 25000e3; i++) cal.advance(600);
+    }
+    const tm = cal.t, thM = Math.atan2(cal.y[1], cal.y[0]);
+    const wM = Math.sqrt((mu + MU.moon) / aMoon ** 3);
+    const moon = { name: 'moon', mu: MU.moon, R: 1737.4e3, a: aMoon, phase0: thM + 0.05 - wM * tm };
+    const world = { central: { name: 'earth', mu, R }, bodies: [moon], ship: { ...s, mass: wetFor(dry, 420, isp), dry, thrust: 440, isp }, hmax: 900 };
+    let wentHigh = false;
+    return orbitalGame({
+      world,
+      dir: 'pro',
+      clock: orbitClock(mu, 9),
+      clockR: (g) => Math.hypot(g.w.y[0], g.w.y[1]),
+      horizon: () => 7 * DAY,
+      trailStep: 1e6,
+      check(g) {
+        const m = g.w.rel('moon');
+        const d = Math.hypot(m.x, m.y);
+        const r = Math.hypot(g.w.y[0], g.w.y[1]);
+        if (d < zone) {
+          const dv = g.w.dvUsed;
+          return g.win(dv <= 230 ? 3 : dv <= 290 ? 2 : 1, ['You reached the Moon!', `Fuel used: ${Math.round(dv)} m/s of Δv`]);
+        }
+        if (r > 200000e3) wentHigh = true;
+        const o = g.w.orbitAbout('earth');
+        if (wentHigh && o.radialV < 0 && r < 300000e3) return g.lose('You missed the Moon and are falling back to Earth. Watch the dotted line!');
+        if (r > 900000e3) return g.lose('Too much speed: you flew off into deep space.');
+        if (g.w.t > 14 * DAY) return g.lose('Time is up.');
+      },
+      onHit: (g, b) => g.lose(b === 'moon' ? 'You crashed into the Moon. Aim for the zone, not the surface!' : 'Crashed into Earth.'),
+      info(g) {
+        const c = g.pred?.closest?.moon;
+        return [['Closest to Moon', c ? fmtKm(Math.max(0, c.d - 1737e3)) : '—'], ['Goal', `< ${fmtKm(zone)}`]];
+      },
+      scene: (g) => ({ central: 'earth', bodies: ['moon'], rings: [{ body: 'moon', r: zone, label: 'Moon zone' }], showOrbit: ['moon'], focus: [[0, 0], [g.w.y[0], g.w.y[1]], [aMoon, 0], [-aMoon, 0], [0, aMoon], [0, -aMoon]] }),
+      bot(g) {
+        const o = g.w.orbitAbout('earth');
+        const c = g.pred?.closest?.moon;
+        const near = o.r < rp * 1.35;
+        return { hold: near && !(c && c.d < zone * 0.6) && o.apo < aMoon * 1.1 };
+      },
+    });
+  },
+};
+
+/* ------------------------------------------------------------------ */
+/* Capture helper: brake at closest approach to be caught (Moon, Mars) */
+/* ------------------------------------------------------------------ */
+function captureLevel({ body, mu, R, vInf, periAlt, startR, dry, wetDv, thrust, isp, apoMax, periMin, starsBy, info2, botApo = 0.25 }) {
+  const rp = R + periAlt;
+  const e = 1 + (rp * vInf * vInf) / mu;
+  const p = rp * (1 + e);
+  const nu0 = -Math.acos((p / startR - 1) / e);
+  const s = conicState(mu, rp, e, nu0, Math.PI / 2);
+  const world = { central: { name: body, mu, R }, bodies: [], ship: { ...s, mass: wetFor(dry, wetDv, isp), dry, thrust, isp }, hmax: 300 };
+  let anglePast = 0;
+  let lastAng = Math.atan2(s.y, s.x);
+  return orbitalGame({
+    world,
+    dir: 'retro',
+    clock: orbitClock(mu, 10),
+    clockR: (g) => Math.hypot(g.w.y[0], g.w.y[1]),
+    burnSlow: 0.6,
+    horizon: () => {
+      return 2 * Math.PI * Math.sqrt(startR ** 3 / mu) * 0.6;
+    },
+    trailStep: 5e4,
+    check(g) {
+      const ang = Math.atan2(g.w.y[1], g.w.y[0]);
+      let d = ang - lastAng;
+      if (d > Math.PI) d -= 2 * Math.PI;
+      if (d < -Math.PI) d += 2 * Math.PI;
+      anglePast += d;
+      lastAng = ang;
+      // judge once we're well past the closest point (≈100° beyond it)
+      const nuNow = nu0 + anglePast;
+      if (nuNow < (100 * Math.PI) / 180 || g.burning) return;
+      const o = g.w.orbitAbout(body);
+      const apoAlt = o.apo - R, periAlt2 = o.peri - R;
+      if (o.energy >= 0) return g.lose(`Not caught: you flew past ${body === 'moon' ? 'the Moon' : 'Mars'}. Hold BRAKE longer near the closest point.`);
+      if (periAlt2 < periMin) return g.lose('Your orbit dips too low: it would hit the surface. Brake a little less.');
+      if (apoAlt > apoMax) return g.lose(`Caught, but the orbit is too stretched (far point ${fmtKm(apoAlt)}). Brake a bit more.`);
+      return g.win(starsBy(g, apoAlt), [`Orbit: ${fmtKm(periAlt2)} × ${fmtKm(apoAlt)}`, `Fuel used: ${Math.round(g.w.dvUsed)} m/s of Δv`]);
+    },
+    onHit: (g) => g.lose(`Crashed into ${body === 'moon' ? 'the Moon' : 'Mars'}! Brake less, or check your path.`),
+    info(g) {
+      const o = g.w.orbitAbout(body);
+      return [['Height', fmtKm(o.r - R)], info2(o)];
+    },
+    scene: (g) => ({ central: body, bodies: [], rings: [{ body, r: R + apoMax, label: 'Capture zone', dashed: true }], focus: [[0, 0], [g.w.y[0], g.w.y[1]], [R * 3, 0], [-R * 3, 0]] }),
+    bot(g) {
+      const o = g.w.orbitAbout(body);
+      return { hold: o.r < rp * 1.6 && (o.energy >= 0 || o.apo - R > apoMax * botApo) };
+    },
+  });
+}
+
+/* 3. Catch the Moon (lunar orbit insertion) */
+const L3 = {
+  id: 'catchmoon',
+  title: 'Catch the Moon',
+  mission: 'Chandrayaan-3',
+  agency: 'ISRO',
+  year: 2023,
+  button: 'BRAKE',
+  control: 'hold',
+  goal: 'Brake so the Moon’s gravity catches you in orbit.',
+  guide: ['You are falling past the Moon too fast to stay.', 'Hold BRAKE near the closest point. Brake more for a rounder orbit, but don’t crash!'],
+  fact: 'On 5 August 2023 Chandrayaan-3 braked for about 30 minutes and was captured by the Moon.',
+  create: () =>
+    captureLevel({
+      body: 'moon',
+      mu: MU.moon,
+      R: 1737.4e3,
+      vInf: 850,
+      periAlt: 300e3,
+      startR: 22000e3,
+      dry: 2204,
+      wetDv: 900,
+      thrust: 440,
+      isp: 315,
+      apoMax: 20000e3,
+      periMin: 50e3,
+      starsBy: (g, apo) => (apo <= 6000e3 ? 3 : apo <= 12000e3 ? 2 : 1),
+      info2: (o) => ['Orbit', o.energy < 0 ? 'Caught!' : 'Flying past'],
+    }),
+};
+
+/* ------------------------------------------------------------------ */
+/* Vertical landers                                                    */
+/* ------------------------------------------------------------------ */
+function landerLevel({ g, engine, mass, dry, z0, vz0, speed = 1, holdThrottle, idleThrottle = 0, limits, stars, surface, crane = false }) {
+  const l = new Lander({ g, engine, mass, dryMass: dry, x: 0, z: z0, vx: 0, vz: vz0, pitch: 0, pitchRate: 0, maxPitch: 0, limits, terrain: { base: 0 }, footprint: 2 });
+  const game = {
+    kind: 'lander',
+    l,
+    surface,
+    crane,
+    status: 'play',
+    stars: 0,
+    reason: '',
+    result: [],
+    burning: false,
+    update(dt, input) {
+      if (game.status !== 'play') return;
+      const thr = typeof holdThrottle === 'function' ? holdThrottle(l) : holdThrottle;
+      l.throttleCmd = input.hold && l.fuel > 0 ? thr : idleThrottle;
+      game.burning = l.thrust() > 0;
+      const steps = Math.ceil((dt * speed) / 0.01);
+      for (let i = 0; i < steps && l.status === 'flying'; i++) l.step((dt * speed) / steps);
+      if (l.status === 'landed') {
+        const v = l.touch.vz;
+        game.status = 'won';
+        game.stars = stars(v);
+        game.result = [`Touchdown at ${v.toFixed(2)} m/s`, `Fuel left: ${Math.round(l.fuel)} kg`];
+      } else if (l.status === 'crashed') {
+        game.status = 'lost';
+        game.reason = `Touched down at ${l.touch.vz.toFixed(1)} m/s: too fast (safe is under ${limits.vz} m/s). Start braking earlier!`;
+      } else if (l.altitude > z0 + 600) {
+        game.status = 'lost';
+        game.reason = 'You flew back up into space! Use shorter bursts.';
+      }
+    },
+    hud: () => ({
+      fuel: l.fuel / (mass - dry),
+      info: [['Height', `${Math.max(0, l.altitude).toFixed(0)} m`], ['Speed', `${Math.abs(l.vz).toFixed(1)} m/s ${l.vz < -0.05 ? '↓' : l.vz > 0.05 ? '↑' : ''}`]],
+      alert: l.altitude < 60 && l.vz < -limits.vz * 1.5 ? 'Too fast! Brake!' : l.fuel <= 0 ? 'Out of fuel!' : null,
+    }),
+    scene: () => ({ kind: 'lander', surface, z0, crane }),
+    bot() {
+      // brake when the engine's real stopping distance (with margin) reaches the ground
+      const aNet = (engine.thrust * (typeof holdThrottle === 'function' ? holdThrottle(l) : holdThrottle)) / l.mass - g;
+      const v = -l.vz;
+      const stop = v > 0 ? (v * v) / (2 * Math.max(0.05, aNet)) : 0;
+      const target = Math.max(0.5, Math.min(limits.vz * 0.5, l.altitude * 0.1));
+      return { hold: (stop + 2 > l.altitude * 0.9 && v > target) || v > 2 + l.altitude * 0.25 };
+    },
+  };
+  return game;
+}
+
+/* 4. Vikram at the south pole */
+const L4 = {
+  id: 'vikram',
+  title: 'Vikram touchdown',
+  mission: 'Chandrayaan-3',
+  agency: 'ISRO',
+  year: 2023,
+  button: 'ENGINE',
+  control: 'hold',
+  goal: 'Land gently: under 3 m/s.',
+  guide: ['The Moon pulls you down, with no air to slow you.', 'Hold ENGINE to push up. Short taps near the ground give a soft landing.'],
+  fact: 'Vikram landed near the Moon’s south pole on 23 August 2023, making India the first country to land there.',
+  create: () =>
+    landerLevel({
+      g: 1.62,
+      engine: { thrust: 3200, isp: 300, minThrottle: 0.4 },
+      mass: 1380,
+      dry: 1250,
+      z0: 800,
+      vz0: -12,
+      speed: 2.2,
+      holdThrottle: 1,
+      limits: { vz: 3, vx: 1, tilt: 15 },
+      stars: (v) => (v <= 1 ? 3 : v <= 2 ? 2 : 1),
+      surface: 'moon',
+    }),
+};
+
+/* ------------------------------------------------------------------ */
+/* 5. Mars launch window (Mangalyaan)                                  */
+/* ------------------------------------------------------------------ */
+const L5 = {
+  id: 'window',
+  title: 'Launch window',
+  mission: 'Mangalyaan',
+  agency: 'ISRO',
+  year: 2013,
+  button: 'LAUNCH',
+  control: 'tap',
+  goal: 'Launch when Mars is about 44° ahead of Earth, so you arrive where Mars will be.',
+  guide: ['Mars moves while you fly: the trip takes about 300 days.', 'Tap LAUNCH when the angle is close to 44°. This chance comes only once every 26 months!'],
+  fact: 'Mangalyaan left Earth on 1 December 2013 in exactly such a window, and reached Mars on its first try.',
+  create() {
+    const mu = MU.sun;
+    const aE = AU, aM = 1.5237 * AU;
+    const wE = Math.sqrt(mu / aE ** 3), wM = Math.sqrt(mu / aM ** 3);
+    const earth = { name: 'earth', mu: 0, R: 6371e3, a: aE, phase0: 0 };
+    const mars = { name: 'mars', mu: 0, R: 3389.5e3, a: aM, phase0: (57 * Math.PI) / 180 };
+    const at = (aE + aM) / 2;
+    const vp = Math.sqrt(mu * (2 / aE - 1 / at));
+    const tTransfer = Math.PI * Math.sqrt(at ** 3 / mu);
+    const ideal = Math.PI - wM * tTransfer; // phase angle Mars–Earth at launch
+    const world = { central: { name: 'sun', mu, R: 695700e3 }, bodies: [earth, mars], ship: { x: aE, y: 0, vx: 0, vy: aE * wE, mass: 1000, dry: 999, thrust: 0, isp: 300 }, hmax: DAY };
+    let launched = false, launchT = 0, best = Infinity, launchPhase = 0;
+    const phaseNow = (t) => {
+      let d = (mars.phase0 + wM * t) - wE * t;
+      d = ((d + Math.PI) % (2 * Math.PI) + 2 * Math.PI) % (2 * Math.PI) - Math.PI;
+      return d;
+    };
+    const g = orbitalGame({
+      world,
+      noFuel: true,
+      dir: 'pro',
+      clock: () => (launched ? 20 : 2.6) * DAY,
+      clockR: () => 0,
+      horizon: () => (launched ? 1 : 0.0001) * tTransfer,
+      trailStep: 2e9,
+      beforeStep(gg, input) {
+        gg.noEngine = true;
+        if (!launched) {
+          const p = bodyState(gg.w.body('earth'), gg.w.t, {});
+          gg.w.y[0] = p.x;
+          gg.w.y[1] = p.y;
+          gg.w.y[2] = p.vx;
+          gg.w.y[3] = p.vy;
+          if (input.tap) {
+            launched = true;
+            launchT = gg.w.t;
+            launchPhase = phaseNow(gg.w.t);
+            const v = Math.hypot(p.vx, p.vy);
+            gg.w.y[2] = (p.vx / v) * vp;
+            gg.w.y[3] = (p.vy / v) * vp;
+            gg.launched = true;
+          }
+        }
+      },
+      check(gg) {
+        if (!launched) {
+          if (phaseNow(gg.w.t) < ideal - (25 * Math.PI) / 180) gg.lose('The window closed: Mars got too far behind. The next chance is 26 months away!');
+          return;
+        }
+        const m = gg.w.rel('mars');
+        best = Math.min(best, Math.hypot(m.x, m.y));
+        if (gg.w.t - launchT > tTransfer * 1.02) {
+          const deg = ((launchPhase - ideal) * 180) / Math.PI;
+          if (best > 15e9) return gg.lose(`Missed Mars by ${fmtKm(best)}. You launched with Mars ${((launchPhase * 180) / Math.PI).toFixed(0)}° ahead; ${deg > 0 ? 'wait a little longer' : 'launch a bit sooner'} next time.`);
+          return gg.win(best < 3e9 ? 3 : best < 7e9 ? 2 : 1, [`Arrived ${fmtKm(best)} from Mars`, `Launch angle: ${((launchPhase * 180) / Math.PI).toFixed(1)}° (best ≈ ${((ideal * 180) / Math.PI).toFixed(0)}°)`]);
+        }
+      },
+      onHit: (gg) => gg.lose('Flew into the Sun!'),
+      info(gg) {
+        if (!launched) return [['Mars ahead by', `${((phaseNow(gg.w.t) * 180) / Math.PI).toFixed(1)}°`], ['Best', `≈ ${((ideal * 180) / Math.PI).toFixed(0)}°`]];
+        return [['Days flown', `${Math.round((gg.w.t - launchT) / DAY)}`], ['Mars distance', fmtKm(Math.hypot(gg.w.rel('mars').x, gg.w.rel('mars').y))]];
+      },
+      scene: (gg) => ({ central: 'sun', bodies: ['earth', 'mars'], showOrbit: ['earth', 'mars'], angle: !launched ? { a: 'earth', b: 'mars', ideal } : null, shipHidden: !launched, focus: [[aM * 1.05, 0], [-aM * 1.05, 0], [0, aM * 1.05], [0, -aM * 1.05]], minR: { sun: 9, earth: 5, mars: 5 } }),
+      bot(gg) {
+        return { tap: !launched && phaseNow(gg.w.t) <= ideal + 0.002 };
+      },
+    });
+    return g;
+  },
+};
+
+/* 6. Mars capture (Mangalyaan) */
+const L6 = {
+  id: 'marscapture',
+  title: 'Mars orbit insertion',
+  mission: 'Mangalyaan',
+  agency: 'ISRO',
+  year: 2014,
+  button: 'BRAKE',
+  control: 'hold',
+  goal: 'Brake to be caught by Mars, using as little fuel as you can.',
+  guide: ['Mangalyaan had very little fuel. Every drop counts!', 'Hold BRAKE as you pass closest to Mars, and stop once you are caught.'],
+  fact: 'On 24 September 2014 Mangalyaan braked for 23 minutes. India became the first nation to reach Mars orbit on its first attempt.',
+  create: () =>
+    captureLevel({
+      body: 'mars',
+      mu: MU.mars,
+      R: 3389.5e3,
+      vInf: 2200,
+      periAlt: 450e3,
+      startR: 60000e3,
+      dry: 482.5,
+      wetDv: 1700,
+      thrust: 440,
+      isp: 315,
+      apoMax: 80000e3,
+      periMin: 150e3,
+      starsBy: (g) => (g.w.dvUsed <= 750 ? 3 : g.w.dvUsed <= 950 ? 2 : 1),
+      botApo: 0.85,
+      info2: (o) => ['Orbit', o.energy < 0 ? `Caught! far point ${fmtKm(o.apo - 3389.5e3)}` : 'Flying past'],
+    }),
+};
+
+/* ------------------------------------------------------------------ */
+/* 7. Seven minutes of terror (Perseverance)                           */
+/* ------------------------------------------------------------------ */
+const L7 = {
+  id: 'terror',
+  title: 'Seven minutes of terror',
+  mission: 'Perseverance',
+  agency: 'NASA',
+  year: 2021,
+  button: 'PARACHUTE',
+  control: 'tap+hold',
+  goal: 'Open the parachute in its safe window, then land gently with the engines.',
+  guide: ['First the air slows you down. Then tap PARACHUTE when the light turns green!', 'Too early and it rips; too late and it can’t slow you. Then hold ENGINE to land softly.'],
+  fact: 'Perseverance landed in Jezero Crater on 18 February 2021. The parachute opened at almost twice the speed of sound.',
+  create() {
+    const def = {
+      entry: { alt: 125000, v: 5420, gammaDeg: -15.5, mass: 3440 },
+      aero: { cd: 1.65, area: 15.9, ld: 0.24, noseRadius: 1.125 },
+      chute: { cd: 0.62, area: 363, maxMach: 2.2, minMach: 1.1, maxQ: 850, shieldSepDelay: 20, shieldMass: 440 },
+      backshellAlt: 2100,
+    };
+    const e = new EntrySim(def);
+    e.liftUp = 0.6;
+    let phase = 'entry';
+    let land = null;
+    const game = {
+      kind: 'edl',
+      e,
+      status: 'play',
+      stars: 0,
+      reason: '',
+      result: [],
+      burning: false,
+      get phase() {
+        return phase;
+      },
+      get button() {
+        return phase === 'land' ? 'ENGINE' : 'PARACHUTE';
+      },
+      get control() {
+        return phase === 'land' ? 'hold' : 'tap';
+      },
+      window: () => e.chuteWindow(),
+      update(dt, input) {
+        if (game.status !== 'play') return;
+        if (phase === 'entry' || phase === 'chute') {
+          if (phase === 'entry' && input.tap) {
+            const w = e.chuteWindow();
+            if (w.ok) {
+              e.deployChute();
+              phase = 'chute';
+            } else if (w.why === 'tooSlow') {
+              game.status = 'lost';
+              game.reason = 'Too late! Below Mach 1.1 the parachute can’t slow you enough in time.';
+              return;
+            } else {
+              e.deployChute();
+              game.status = 'lost';
+              game.reason = 'Too early! At that speed the air tears the parachute apart. Wait for the green light.';
+              return;
+            }
+          }
+          const speed = phase === 'entry' ? 22 : 8;
+          const n = Math.ceil((dt * speed) / 0.05);
+          for (let i = 0; i < n; i++) e.step((dt * speed) / n);
+          if (phase === 'entry' && e.chuteWindow().why === 'tooSlow') {
+            game.status = 'lost';
+            game.reason = 'You missed the parachute window (Mach 2.2 to 1.1). Tap as soon as the light is green!';
+            return;
+          }
+          if (e.phase === 'failed') {
+            game.status = 'lost';
+            game.reason = 'The capsule hit the ground.';
+            return;
+          }
+          if (e.phase === 'handover') {
+            const hs = e.handoverState();
+            land = landerLevel({
+              g: 3.721,
+              engine: { thrust: 24800, isp: 220, minThrottle: 0.13 },
+              mass: 2100,
+              dry: 1700,
+              z0: hs.alt,
+              vz0: hs.vz,
+              speed: 2.4,
+              holdThrottle: (l) => Math.min(1, (l.mass * (3.721 + 3.2)) / 24800),
+              idleThrottle: 0.13,
+              limits: { vz: 2.5, vx: 2, tilt: 20 },
+              stars: (v) => (v <= 0.9 ? 3 : v <= 1.6 ? 2 : 1),
+              surface: 'mars',
+              crane: true,
+            });
+            phase = 'land';
+          }
+          return;
+        }
+        land.update(dt, input);
+        game.burning = input.hold;
+        if (land.status !== 'play') {
+          game.status = land.status;
+          game.stars = land.stars;
+          game.reason = land.reason;
+          game.result = land.status === 'won' ? ['Touchdown on Mars!', ...land.result] : [];
+        }
+      },
+      hud() {
+        if (phase === 'land') return land.hud();
+        const w = e.chuteWindow();
+        return {
+          fuel: null,
+          info: [['Speed', `Mach ${e.mach.toFixed(1)}`], ['Height', `${(e.alt / 1000).toFixed(1)} km`]],
+          light: phase === 'entry' ? (w.ok ? 'go' : w.why === 'tooSlow' ? 'late' : 'wait') : 'open',
+        };
+      },
+      scene: () => (phase === 'land' ? land.scene() : { kind: 'edl', phase }),
+      get land() {
+        return land;
+      },
+      bot() {
+        if (phase === 'entry') return { tap: e.chuteWindow().ok && e.mach < 2.0 };
+        if (phase === 'land') return land.bot();
+        return {};
+      },
+    };
+    return game;
+  },
+};
+
+/* ------------------------------------------------------------------ */
+/* 8. Jupiter slingshot (Voyager 2)                                    */
+/* ------------------------------------------------------------------ */
+const L8 = {
+  id: 'slingshot',
+  title: 'Jupiter slingshot',
+  mission: 'Voyager 2',
+  agency: 'NASA',
+  year: 1979,
+  button: 'LAUNCH',
+  control: 'aim+tap',
+  goal: 'Aim so Jupiter’s gravity flings you on to Saturn.',
+  guide: ['Your rocket alone can’t reach Saturn. Borrow speed from Jupiter!', 'Slide to aim, then tap LAUNCH. Watch how Jupiter bends your path, and try again.'],
+  fact: 'Voyager 2 used Jupiter in 1979 to reach Saturn in 1981, then Uranus and Neptune: the Grand Tour.',
+  create() {
+    const mu = MU.sun;
+    const aJ = 5.2026 * AU, aS = 9.5549 * AU;
+    const v0 = Math.sqrt(mu * (2 / AU - 1 / ((AU + 5.6 * AU) / 2)));
+    const AIM = (0.15 * Math.PI) / 180; // slider ±1 → ±0.15° launch direction
+    const launchState = (aim) => {
+      const a = aim * AIM;
+      return { x: AU, y: 0, vx: -v0 * Math.sin(a), vy: v0 * Math.cos(a) };
+    };
+    // 1) Sun-only flight: where/when the path crosses Jupiter's orbit
+    const sunOnly = createWorld({ central: { name: 'sun', mu, R: 695700e3 }, bodies: [], ship: { ...launchState(0), mass: 1, dry: 1, thrust: 0, isp: 1 }, hmax: DAY });
+    while (Math.hypot(sunOnly.y[0], sunOnly.y[1]) < aJ) sunOnly.advance(DAY);
+    const tJ = sunOnly.t, thJ = Math.atan2(sunOnly.y[1], sunOnly.y[0]);
+    const wJ = Math.sqrt((mu + MU.jupiter) / aJ ** 3);
+    // Jupiter a little ahead of the crossing point, so the ship passes behind it and gains speed
+    const jup = { name: 'jupiter', mu: MU.jupiter, R: RADIUS.jupiter, a: aJ, phase0: thJ + 0.012 - wJ * tJ };
+    // 2) with Jupiter: which aims get flung out past Saturn's orbit? Put Saturn where the middle one crosses it.
+    const cross = (aim) => {
+      const pw = createWorld({ central: { name: 'sun', mu, R: 695700e3 }, bodies: [jup], ship: { ...launchState(aim), mass: 1, dry: 1, thrust: 0, isp: 1 }, hmax: DAY });
+      for (let i = 0; i < 1400 && pw.status === 'flying'; i++) {
+        pw.advance(2 * DAY);
+        if (Math.hypot(pw.y[0], pw.y[1]) >= aS) return { t: pw.t, th: Math.atan2(pw.y[1], pw.y[0]) };
+      }
+      return null;
+    };
+    const good = [];
+    for (let a = -1; a <= 1.0001; a += 0.05) if (cross(a)) good.push(a);
+    const ref = good.length ? good[Math.floor(good.length / 2)] : 0;
+    const c = cross(ref) || { t: 1600 * DAY, th: 0 };
+    const tS = c.t, thS = c.th;
+    const wS = Math.sqrt((mu + MU.saturn) / aS ** 3);
+    const sat = { name: 'saturn', mu: MU.saturn, R: RADIUS.saturn, a: aS, phase0: thS - wS * tS };
+    const world = { central: { name: 'sun', mu, R: 695700e3 }, bodies: [jup, sat], ship: { ...launchState(0), mass: 722, dry: 690, thrust: 0, isp: 220 }, hmax: DAY };
+    let launched = false, aim = 0, best = Infinity, launchT = 0;
+    const zone = 0.25 * AU;
+    const g = orbitalGame({
+      world,
+      noFuel: true,
+      dir: 'pro',
+      clock: () => (launched ? 70 : 0) * DAY,
+      clockR: () => 0,
+      horizon: () => (launched ? 2 * 365 * DAY : tS * 1.05),
+      trailStep: 5e9,
+      beforeStep(gg, input) {
+        gg.noEngine = true;
+        if (!launched) {
+          aim = input.aim ?? 0;
+          const s = launchState(aim);
+          gg.w.y[0] = s.x;
+          gg.w.y[1] = s.y;
+          gg.w.y[2] = s.vx;
+          gg.w.y[3] = s.vy;
+          gg.w.t = 0;
+          if (input.tap) {
+            launched = true;
+            launchT = 0;
+            gg.launched = true;
+          }
+          gg.predAt = -1; // refresh the dotted path as the aim changes
+        }
+      },
+      check(gg) {
+        if (!launched) return;
+        const s = gg.w.rel('saturn');
+        const d = Math.hypot(s.x, s.y);
+        // inside the zone: judge at the closest pass (when the distance starts growing again)
+        if (best < zone && d > best) return gg.win(best < 0.06 * AU ? 3 : best < 0.13 * AU ? 2 : 1, ['Saturn reached!', `Closest pass: ${(best / AU).toFixed(3)} AU (${fmtKm(best)})`]);
+        best = Math.min(best, d);
+        const r = Math.hypot(gg.w.y[0], gg.w.y[1]);
+        if (gg.w.t - launchT > tS * 1.25 || r > aS * 1.6) return gg.lose(`Missed Saturn by ${(best / AU).toFixed(2)} AU. Change your aim a little and try again.`);
+      },
+      onHit: (gg, b) => gg.lose(b === 'sun' ? 'Lost in the Sun!' : `You crashed into ${b[0].toUpperCase() + b.slice(1)}! Change your aim a little.`),
+      info(gg) {
+        return launched ? [['Year', `${(1977 + (gg.w.t - launchT) / (365.25 * DAY)).toFixed(1)}`], ['To Saturn', `${(Math.hypot(gg.w.rel('saturn').x, gg.w.rel('saturn').y) / AU).toFixed(2)} AU`]] : [['Aim', `${(aim * 0.15).toFixed(3)}°`], ['Goal', 'reach Saturn']];
+      },
+      scene: (gg) => ({ central: 'sun', bodies: ['jupiter', 'saturn'], showOrbit: ['jupiter', 'saturn'], rings: [{ body: 'saturn', r: zone, label: 'Saturn zone', fixedPx: false }], predShort: !launched, focus: [[aS * 1.05, 0], [-aS * 1.05, 0], [0, aS * 1.05], [0, -aS * 1.05]], minR: { sun: 8, jupiter: 7, saturn: 6 } }),
+      bot(gg) {
+        return { aim: ref, tap: !launched && gg.realT > 0.3 };
+      },
+    });
+    g.refAim = ref;
+    return g;
+  },
+};
+
+export const CHAPTERS = [
+  { id: 'moon', title: 'To the Moon', levels: ['raise', 'moonshot', 'catchmoon', 'vikram'] },
+  { id: 'mars', title: 'Mars & beyond', levels: ['window', 'marscapture', 'terror', 'slingshot'] },
+];
+export const LEVELS = [L1, L2, L3, L4, L5, L6, L7, L8];
+export const levelById = (id) => LEVELS.find((l) => l.id === id);

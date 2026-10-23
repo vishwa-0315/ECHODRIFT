@@ -1,31 +1,27 @@
-/** Home: real-time sky clock, real missions, discovery labs, Solar System explorer. */
+/** Home: Vyom says hello, one big PLAY button, the level tiles, badges and extras. */
 import { h, fitCanvas } from '../dom.js';
-import { utc } from '../fmt.js';
 import { starField, drawBody } from '../render.js';
 import { helioState } from '../../core/ephem.js';
 import { AU } from '../../core/constants.js';
+import { LEVELS, CHAPTERS, levelById } from '../../arcade/levels.js';
+import { progress } from '../../game/progress.js';
+import { guide } from '../guide.js';
+import { setAudio, setMood, startMusic, sfx, unlockAudio } from '../audio.js';
 
-export const LABS = [
-  { id: 'galileo', year: 1610, title: 'Weigh Jupiter like Galileo', who: 'Galileo Galilei · Kepler’s 3rd law', desc: 'Track Io across real nights and use its orbit to measure Jupiter’s mass.' },
-  { id: 'exoplanet', year: 1995, title: 'Find the first exoplanet', who: 'Mayor & Queloz · Nobel Prize 2019', desc: 'Fit the wobble of the star 51 Pegasi and discover a hot Jupiter.' },
-  { id: 'gw', year: 2015, title: 'Hear two black holes collide', who: 'LIGO · GW150914', desc: 'Match the “chirp” of gravitational waves and weigh the black holes.' },
-  { id: 'blackhole', year: 2019, title: 'Weigh the black hole in M87', who: 'Event Horizon Telescope', desc: 'Measure the shadow in the first black-hole image to find its mass.' },
-];
+const ICON = { raise: '🛰️', moonshot: '🌙', catchmoon: '🎯', vikram: '🛬', window: '🪐', marscapture: '🔴', terror: '🪂', slingshot: '☄️' };
 
-export function homeScreen(app) {
-  const missions = app.content.missions;
+export function homeScreen(app, params = {}) {
+  const prog = progress(app);
   const sky = h('canvas', { 'aria-hidden': 'true' });
-  const clock = h('div.clock');
-  const stars = starField(500, 3);
+  const stars = starField(380, 3);
   let raf = 0;
   const draw = () => {
     const { w, h: hh, ctx } = fitCanvas(sky);
     ctx.fillStyle = '#04060b';
     ctx.fillRect(0, 0, w, hh);
     stars(ctx, w, hh);
-    // real inner Solar System right now (top-down, Sun at right)
     const now = new Date();
-    const cx = w * 0.84, cy = hh * 0.5, s = Math.min(w * 0.15, hh * 0.36) / (1.6 * AU);
+    const cx = w * 0.82, cy = hh * 0.5, s = Math.min(w * 0.15, hh * 0.36) / (1.6 * AU);
     ctx.strokeStyle = 'rgba(141,156,181,0.18)';
     for (const r of [0.387, 0.723, 1, 1.524]) {
       ctx.beginPath();
@@ -37,62 +33,86 @@ export function homeScreen(app) {
       const p = helioState(b, now);
       const x = cx + p.x * s, y = cy - p.y * s;
       drawBody(ctx, b, x, y, b === 'earth' ? 4 : 3, Math.atan2(cy - y, cx - x), { minR: 3 });
-      if (b === 'earth') {
-        ctx.fillStyle = '#4cc9f0';
-        ctx.font = '11px Inter, system-ui, sans-serif';
-        ctx.fillText('Earth', x - 12, y - 8);
-      }
     }
-    clock.textContent = utc(now) + ' · planets at their real positions';
   };
-  const done = (id) => app.save.missions[id]?.stars || 0;
-  const card = (m) =>
-    h(
-      'button.mcard',
-      { 'data-testid': 'mission-' + m.id, onclick: () => app.go('briefing', { id: m.id }) },
-      h('div.yr', { 'aria-hidden': 'true' }, String(m.year)),
-      h('div.row', h('span.chip.' + (m.agency.startsWith('ISRO') ? 'isro' : 'nasa'), m.agency), h('span.diff', '●'.repeat(m.difficulty) + '○'.repeat(3 - m.difficulty))),
-      h('div.t', m.title),
-      h('div.d', m.goal),
-      h('div.foot', h('span.small.muted', m.craft), done(m.id) ? h('span.stars', { 'aria-label': `${done(m.id)} stars` }, '★'.repeat(done(m.id)) + '☆'.repeat(3 - done(m.id))) : h('span.small.muted', 'Not flown')),
+  const total = prog.total();
+  const next = prog.nextLevel();
+  const g = guide({ compact: true });
+
+  const tile = (L, i) => {
+    const open = prog.unlocked(L.id);
+    const st = prog.stars(L.id);
+    return h(
+      'button.level-tile' + (open ? '' : '.locked') + (next?.id === L.id ? '.next' : ''),
+      { 'data-testid': 'level-' + L.id, disabled: !open, onclick: () => (sfx.tap(), app.go('play', { id: L.id })), 'aria-label': `Level ${i + 1}: ${L.title}${open ? `, ${st} stars` : ', locked'}` },
+      h('div.lt-num', open ? String(i + 1) : '🔒'),
+      h('div.lt-icon', { 'aria-hidden': 'true' }, ICON[L.id]),
+      h('div.lt-title', L.title),
+      h('div.lt-mission', `${L.mission} · ${L.year}`),
+      h('div.lt-stars', open ? '★'.repeat(st) + '☆'.repeat(3 - st) : 'Finish the level before'),
     );
-  const isro = missions.filter((m) => m.agency.startsWith('ISRO'));
-  const other = missions.filter((m) => !m.agency.startsWith('ISRO'));
-  const labCard = (l) =>
-    h(
-      'button.mcard',
-      { 'data-testid': 'lab-' + l.id, onclick: () => app.go('lab', { id: l.id }) },
-      h('div.yr', { 'aria-hidden': 'true' }, String(l.year)),
-      h('div.row', h('span.chip', 'Discovery lab')),
-      h('div.t', l.title),
-      h('div.d', l.desc),
-      h('div.foot', h('span.small.muted', l.who), app.save.labs[l.id] ? h('span.ok.small', '✓ Done') : h('span.small.muted', 'Open')),
-    );
+  };
+
+  const musicBtn = h('button.btn.icon.sm.ghost', { 'aria-label': 'Music on or off', onclick: () => toggle('music') });
+  const soundBtn = h('button.btn.icon.sm.ghost', { 'aria-label': 'Sound effects on or off', onclick: () => toggle('sound') });
+  const paintToggles = () => {
+    musicBtn.textContent = app.settings.music === false ? '🎵̸' : '🎵';
+    musicBtn.classList.toggle('off', app.settings.music === false);
+    soundBtn.textContent = app.settings.sound === false ? '🔇' : '🔊';
+  };
+  function toggle(k) {
+    unlockAudio();
+    app.setSetting(k, app.settings[k] === false);
+    setAudio({ music: app.settings.music !== false, sounds: app.settings.sound !== false });
+    if (k === 'music' && app.settings.music !== false) startMusic('menu');
+    paintToggles();
+    sfx.tap();
+  }
+  paintToggles();
+
   const el = h(
-    'div.screen',
+    'div.screen.home',
     h(
       'div.hero',
       sky,
-      h('div.inner', h('div.label', 'Real missions · real physics'), h('h1', 'Launch Window'), h('p', { style: { maxWidth: '40ch' } }, 'Fly the real missions of ISRO, NASA and others, with real gravity, real planet positions and real rocket engines. No made-up worlds.'), clock),
+      h('div.home-toggles', musicBtn, soundBtn),
+      h('div.inner', h('div.label', 'Real missions · real physics'), h('h1', 'Launch Window'), h('p.tagline', 'Fly India’s and NASA’s real space missions. Every orbit and landing follows the real laws of physics.')),
     ),
-    h('div.row.wrap', h('button.btn.primary', { onclick: () => app.go('explorer') }, '🪐 Solar System now'), h('button.btn', { onclick: () => app.go('about') }, 'How the physics works')),
-    h('div.section', h('h3', 'ISRO missions'), h('span.small.muted', 'India’s journey to the Moon, Mars and the Sun')),
-    h('div.cards', isro.map(card)),
-    h('div.section', h('h3', 'NASA history'), h('span.small.muted', 'Missions that changed exploration')),
-    h('div.cards', other.map(card)),
-    h('div.section', h('h3', 'Discovery labs'), h('span.small.muted', 'Real data, real formulas')),
-    h('div.cards', LABS.map(labCard)),
-    h('p.small.muted', { style: { marginTop: '18px' } }, 'For all ages: younger players can let ✦ Mission Assist plan every burn. Every mission shows its real history and sources, and states every simplification.'),
+    g.el,
+    h(
+      'div.play-row',
+      next
+        ? h('button.btn.primary.play-btn', { 'data-testid': 'play', onclick: () => (unlockAudio(), sfx.tap(), app.go('play', { id: next.id })) }, h('span', '▶ PLAY'), h('span.small', `Level ${LEVELS.indexOf(next) + 1}: ${next.title}`))
+        : h('button.btn.primary.play-btn', { onclick: () => app.go('play', { id: LEVELS[0].id }) }, h('span', '▶ PLAY AGAIN'), h('span.small', 'Can you get 3 stars everywhere?')),
+      h('div.star-total', { 'aria-label': `${total} of ${LEVELS.length * 3} stars` }, h('span.big', `★ ${total}`), h('span.small.muted', `of ${LEVELS.length * 3}`)),
+    ),
+    CHAPTERS.map((c) => [h('div.section', h('h3', c.id === 'moon' ? '🌙 ' + c.title : '🔴 ' + c.title)), h('div.level-grid', c.levels.map((id) => tile(levelById(id), LEVELS.findIndex((l) => l.id === id))))]),
+    h(
+      'div.home-more',
+      h('button.btn', { onclick: () => app.go('hangar'), 'data-testid': 'hangar' }, `🏅 Badges & rockets (${Object.keys(prog.data.badges).length})`),
+      h('button.btn', { onclick: () => app.go('explorer') }, '🔭 Solar System now'),
+      h('button.btn', { onclick: () => app.go('expert'), 'data-testid': 'expert' }, '🛰️ Expert missions & labs'),
+      h('button.btn.ghost', { onclick: () => app.go('about') }, 'How the physics works'),
+    ),
+    h('p.small.muted', { style: { marginTop: '14px' } }, 'For all ages. Every level uses real gravity, real engines and real mission data. Stuck? Vyom can show you how.'),
   );
+
   return {
     el,
     mounted() {
-      const loop = () => {
-        draw();
-        raf = setTimeout(loop, 1000);
-      };
-      loop();
+      draw();
+      raf = setInterval(draw, 1000);
+      setMood('menu');
+      const first = !total && !Object.keys(prog.data.tries).length;
+      const lines = params.finished
+        ? ['You finished every level! 🎉', 'Try for 3 stars everywhere, or take on the Expert missions.']
+        : first
+          ? ['Namaste! I’m Vyom, your mission buddy. 🚀', 'Each level is a real space mission. One button, real physics.', 'Press PLAY to start!']
+          : next
+            ? [`Welcome back! Next up: ${next.title}.`]
+            : ['Every level done! Can you get 3 stars on all of them?'];
+      setTimeout(() => g.say(lines, 'happy'), 250);
     },
-    destroy: () => clearTimeout(raf),
+    destroy: () => clearInterval(raf),
   };
 }

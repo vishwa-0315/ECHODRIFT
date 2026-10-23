@@ -6,26 +6,19 @@
 Launch Window teaches how spaceflight really works. Players fly real missions on their real dates, under the same laws of physics the engineers faced. There are no invented worlds and no scripted outcomes: a wrong burn means a miss, a crash or an empty tank, just as in reality.
 
 ## Target audience
-All ages, from about 10 to adult. Beginners press **Mission Assist** to have each burn planned for them. Advanced players plan burns themselves from the predicted trajectory. Students get a hands-on feel for orbits, fuel limits and astronomy.
+All ages. Quick play needs one button and no prior knowledge. Expert mode challenges older students and adults. Students get a hands-on feel for orbits, fuel limits and astronomy.
 
 ## Core mechanics
-- **Orbital missions:**
-  - Chandrayaan-3: orbit raising, lunar transfer and capture.
-  - Mangalyaan: choose a launch window on a porkchop plot, then the Mars capture burn.
-  - Aditya-L1: station-keeping at the unstable Sun–Earth L1 point.
-  - Apollo 13: get the crew home inside the re-entry corridor.
-  - Voyager 2: the Jupiter flyby that reaches Saturn.
-- **Burn planning:** choose when, how hard and which way to fire. The dashed path shows exactly what will happen.
-- **Landings:**
-  - Apollo 11 and Vikram: powered descents with real thrust and fuel.
-  - Perseverance: steer the entry with lift, open the parachute inside its real Mach window, then the sky-crane landing.
-- **Discovery labs:**
-  - Weigh Jupiter from Io's orbit (Galileo, 1610).
-  - Find 51 Pegasi b from its star's wobble (1995).
-  - Weigh the GW150914 black holes from the chirp (2015).
-  - Weigh M87* from its shadow (2019).
-- **Solar System explorer:** real planet positions on any date within ±10 years, and the next real Mars launch window.
-- **Scoring:** one to three stars for success, fuel saved and matching history. Every mission ends with what really happened, and its sources.
+- **Quick play:** 8 short levels (30–60 s), each with one big button:
+  - Hold BOOST to raise Chandrayaan-3's orbit, then stretch the path to the Moon.
+  - Hold BRAKE to be captured by the Moon, then by Mars.
+  - Hold ENGINE to land Vikram softly.
+  - Tap LAUNCH in the real Mars launch window.
+  - Tap PARACHUTE in Perseverance's Mach window, then land.
+  - Aim a Jupiter slingshot to reach Saturn.
+- **The dotted line** always shows where you will go.
+- **Fun layer:** Vyom, a robot guide, gives tips and can fly a level for you. Stars, badges, rocket colours, music and a quiz card after every level.
+- **Expert mode:** full missions on their real dates, planning every burn, plus four discovery labs (Galileo's Jupiter, 51 Pegasi b, GW150914, M87*).
 
 ## Educational relevance
 - **Gravity:** Newton's gravity from every relevant body, with planets and the Moon at their real positions on each mission's dates.
@@ -37,11 +30,12 @@ All ages, from about 10 to adult. Beginners press **Mission Assist** to have eac
   - Lambert's problem, which is how launch windows are found
 - **Atmospheric entry:** the NASA Glenn Mars atmosphere model, Mach number, dynamic pressure, heating and parachute limits.
 - **Honesty:** the game states every simplification. For example, it is 2D, so Aditya-L1's halo orbit appears as its planar cousin, a Lyapunov orbit.
-- **Proven playable:** an automatic test flies every mission with the real fuel load. The player's Chandrayaan-3 can reach lunar orbit on 5 August 2023, the real date.
+- **Proven playable:** automatic tests win every level and every mission with the real physics and real fuel.
 
 ## Tech stack
 - **Code:** HTML5 Canvas and JavaScript, bundled by esbuild into one file that works fully offline.
 - **Physics engine:** written for the game, with an adaptive Dormand–Prince integrator, finite burns, a Lambert solver, and lander and entry models.
 - **Planet positions:** astronomy-engine (VSOP87).
 - **Android:** Capacitor. GitHub Actions builds the APK, and the web version is on GitHub Pages.
-- **Testing:** 21 physics unit tests, an autopilot that proves every mission can be completed, and a Playwright test that plays every screen at phone size.
+- **Testing:** 33 unit tests (orbits, rocket equation, every level winnable) and a Playwright test that plays every screen at phone size.
+- **Sound:** music and effects synthesised live with Web Audio.

@@ -32,7 +32,7 @@ export function briefingScreen(app, { id }) {
   };
   const el = h(
     'div.screen',
-    h('div.topbar', h('button.btn.icon.ghost', { 'aria-label': 'Back', onclick: () => app.go('home') }, '←'), h('h2', m.title)),
+    h('div.topbar', h('button.btn.icon.ghost', { 'aria-label': 'Back', onclick: () => app.go('expert') }, '←'), h('h2', m.title)),
     h('div.row.wrap', h('span.chip.' + (m.agency.startsWith('ISRO') ? 'isro' : 'nasa'), m.agency), h('span.chip', m.date.slice(0, 10)), h('span.chip', m.crew)),
     h('div.story', { style: { marginTop: '12px' } }, m.story.map((s) => h('p', s))),
     h('div.panel', { style: { margin: '6px 0 12px', borderColor: 'var(--accent)' } }, h('div.label.accent', 'Your mission'), h('p', { style: { margin: '4px 0 0', fontSize: '1.05rem' } }, m.goal)),

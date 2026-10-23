@@ -41,7 +41,7 @@ export function landerScreen(app, { id, handover }) {
   const el = h(
     'div.screen.full',
     h('div.view', canvas),
-    h('div.hud-tl', h('div.row', h('button.btn.icon.sm', { 'aria-label': 'Back', onclick: () => app.go('home') }, '←'), h('div.label', m.title)), tele),
+    h('div.hud-tl', h('div.row', h('button.btn.icon.sm', { 'aria-label': 'Back', onclick: () => app.go('expert') }, '←'), h('div.label', m.title)), tele),
     h('div.throttle', h('div.label', 'Thrust'), thr, thrLbl),
     callout,
     h(
@@ -148,7 +148,7 @@ export function landerScreen(app, { id, handover }) {
     if (v === 'retry') {
       if (mars) app.go('edl', { id });
       else init();
-    } else app.go('home');
+    } else app.go('expert');
   }
 
   /* ---------- drawing ---------- */

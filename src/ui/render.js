@@ -94,9 +94,19 @@ function sphere(body, size, lightAng, lon0 = 0) {
           B = tex.data[ti + 2];
         } else {
           // banded procedural colouring (gas giants have bands; rocky worlds mottled)
-          const band = body === 'jupiter' || body === 'saturn' ? Math.floor((lat + 1.6) * 7 + Math.sin(lon * 3) * 0.3) : Math.floor((Math.sin(lon * 5 + lat * 7) + Math.sin(lat * 11) + 2) * 1.2);
-          const cc = cols[((band % cols.length) + cols.length) % cols.length];
-          [R, G, B] = cc;
+          if (body === 'jupiter' || body === 'saturn') {
+            const band = Math.floor((lat + 1.6) * 7 + Math.sin(lon * 3) * 0.3);
+            [R, G, B] = cols[((band % cols.length) + cols.length) % cols.length];
+          } else {
+            // rocky worlds: smooth mottling between the light and dark tones (+ Mars polar caps)
+            const n = 0.5 + 0.22 * Math.sin(lon * 3 + lat * 5) + 0.14 * Math.sin(lat * 9 - lon * 2 + 1) + 0.08 * Math.sin(lon * 11 + lat * 3);
+            const a = cols[0], b = cols[1] || cols[0];
+            const t = Math.max(0, Math.min(1, n));
+            R = a[0] * (1 - t) + b[0] * t;
+            G = a[1] * (1 - t) + b[1] * t;
+            B = a[2] * (1 - t) + b[2] * t;
+            if (body === 'mars' && Math.abs(lat) > 1.32) R = G = B = 235;
+          }
         }
         const lam = Math.max(0, (nx * L[0] + ny * L[1] + nz * L[2]) / ln);
         const lit = 0.06 + 0.94 * Math.pow(lam, 0.9);

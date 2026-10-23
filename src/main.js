@@ -12,13 +12,21 @@ import { edlScreen } from './ui/screens/edl.js';
 import { labScreen } from './ui/screens/lab.js';
 import { explorerScreen } from './ui/screens/explorer.js';
 import { aboutScreen } from './ui/screens/about.js';
+import { expertScreen } from './ui/screens/expert.js';
+import { playScreen } from './ui/screens/play.js';
+import { hangarScreen } from './ui/screens/hangar.js';
+import { setAudio, unlockAudio } from './ui/audio.js';
 
-const screens = { home: homeScreen, briefing: briefingScreen, orbital: orbitalScreen, porkchop: porkchopScreen, lander: landerScreen, edl: edlScreen, lab: labScreen, explorer: explorerScreen, about: aboutScreen };
+const screens = { home: homeScreen, expert: expertScreen, play: playScreen, hangar: hangarScreen, briefing: briefingScreen, orbital: orbitalScreen, porkchop: porkchopScreen, lander: landerScreen, edl: edlScreen, lab: labScreen, explorer: explorerScreen, about: aboutScreen };
 
 async function boot() {
   const root = document.getElementById('app');
   await loadTextures();
   const app = createApp(root, { missions, design }, screens);
+  setAudio({ music: app.settings.music !== false, sounds: app.settings.sound !== false });
+  // browsers only allow sound after the first touch
+  document.addEventListener('pointerdown', unlockAudio, { passive: true });
+  document.addEventListener('keydown', unlockAudio);
   const deep = location.hash.slice(1);
   if (deep && missions.some((m) => m.id === deep)) app.go('briefing', { id: deep });
   else app.go('home');
@@ -26,6 +34,7 @@ async function boot() {
     window.Capacitor?.Plugins?.App?.addListener('backButton', () => {
       if (root.querySelector('.overlay')) return;
       if (app.currentName === 'home') window.Capacitor.Plugins.App.minimizeApp?.();
+      else if (['briefing', 'orbital', 'porkchop', 'lander', 'edl', 'lab'].includes(app.currentName)) app.go('expert');
       else app.go('home');
     });
   } catch {

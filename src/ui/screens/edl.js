@@ -27,7 +27,7 @@ export function edlScreen(app, { id }) {
   const el = h(
     'div.screen.full',
     h('div.view', canvas),
-    h('div.hud-tl', h('div.row', h('button.btn.icon.sm', { 'aria-label': 'Back', onclick: () => app.go('home') }, '←'), h('div.label', m.title)), tele),
+    h('div.hud-tl', h('div.row', h('button.btn.icon.sm', { 'aria-label': 'Back', onclick: () => app.go('expert') }, '←'), h('div.label', m.title)), tele),
     h(
       'div.dock',
       h('div.row.wrap', h('span.label', 'Lift down'), lift, h('span.label', 'Lift up')),
@@ -70,7 +70,7 @@ export function edlScreen(app, { id }) {
       { label: 'Try again', cls: 'primary', value: 'retry' },
     ]);
     if (v === 'retry') init();
-    else app.go('home');
+    else app.go('expert');
   }
   function frame(now) {
     raf = requestAnimationFrame(frame);

@@ -4,12 +4,12 @@ import { jupiterMoonsSky } from '../../core/ephem.js';
 import { keplerMass, rvMinMass, chirpFrequency, chirpMassOf } from '../../core/labs.js';
 import { G, C, MSUN, MJUP, DAY, PC, LY } from '../../core/constants.js';
 import { sci } from '../fmt.js';
-import { LABS } from './home.js';
+import { LABS } from './expert.js';
 
 export function labScreen(app, { id }) {
   const meta = LABS.find((l) => l.id === id);
   const body = h('div.col');
-  const el = h('div.screen', h('div.topbar', h('button.btn.icon.ghost', { 'aria-label': 'Back', onclick: () => app.go('home') }, '←'), h('h2', meta.title)), h('div.label', meta.who), body);
+  const el = h('div.screen', h('div.topbar', h('button.btn.icon.ghost', { 'aria-label': 'Back', onclick: () => app.go('expert') }, '←'), h('h2', meta.title)), h('div.label', meta.who), body);
   const labs = { galileo, exoplanet, gw, blackhole };
   let cleanup = () => {};
   const finish = async (title, lines, real) => {
@@ -18,7 +18,7 @@ export function labScreen(app, { id }) {
     app.beep(523, 0.15);
     setTimeout(() => app.beep(784, 0.25), 160);
     await app.modal(h('div', h('h2.ok', title), lines.map((l) => h('p', l)), h('p.small.muted', real)), [{ label: 'Back to missions', cls: 'primary', value: 1 }]);
-    app.go('home');
+    app.go('expert');
   };
 
   /* ------------------------------------------------------------------ */

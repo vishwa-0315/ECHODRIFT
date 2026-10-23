@@ -111,7 +111,7 @@ export function orbitalScreen(app, { id, choice = {} }) {
       { label: 'Stay', value: false },
       { label: 'Leave', cls: 'danger', value: true },
     ]);
-    if (v) app.go('home');
+    if (v) app.go('expert');
   }
   function renderFoci() {
     clear(focusSeg);
@@ -416,7 +416,7 @@ export function orbitalScreen(app, { id, choice = {} }) {
       ],
     );
     if (v === 'retry') init();
-    else app.go('home');
+    else app.go('expert');
   }
 
   /* ---------- drawing ---------- */
