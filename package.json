@@ -1,34 +1,32 @@
 {
-  "name": "echo-drift",
+  "name": "launch-window",
   "version": "1.0.0",
-  "description": "ECHO DRIFT: an educational space-mystery game for ages 10-16",
+  "description": "",
+  "main": "index.js",
   "scripts": {
     "test": "node --test tests/*.test.js",
-    "lint": "node tools/validate_content.mjs",
     "build": "node tools/build.mjs",
-    "solve": "node tools/solve_levels.mjs",
-    "balance": "node tools/balance_colony.mjs",
+    "design": "node tools/design_missions.mjs",
+    "solve": "node tools/solve_missions.mjs && node tools/solve_landings.mjs",
     "e2e": "node tools/e2e.mjs e2e-shots",
-    "notes": "node tools/export_science_notes.mjs",
-    "android:add": "npx cap add android",
     "android:sync": "npm run build && npx cap sync android",
     "android:open": "npx cap open android"
   },
   "keywords": [],
   "author": "",
-  "license": "UNLICENSED",
-  "devDependencies": {
-    "@capacitor/cli": "8.4.3",
-    "@fontsource/atkinson-hyperlegible": "^5.1.0",
-    "@fontsource/opendyslexic": "^5.3.0",
-    "esbuild": "^0.24.0",
-    "playwright-core": "^1.48.2"
-  },
+  "license": "ISC",
   "type": "module",
   "private": true,
   "dependencies": {
-    "@capacitor/android": "8.4.3",
+    "@capacitor/android": "^8.4.3",
     "@capacitor/app": "^8.1.1",
-    "@capacitor/core": "8.4.3"
+    "@capacitor/core": "^8.4.3",
+    "astronomy-engine": "^2.1.19"
+  },
+  "devDependencies": {
+    "@capacitor/cli": "^8.4.3",
+    "@fontsource/inter": "^5.1.0",
+    "esbuild": "^0.24.0",
+    "playwright-core": "^1.48.2"
   }
 }

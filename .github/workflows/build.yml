@@ -1,0 +1,86 @@
+# Builds Launch Window on GitHub's servers on every push to main:
+#  1. runs the physics tests and proves every mission is flyable with real fuel,
+#  2. builds the Android APK and publishes it as a GitHub Release ("Launch Window build N"),
+#  3. publishes the playable web version to the gh-pages branch (GitHub Pages).
+name: Build APK and web version
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+
+      - name: Install
+        run: npm ci
+
+      - name: Physics tests
+        run: npm test
+
+      - name: Prove every mission is flyable (autopilot, real fuel)
+        run: npm run solve
+
+      - name: Build game (single offline HTML) and copy into Android project
+        run: npm run build && npx cap sync android
+
+      - name: Build APK
+        working-directory: android
+        run: |
+          chmod +x gradlew
+          ./gradlew assembleDebug --no-daemon
+
+      - name: Rename APK
+        run: cp android/app/build/outputs/apk/debug/app-debug.apk LaunchWindow-build${{ github.run_number }}.apk
+
+      - name: Upload APK (download from this run's page)
+        uses: actions/upload-artifact@v4
+        with:
+          name: LaunchWindow-apk
+          path: LaunchWindow-*.apk
+
+      - name: Publish release (APK download for phones)
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: lw-build-${{ github.run_number }}
+          name: Launch Window build ${{ github.run_number }}
+          target_commitish: ${{ github.sha }}
+          make_latest: true
+          files: |
+            LaunchWindow-*.apk
+            dist/launch-window.html
+          body: |
+            **Install on Android:** download `LaunchWindow-build${{ github.run_number }}.apk` on your phone, open it, and allow "Install unknown apps" when asked. Android 7.0 or newer.
+            **Play in a browser:** https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/ (or download `launch-window.html`, which works offline).
+            This is a debug-signed build, fine for testing and judging; use a signed release AAB for Google Play.
+
+      - name: Prepare web version
+        run: |
+          mkdir -p site
+          cp dist/index.html site/index.html
+          cp assets/icon-512.png site/icon-512.png
+          touch site/.nojekyll
+
+      - name: Publish web version to gh-pages
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./site
+          publish_branch: gh-pages
+          force_orphan: true

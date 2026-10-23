@@ -1,7 +1,9 @@
 node_modules/
 e2e-shots/
+dist/
 android/app/build/
 android/build/
 android/.gradle/
 android/local.properties
 *.keystore
+www/

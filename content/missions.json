@@ -1,0 +1,791 @@
+[
+  {
+    "id": "apollo11",
+    "kind": "lander",
+    "agency": "NASA",
+    "year": 1969,
+    "date": "1969-07-20T20:17:40Z",
+    "title": "Apollo 11: The Eagle Has Landed",
+    "craft": "Lunar Module Eagle (LM-5)",
+    "crew": "Neil Armstrong, Buzz Aldrin (Michael Collins in orbit aboard Columbia)",
+    "difficulty": 1,
+    "story": [
+      "20 July 1969. Eagle is descending toward the Sea of Tranquility when the guidance computer flashes program alarms 1202 and 1201. Mission Control decides it's safe to continue.",
+      "Close to the surface, Neil Armstrong sees that the computer is steering them into a boulder field around a crater. He takes semi-manual control and flies on, looking for a clear spot.",
+      "In Houston, Charlie Duke calls out fuel: \"60 seconds\"… \"30 seconds\". That's the time left before they must land or abort."
+    ],
+    "goal": "Fly past the boulder field and touch down gently before you run out of fuel.",
+    "physics": {
+      "g": 1.62,
+      "engine": {
+        "name": "Descent Propulsion System",
+        "thrust": 45040,
+        "isp": 305,
+        "minThrottle": 0.1,
+        "maxThrottle": 0.6
+      },
+      "mass": 7600,
+      "dryMass": 6930,
+      "start": {
+        "x": -120,
+        "z": 152,
+        "vx": 13,
+        "vz": -4,
+        "pitch": -10
+      },
+      "pitchRate": 10,
+      "maxPitch": 45,
+      "limits": {
+        "vz": 3.0,
+        "vx": 1.2,
+        "tilt": 12
+      },
+      "footprint": 4.5,
+      "bingoReserveSeconds": 20,
+      "callouts": [
+        60,
+        30
+      ],
+      "target": {
+        "x0": 300,
+        "x1": 520
+      },
+      "terrain": {
+        "base": 0,
+        "craters": [
+          {
+            "x": 120,
+            "r": 90,
+            "depth": 18,
+            "rim": 3
+          },
+          {
+            "x": 420,
+            "r": 8,
+            "depth": 1.2,
+            "rim": 0.3
+          },
+          {
+            "x": 610,
+            "r": 30,
+            "depth": 5,
+            "rim": 1
+          }
+        ],
+        "boulders": [
+          {
+            "x": 20,
+            "r": 2.5
+          },
+          {
+            "x": 45,
+            "r": 3
+          },
+          {
+            "x": 70,
+            "r": 2
+          },
+          {
+            "x": 95,
+            "r": 4
+          },
+          {
+            "x": 150,
+            "r": 3.5
+          },
+          {
+            "x": 175,
+            "r": 2.5
+          },
+          {
+            "x": 200,
+            "r": 3
+          },
+          {
+            "x": 228,
+            "r": 2
+          },
+          {
+            "x": 255,
+            "r": 2.5
+          },
+          {
+            "x": 560,
+            "r": 2.5
+          },
+          {
+            "x": 585,
+            "r": 3
+          }
+        ]
+      },
+      "surface": "moon"
+    },
+    "history": "Eagle touched down at 20:17:40 UTC on 20 July 1969, a few hundred metres beyond West crater. Post-flight analysis estimated roughly 45 seconds of fuel remained before the abort deadline, more than the \"30 seconds\" called at the time, because propellant sloshing had fooled the low-level sensor.",
+    "facts": [
+      "The descent engine was the first throttleable rocket engine flown in space.",
+      "Lunar gravity is about one-sixth of Earth's, so hovering burns far less fuel than it would on Earth."
+    ],
+    "sources": [
+      {
+        "title": "Descent propulsion system (thrust, throttle range, Isp)",
+        "url": "https://en.wikipedia.org/wiki/Descent_propulsion_system"
+      },
+      {
+        "title": "NASA: 50 Years Ago, One Small Step",
+        "url": "https://www.nasa.gov/feature/50-years-ago-one-small-step-one-giant-leap"
+      }
+    ],
+    "approximate": [
+      "Lander mass and fuel at the start of this final approach are estimates for gameplay; the engine figures are the real DPS values."
+    ]
+  },
+  {
+    "id": "apollo13",
+    "kind": "orbital",
+    "agency": "NASA",
+    "year": 1970,
+    "date": "1970-04-14T03:08:00Z",
+    "title": "Apollo 13: Get Them Home",
+    "craft": "Odyssey (CSM) + Aquarius (LM)",
+    "crew": "Jim Lovell, Jack Swigert, Fred Haise",
+    "difficulty": 3,
+    "story": [
+      "14 April 1970, 55 h 54 min into the flight. An oxygen tank in the Service Module explodes. The Moon landing is off; now the only goal is getting three astronauts home alive.",
+      "The ship is on a \"hybrid\" trajectory that skims about 110 km above the Moon and would then miss Earth completely. The crew must burn the Lunar Module's descent engine to get back onto a free-return path, one where the Moon's gravity swings them home.",
+      "They must hit Earth's atmosphere at just the right angle. Too steep and they burn up; too shallow and they skip off into space."
+    ],
+    "goal": "Burn the LM descent engine to reach Earth's entry corridor: −7.4° to −5.3° at 121.9 km altitude.",
+    "physics": {
+      "central": "earth",
+      "perturbers": [
+        "moon",
+        "sun"
+      ],
+      "span": 6,
+      "ship": {
+        "name": "Apollo 13 stack (LM descent engine)",
+        "wetMass": 44000,
+        "dryMass": 35800,
+        "engine": {
+          "name": "LM Descent Propulsion System",
+          "thrust": 18016,
+          "isp": 305
+        }
+      },
+      "entryInterface": {
+        "body": "earth",
+        "altitude": 121920,
+        "stop": true
+      },
+      "corridor": [
+        -7.4,
+        -5.3
+      ]
+    },
+    "history": "At 61 h 29 min the crew burned the LM descent engine for about 35 s (≈ 11.6 m/s) to restore a free return. After swinging around the Moon they made the \"PC+2\" burn (≈ 262 m/s) to speed the trip home. Odyssey splashed down in the Pacific on 17 April 1970.",
+    "facts": [
+      "The burn was done with the Lunar Module steering the whole docked stack, something it was never designed for.",
+      "Apollo 13 holds the record for the farthest humans have travelled from Earth."
+    ],
+    "sources": [
+      {
+        "title": "NASA Apollo Flight Journal: Apollo 13",
+        "url": "https://www.nasa.gov/history/afj/ap13fj/11day3-minimise-power.html"
+      },
+      {
+        "title": "Apollo 13 entry and trajectory notes (NASA NTRS)",
+        "url": "https://ntrs.nasa.gov/api/citations/20090026451/downloads/20090026451.pdf"
+      }
+    ],
+    "approximate": [
+      "Stack mass, remaining DPS propellant and the throttle (40%) are approximations. Because this game is 2D, the corrective burn needed differs from the real 11.6 m/s."
+    ],
+    "stageText": {
+      "freeReturn": {
+        "title": "Back to free return",
+        "hint": "Make a small burn so the predicted path enters Earth’s atmosphere between −7.4° and −5.3°. Watch the entry gauge."
+      },
+      "pc2": {
+        "title": "PC+2 burn (bonus)",
+        "hint": "After passing the Moon, make a 262 m/s burn that brings the crew home sooner, still inside the corridor."
+      }
+    }
+  },
+  {
+    "id": "voyager2",
+    "kind": "orbital",
+    "agency": "NASA / JPL",
+    "year": 1979,
+    "date": "1979-03-01T00:00:00Z",
+    "title": "Voyager 2: The Grand Tour",
+    "craft": "Voyager 2",
+    "crew": "Uncrewed",
+    "difficulty": 3,
+    "story": [
+      "In the late 1970s the outer planets lined up in a way that happens only once every 175 years. Voyager 2 can use Jupiter's gravity as a slingshot to reach Saturn, and later Uranus and Neptune.",
+      "It's March 1979. Voyager 2 is closing in on Jupiter, but its aim is slightly off. A small trajectory correction now decides whether Jupiter flings it to Saturn or off into empty space."
+    ],
+    "goal": "Make a correction burn so that Jupiter's gravity assist sends Voyager 2 within 1,000,000 km of Saturn.",
+    "physics": {
+      "central": "sun",
+      "perturbers": [
+        "jupiter",
+        "saturn"
+      ],
+      "span": 1000,
+      "ship": {
+        "name": "Voyager 2",
+        "wetMass": 722,
+        "dryMass": 690,
+        "engine": {
+          "name": "Hydrazine thrusters",
+          "thrust": 89,
+          "isp": 220
+        }
+      },
+      "saturnTargetKm": 1000000
+    },
+    "history": "Voyager 2 passed Jupiter on 9 July 1979 (about 570,000 km above the clouds) and Saturn on 26 August 1981. It went on to become the only spacecraft to visit Uranus (1986) and Neptune (1989).",
+    "facts": [
+      "A gravity assist steals a tiny bit of a planet's orbital energy. Jupiter slowed down by an immeasurably small amount.",
+      "Voyager 2 is now in interstellar space, more than 20 billion km from Earth."
+    ],
+    "sources": [
+      {
+        "title": "Voyager 2 flyby dates and distances",
+        "url": "https://www.universetoday.com/articles/voyager-2"
+      },
+      {
+        "title": "NASA: Voyager mission",
+        "url": "https://science.nasa.gov/mission/voyager/"
+      }
+    ],
+    "approximate": [
+      "Spacecraft mass and thruster figures are approximate. The flyby distances and dates come from a trajectory designed to match the real ones in this 2D model."
+    ],
+    "stageText": {
+      "aim": {
+        "title": "Correct course",
+        "hint": "A tiny burn now shifts where you pass Jupiter, and that changes everything after. Get the predicted Saturn approach under 1,000,000 km."
+      },
+      "saturn": {
+        "title": "Reach Saturn",
+        "hint": "Fly through the Jupiter gravity assist all the way to Saturn."
+      }
+    }
+  },
+  {
+    "id": "mangalyaan",
+    "kind": "orbital",
+    "agency": "ISRO",
+    "year": 2014,
+    "date": "2013-11-05T09:08:00Z",
+    "title": "Mangalyaan: Mars on the First Try",
+    "craft": "Mars Orbiter Mission (MOM)",
+    "crew": "Uncrewed",
+    "difficulty": 2,
+    "story": [
+      "India's first interplanetary mission had a tight budget and a small rocket. The PSLV couldn't throw the spacecraft straight to Mars, so ISRO raised its orbit around Earth six times before the final push.",
+      "Launch windows to Mars open only once every 26 months. Pick the departure date and travel time that the spacecraft's fuel can afford.",
+      "Then, ten months later, the 440 N main engine must fire for about 23 minutes at Mars, and it hasn't run for 300 days. Too little and Mangalyaan sails past Mars forever."
+    ],
+    "goal": "Choose a launch window, aim for Mars, and fire the engine to enter Mars orbit (periapsis 300–800 km).",
+    "physics": {
+      "central": "sun",
+      "perturbers": [
+        "earth",
+        "mars",
+        "jupiter",
+        "venus"
+      ],
+      "span": 360,
+      "ship": {
+        "name": "Mars Orbiter Mission",
+        "wetMass": 845,
+        "dryMass": 482.5,
+        "engine": {
+          "name": "440 N Liquid Apogee Motor",
+          "thrust": 440,
+          "isp": 315
+        }
+      },
+      "massBeforeTMI": 1012,
+      "preTMIorbitKm": [
+        248,
+        192874
+      ],
+      "window": {
+        "departFrom": "2013-10-20",
+        "departTo": "2014-01-20",
+        "tofMin": 200,
+        "tofMax": 360
+      },
+      "captureKm": {
+        "periMin": 300,
+        "periMax": 800,
+        "apoMax": 100000
+      }
+    },
+    "history": "Launched on 5 November 2013 on PSLV-C25, Mangalyaan left Earth on 1 December 2013 and fired its engine for 1,388.67 s on 24 September 2014. It entered a 421.7 × 76,993.6 km Mars orbit, making India the first nation to reach Mars orbit on its first attempt.",
+    "facts": [
+      "The Mars Orbiter Mission was famously cheaper than the film Gravity.",
+      "MOM's orbit took 72 hours 51 minutes, which is why its photos could capture the whole disc of Mars."
+    ],
+    "sources": [
+      {
+        "title": "Mars Orbiter Mission (masses, burns, orbit)",
+        "url": "https://en.wikipedia.org/wiki/Mars_Orbiter_Mission"
+      }
+    ],
+    "approximate": [
+      "Mass after the Earth-orbit raising burns (1,012 kg) is an estimate. The LAM specific impulse (315 s) is approximate."
+    ],
+    "stageText": {
+      "tcm": {
+        "title": "Trajectory correction",
+        "hint": "Months before arrival, a small burn moves your closest approach to Mars to 300–800 km altitude."
+      },
+      "moi": {
+        "title": "Mars orbit insertion",
+        "hint": "At closest approach, burn retrograde relative to Mars for about 20+ minutes. Too short and you fly past Mars forever."
+      }
+    }
+  },
+  {
+    "id": "perseverance",
+    "kind": "edl",
+    "agency": "NASA / JPL",
+    "year": 2021,
+    "date": "2021-02-18T20:55:00Z",
+    "title": "Perseverance: Seven Minutes of Terror",
+    "craft": "Mars 2020 (Perseverance rover)",
+    "crew": "Uncrewed",
+    "difficulty": 2,
+    "story": [
+      "18 February 2021. Perseverance hits the top of Mars's atmosphere at about 19,500 km/h. Radio signals take over 11 minutes to reach Earth, so everything happens on its own.",
+      "The capsule rolls its lift up or down to steer. When it has slowed enough, the supersonic parachute opens, and that only works within a narrow window.",
+      "Finally the descent stage fires its rockets and lowers the rover on cables: the sky crane."
+    ],
+    "goal": "Steer the entry, open the parachute in its safe window, then fly the descent stage to a safe spot in Jezero Crater.",
+    "physics": {
+      "entry": {
+        "alt": 125000,
+        "v": 5420,
+        "gammaDeg": -15.5,
+        "mass": 3440
+      },
+      "aero": {
+        "cd": 1.65,
+        "area": 15.9,
+        "ld": 0.24,
+        "noseRadius": 1.125
+      },
+      "chute": {
+        "cd": 0.62,
+        "area": 363,
+        "maxMach": 2.2,
+        "minMach": 1.1,
+        "maxQ": 850,
+        "shieldSepDelay": 20,
+        "shieldMass": 440
+      },
+      "backshellAlt": 2100,
+      "targetDownrange": 650000,
+      "ellipseKm": 7.7,
+      "lander": {
+        "g": 3.721,
+        "engine": {
+          "name": "8 × Mars Landing Engine",
+          "thrust": 24800,
+          "isp": 220,
+          "minThrottle": 0.13,
+          "maxThrottle": 1
+        },
+        "mass": 2100,
+        "dryMass": 1700,
+        "pitchRate": 25,
+        "maxPitch": 45,
+        "limits": {
+          "vz": 1.0,
+          "vx": 0.5,
+          "tilt": 15
+        },
+        "footprint": 2,
+        "skycraneAlt": 20,
+        "skycraneSpeed": 0.75,
+        "terrain": {
+          "base": 0,
+          "craters": [
+            {
+              "x": 300,
+              "r": 60,
+              "depth": 10,
+              "rim": 2
+            },
+            {
+              "x": 900,
+              "r": 40,
+              "depth": 7,
+              "rim": 1.5
+            }
+          ],
+          "boulders": [
+            {
+              "x": 180,
+              "r": 3
+            },
+            {
+              "x": 230,
+              "r": 2
+            },
+            {
+              "x": 410,
+              "r": 3
+            },
+            {
+              "x": 460,
+              "r": 2.5
+            },
+            {
+              "x": 700,
+              "r": 3
+            },
+            {
+              "x": 760,
+              "r": 2
+            },
+            {
+              "x": 1050,
+              "r": 3
+            }
+          ],
+          "slopes": [
+            {
+              "x0": 1150,
+              "x1": 1500,
+              "grade": 0.25
+            }
+          ]
+        },
+        "target": {
+          "x0": 560,
+          "x1": 660
+        },
+        "targetCenter": 610
+      }
+    },
+    "history": "The parachute opened about 240 s after entry, at about 11 km altitude and 1,512 km/h. Powered descent began at 2.1 km, and the sky crane lowered the rover 6.4 m on cables. Perseverance touched down in Jezero Crater at about 20:55 UTC.",
+    "facts": [
+      "Terrain-Relative Navigation let Perseverance compare camera images with a map and divert to a safer spot. It was a first for Mars.",
+      "The 21.5 m parachute had to open at almost twice the speed of sound."
+    ],
+    "sources": [
+      {
+        "title": "NASA JPL Mars 2020 landing press kit",
+        "url": "https://www.jpl.nasa.gov/news/press_kits/mars_2020/landing/mission"
+      },
+      {
+        "title": "Mars 2020 quick facts",
+        "url": "https://www.jpl.nasa.gov/news/press_kits/mars_2020/landing/quick_facts"
+      },
+      {
+        "title": "NASA Glenn: Mars atmosphere model",
+        "url": "https://www.grc.nasa.gov/www/k-12/airplane/atmosmrm.html"
+      }
+    ],
+    "approximate": [
+      "Entry mass, aerodynamic coefficients, parachute limits and descent-stage mass are approximate public figures. Mars's rotation and cross-range steering are not modelled."
+    ]
+  },
+  {
+    "id": "chandrayaan3",
+    "kind": "orbital",
+    "agency": "ISRO",
+    "year": 2023,
+    "date": "2023-07-15T00:00:00Z",
+    "title": "Chandrayaan-3: Earth to the Moon",
+    "craft": "Chandrayaan-3 (Propulsion Module + Vikram lander)",
+    "crew": "Uncrewed",
+    "difficulty": 2,
+    "story": [
+      "14 July 2023: LVM3 launches Chandrayaan-3 from Sriharikota into an Earth orbit of about 170 × 36,500 km.",
+      "There isn't enough rocket to fly straight to the Moon, so the Propulsion Module's 440 N engine raises the orbit step by step, firing each time it swings past perigee.",
+      "Then comes trans-lunar injection, timed so the Moon is waiting when the craft arrives, and a braking burn to be captured into lunar orbit."
+    ],
+    "goal": "Raise your orbit, fly to the Moon and fire a braking burn to enter lunar orbit (periapsis 100–1,000 km, apoapsis below 20,000 km).",
+    "physics": {
+      "central": "earth",
+      "perturbers": [
+        "moon",
+        "sun"
+      ],
+      "span": 40,
+      "ship": {
+        "name": "Chandrayaan-3 integrated module",
+        "wetMass": 3900,
+        "dryMass": 2204,
+        "engine": {
+          "name": "440 N Liquid Apogee Motor",
+          "thrust": 440,
+          "isp": 315
+        }
+      },
+      "startOrbitKm": [
+        170,
+        36500
+      ],
+      "perigeeLongitudeDeg": 184,
+      "captureKm": {
+        "periMin": 100,
+        "periMax": 1000,
+        "apoMax": 20000
+      },
+      "circularKm": {
+        "max": 200
+      }
+    },
+    "history": "After five Earth-bound burns, trans-lunar injection came on 1 August 2023 (IST). Lunar orbit insertion on 5 August placed Chandrayaan-3 in a 164 × 18,074 km orbit, later circularised to 153 × 163 km.",
+    "facts": [
+      "Chandrayaan-3 took about 40 days to reach the Moon. Apollo took about 3, but needed a giant Saturn V rocket.",
+      "The Propulsion Module later returned to Earth orbit: a bonus test of ISRO's navigation skills."
+    ],
+    "sources": [
+      {
+        "title": "ISRO: Chandrayaan-3 mission updates",
+        "url": "https://www.isro.gov.in/Chandrayaan3.html"
+      },
+      {
+        "title": "Chandrayaan-3 (masses, landing site)",
+        "url": "https://en.wikipedia.org/wiki/Chandrayaan-3"
+      }
+    ],
+    "approximate": [
+      "The Propulsion Module engine's specific impulse is approximate. The perigee direction is chosen so the real Moon is reachable on similar dates."
+    ],
+    "stageText": {
+      "raise": {
+        "title": "Raise your orbit",
+        "hint": "Burn prograde at perigee (closest to Earth). Each burn lifts the far side of the orbit. Get the apogee above 100,000 km."
+      },
+      "tli": {
+        "title": "Trans-lunar injection",
+        "hint": "From perigee, burn prograde again so the orbit stretches out to where the Moon WILL be when you arrive. Watch the dashed prediction meet the Moon."
+      },
+      "loi": {
+        "title": "Lunar orbit insertion",
+        "hint": "At closest approach to the Moon, burn retrograde (against your motion relative to the Moon) to be captured. Aim for 100–1,000 km periapsis and apoapsis below 20,000 km."
+      },
+      "circular": {
+        "title": "Circularise (bonus)",
+        "hint": "Lower the orbit to under 200 km with braking burns at perilune, like ISRO did."
+      }
+    }
+  },
+  {
+    "id": "vikram",
+    "kind": "lander",
+    "agency": "ISRO",
+    "year": 2023,
+    "date": "2023-08-23T12:33:00Z",
+    "title": "Chandrayaan-3: Vikram at the South Pole",
+    "craft": "Vikram lander (with Pragyan rover)",
+    "crew": "Uncrewed",
+    "difficulty": 1,
+    "story": [
+      "23 August 2023. Vikram is descending near the Moon's south pole, where no spacecraft had ever landed softly.",
+      "At about 150 m it pauses and hovers, and its hazard camera searches for flat, boulder-free ground.",
+      "Its four 800 N engines must set the lander down gently: its legs can take no more than about 3 m/s."
+    ],
+    "goal": "Hover, pick a safe spot from the hazard map, and land at under 3 m/s.",
+    "physics": {
+      "g": 1.62,
+      "engine": {
+        "name": "4 × 800 N throttleable engines",
+        "thrust": 3200,
+        "isp": 300,
+        "minThrottle": 0.4,
+        "maxThrottle": 1
+      },
+      "mass": 1380,
+      "dryMass": 1250,
+      "start": {
+        "x": 0,
+        "z": 800,
+        "vx": 0,
+        "vz": -12,
+        "pitch": 0
+      },
+      "pitchRate": 15,
+      "maxPitch": 30,
+      "limits": {
+        "vz": 3.0,
+        "vx": 0.5,
+        "tilt": 12
+      },
+      "footprint": 2.5,
+      "hazardHoverAlt": 150,
+      "target": {
+        "x0": -20,
+        "x1": 20
+      },
+      "terrain": {
+        "base": 0,
+        "craters": [
+          {
+            "x": -140,
+            "r": 40,
+            "depth": 8,
+            "rim": 1.5
+          },
+          {
+            "x": 60,
+            "r": 25,
+            "depth": 5,
+            "rim": 1
+          },
+          {
+            "x": 210,
+            "r": 50,
+            "depth": 9,
+            "rim": 2
+          }
+        ],
+        "boulders": [
+          {
+            "x": -70,
+            "r": 2
+          },
+          {
+            "x": -40,
+            "r": 1.5
+          },
+          {
+            "x": -10,
+            "r": 2
+          },
+          {
+            "x": 20,
+            "r": 1.5
+          },
+          {
+            "x": 100,
+            "r": 2
+          },
+          {
+            "x": 130,
+            "r": 1.5
+          },
+          {
+            "x": 290,
+            "r": 2
+          }
+        ],
+        "slopes": [
+          {
+            "x0": -300,
+            "x1": -200,
+            "grade": 0.2
+          }
+        ]
+      },
+      "safeSpots": [
+        {
+          "x": -100,
+          "w": 14
+        },
+        {
+          "x": 155,
+          "w": 16
+        },
+        {
+          "x": 250,
+          "w": 10
+        }
+      ],
+      "surface": "moon"
+    },
+    "history": "Vikram touched down at 12:33 UTC (18:03 IST) on 23 August 2023 at 69.373°S, 32.319°E. India became the first country to land near the lunar south pole. Pragyan rolled out the next day and confirmed sulphur in the soil.",
+    "facts": [
+      "The landing site is now called Shiv Shakti Point.",
+      "Vikram later \"hopped\": it re-fired its engines, rose about 40 cm and landed again 30–40 cm away."
+    ],
+    "sources": [
+      {
+        "title": "Chandrayaan-3 (lander mass, engines, landing site, time)",
+        "url": "https://en.wikipedia.org/wiki/Chandrayaan-3"
+      },
+      {
+        "title": "ISRO: Chandrayaan-3",
+        "url": "https://www.isro.gov.in/Chandrayaan3.html"
+      }
+    ],
+    "approximate": [
+      "Mass and fuel at 800 m, engine Isp and the minimum throttle are estimates; engine count and thrust are real."
+    ]
+  },
+  {
+    "id": "aditya",
+    "kind": "orbital",
+    "agency": "ISRO",
+    "year": 2024,
+    "date": "2024-01-06T10:30:00Z",
+    "title": "Aditya-L1: Parking at L1",
+    "craft": "Aditya-L1 solar observatory",
+    "crew": "Uncrewed",
+    "difficulty": 3,
+    "story": [
+      "1.5 million km from Earth, toward the Sun, there is a point where the Sun's and Earth's pulls balance out: Lagrange point L1. From there, a telescope can watch the Sun without ever being blocked.",
+      "But L1 is like balancing a ball on a hill. Leave a spacecraft there and it slowly rolls away.",
+      "6 January 2024: Aditya-L1 fires its engine for halo-orbit insertion. After that, small station-keeping burns keep it circling L1."
+    ],
+    "goal": "Keep Aditya-L1 near L1 for one full orbit (178 days), using as little fuel as possible.",
+    "physics": {
+      "central": "sun",
+      "perturbers": [
+        "earth",
+        "moon",
+        "venus",
+        "jupiter"
+      ],
+      "span": 220,
+      "ship": {
+        "name": "Aditya-L1",
+        "wetMass": 1475,
+        "dryMass": 1200,
+        "engine": {
+          "name": "440 N Liquid Apogee Motor",
+          "thrust": 440,
+          "isp": 315
+        }
+      },
+      "insertionErrorMs": 35,
+      "box": {
+        "xMinKm": -1950000,
+        "xMaxKm": -1050000,
+        "yMaxKm": 900000
+      },
+      "holdDays": 178
+    },
+    "history": "Aditya-L1 launched on 2 September 2023 on PSLV-C57, cruised for about 110 days and entered its halo orbit on 6 January 2024. It completed its first revolution around L1 in about 178 days, on 2 July 2024.",
+    "facts": [
+      "L1 is about 1% of the way from Earth to the Sun.",
+      "NASA's SOHO observatory has watched the Sun from L1 since 1996."
+    ],
+    "sources": [
+      {
+        "title": "ISRO: Halo-orbit insertion of Aditya-L1",
+        "url": "https://www.isro.gov.in/halo-orbit-insertion-adtya-l1.html"
+      }
+    ],
+    "approximate": [
+      "This is a 2D game, so the real 3D halo orbit is shown as its planar cousin, a Lyapunov orbit with the same 178-day period. The fuel load is approximate."
+    ],
+    "stageText": {
+      "hold": {
+        "title": "Hold the halo orbit",
+        "hint": "Stay inside the box around L1 for 178 days. Small burns every few weeks keep you on the reference orbit (dotted)."
+      }
+    }
+  }
+]

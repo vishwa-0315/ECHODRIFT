@@ -1,7 +1,6 @@
 {
-  "appId": "com.echodrift.game",
-  "appName": "Echo Drift",
+  "appId": "org.launchwindow.game",
+  "appName": "Launch Window",
   "webDir": "www",
-  "android": { "allowMixedContent": false, "backgroundColor": "#080a1c" },
-  "plugins": {}
+  "android": { "backgroundColor": "#04060b" }
 }

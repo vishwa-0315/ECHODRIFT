@@ -1,0 +1,10 @@
+import { chromium } from 'playwright-core';
+const b = await chromium.launch({ executablePath: '/opt/pw-browsers/chromium-1243/chrome-linux64/chrome' });
+const p = await (await b.newContext({ viewport: { width: 390, height: 844 }, deviceScaleFactor: 2 })).newPage();
+const errs = []; p.on('pageerror', e => errs.push(e.message));
+await p.goto('file:///home/claude/launch-window/dist/index.html'); await p.waitForTimeout(800);
+await p.screenshot({ path: '/tmp/claude-0/i1.png' });
+await p.click('[data-testid=mission-chandrayaan3]'); await p.click('[data-testid=start]'); await p.waitForTimeout(800);
+await p.evaluate(() => document.querySelectorAll('.toast').forEach(t => t.remove()));
+await p.screenshot({ path: '/tmp/claude-0/i2.png' });
+console.log('errors', errs); await b.close();
