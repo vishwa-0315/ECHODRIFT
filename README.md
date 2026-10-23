@@ -3,7 +3,7 @@
 **Fly the real missions of ISRO and NASA, with real physics.**
 Chandrayaan-3 · Vikram · Mangalyaan · Aditya-L1 · Apollo 11 · Apollo 13 · Voyager 2 · Perseverance, plus four discovery labs and a live Solar System explorer.
 
-- **Play in a browser:** https://vishwa-0315.github.io/echodrift/
+- **Play in a browser:** https://vishwa-0315.github.io/ECHODRIFT/
 - **Android APK:** latest release on the [Releases page](../../releases/latest). Download `LaunchWindow-buildN.apk` on your phone and open it; allow "Install unknown apps" when asked. Needs Android 7.0 or newer.
 - **Concept document (≤ 500 words):** [CONCEPT.md](CONCEPT.md)
 
