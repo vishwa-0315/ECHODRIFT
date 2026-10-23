@@ -175,8 +175,8 @@ if (!ONLY || ONLY === 'labs') {
     await page.$eval('[data-testid=mc]', (el) => ((el.value = 28.1), el.oninput()));
   });
   await lab('blackhole', async () => {
-    for (let i = 0; i < 18; i++) await page.click('text=◀ left');
-    for (let i = 0; i < 18; i++) await page.click('text=right ▶');
+    for (let i = 0; i < 18; i++) await page.click('text=left ▶');
+    for (let i = 0; i < 18; i++) await page.click('text=◀ right');
   });
 }
 

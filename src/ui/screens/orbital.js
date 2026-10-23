@@ -33,6 +33,7 @@ export function orbitalScreen(app, { id, choice = {} }) {
   let lastPredReal = 0;
   let warpIdx = WARPS.indexOf(V.warp);
   let paused = true;
+  let lastKeep = 0; // last time the player acted (burn finished or a reminder pause)
   let raf = 0;
   let last = 0;
   let focus = V.focus;
@@ -78,13 +79,14 @@ export function orbitalScreen(app, { id, choice = {} }) {
     h('div.view', canvas),
     h('div.hud-top', h('div.row', h('button.btn.icon.sm', { 'aria-label': 'Back to missions', onclick: () => leave() }, '←'), h('div.label.grow', m.title), focusSeg), tele, obj),
     h('div.hud-side', zoom, h('button.btn.icon.sm', { 'aria-label': 'Restart mission', onclick: () => restart() }, '↺')),
-    banner,
     dock,
   );
+  dock.insertBefore(banner, dock.firstChild); // burn banner sits just above the controls, clear of the map and objective
   let hintOpen = true;
 
   /* ---------- setup ---------- */
   function init() {
+    lastKeep = 0;
     mission = buildMission(m, design, choice);
     sim = mission.sim;
     done.clear();
@@ -274,9 +276,21 @@ export function orbitalScreen(app, { id, choice = {} }) {
     hud();
   }
   let approachWarned = new Set();
-  let lastKeep = 0; // Aditya: time of the last station-keeping check
   function step(dtR) {
     let simDt = WARPS[warpIdx] * dtR;
+    // stages that need a burn soon (e.g. orbit raising): don't let high warp skip the chances
+    const stg = currentStage();
+    if (stg?.idlePause && !sim.nodes.length && !burning && !(stg.onTrack && stg.onTrack(sim, ctx))) {
+      const due = lastKeep + stg.idlePause;
+      if (sim.t + simDt >= due) {
+        if (due > sim.t) sim.advance(due - sim.t);
+        lastKeep = sim.t;
+        setPaused(true);
+        app.beep(880, 0.12);
+        app.toast('Time for your next burn: plan one (+ Burn) or press ✦ Mission Assist, then ▶.', 6000);
+        return;
+      }
+    }
     // L1 is unstable: stop time for a station-keeping burn about every four weeks
     if (mission.box && !sim.nodes.length && !burning) {
       const due = lastKeep + 28 * DAY;

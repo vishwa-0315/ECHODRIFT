@@ -291,7 +291,7 @@ export function labScreen(app, { id }) {
       x.putImageData(id2, 0, 0);
     }
     function geo() {
-      const { w, h: H } = canvas.getBoundingClientRect();
+      const { width: w, height: H } = canvas.getBoundingClientRect();
       const size = Math.min(w, H) - 20;
       return { size, ox: (w - size) / 2, oy: (H - size) / 2, px: size / fov };
     }
@@ -301,9 +301,7 @@ export function labScreen(app, { id }) {
       ctx.fillRect(0, 0, w, H);
       const g = geo();
       ctx.imageSmoothingEnabled = true;
-      ctx.filter = 'blur(2px)';
       ctx.drawImage(img, g.ox, g.oy, g.size, g.size);
-      ctx.filter = 'none';
       const cxp = g.ox + g.size / 2, cyp = g.oy + g.size / 2;
       ctx.strokeStyle = '#4cc9f0';
       ctx.lineWidth = 2;

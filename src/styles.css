@@ -105,7 +105,7 @@ a { color: var(--cyan); }
 .dock { position: absolute; left: 0; right: 0; bottom: 0; z-index: 4; padding: 8px max(10px, env(safe-area-inset-right)) max(10px, env(safe-area-inset-bottom)) max(10px, env(safe-area-inset-left)); background: linear-gradient(0deg, rgba(4, 6, 11, 0.96), rgba(4, 6, 11, 0.75) 70%, rgba(4, 6, 11, 0)); display: flex; flex-direction: column; gap: 8px; }
 .clock { font-family: var(--mono); font-size: 0.85rem; color: var(--cyan); }
 .warp { font-family: var(--mono); min-width: 74px; text-align: center; }
-.burned { position: absolute; left: 50%; top: 22%; transform: translateX(-50%); z-index: 5; padding: 8px 14px; border-radius: 10px; background: var(--panel); border: 1px solid var(--accent); color: var(--accent); font-family: var(--display); font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; }
+.burned { align-self: center; padding: 6px 14px; font-size: 13px; white-space: nowrap; border-radius: 10px; background: var(--panel); border: 1px solid var(--accent); color: var(--accent); font-family: var(--display); font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; }
 .editor { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 10px; display: flex; flex-direction: column; gap: 8px; }
 .editor .line { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
 .editor input[type='range'] { flex: 1; min-width: 140px; accent-color: var(--accent); height: 32px; }

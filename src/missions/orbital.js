@@ -94,6 +94,7 @@ function chandrayaan(m, sim) {
     {
       id: 'raise',
       focus: 'earth',
+      idlePause: DAY,
       check: (s) => (km(alt('earth', s.elementsAbout('earth').apo)) > 100000 ? 'done' : null),
       assist: (s) => {
         const p = nextPeriapsis(s, 'earth', 4 * DAY);
@@ -114,6 +115,7 @@ function chandrayaan(m, sim) {
     {
       id: 'tli',
       focus: 'earth',
+      idlePause: DAY,
       // done once the craft is actually within 60,000 km of the Moon (inside its sphere of influence)
       check: (s) => (Math.hypot(s.rel('moon').x, s.rel('moon').y) < 60000e3 ? 'done' : null),
       predictTarget: 'moon',
