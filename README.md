@@ -36,6 +36,15 @@ The `android/` folder is a ready-made Capacitor 8 project (min SDK 24, target SD
 
 After every content or code change, run `npm run android:sync` again.
 
+
+## Build the APK on GitHub (no Android Studio needed)
+
+The repo includes `.github/workflows/android.yml`. Once it's on GitHub:
+
+- **Every push to `main`** runs the tests and builds an APK. Open the repo's **Actions** tab, click the latest run, and download **EchoDrift-apk** from the Artifacts section. It downloads as a zip with the .apk inside, and you need to be signed in to GitHub.
+- **To get a phone-friendly download link**, create a tag: `git tag v1.0.1 && git push origin v1.0.1`. The APK then appears on the repo's **Releases** page. Open that page on your phone, tap the .apk, and install it (allow "Install unknown apps" when asked).
+- You can also start a build without pushing: Actions › Build Android APK › **Run workflow**.
+
 ## Project layout
 
 ```
