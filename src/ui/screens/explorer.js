@@ -5,6 +5,7 @@ import { lambert } from '../../core/orbit.js';
 import { AU, C, DAY, MU } from '../../core/constants.js';
 import { drawBody, starField } from '../render.js';
 import { dist } from '../fmt.js';
+import { vyomNote } from '../guide.js';
 
 const PLANETS = ['mercury', 'venus', 'earth', 'mars', 'jupiter', 'saturn', 'uranus', 'neptune'];
 const FACTS = {
@@ -114,6 +115,7 @@ export function explorerScreen(app) {
   const el = h(
     'div.screen',
     h('div.topbar', h('button.btn.icon.ghost', { 'aria-label': 'Back', onclick: () => app.go('home') }, '←'), h('h2', 'The Solar System, really')),
+    vyomNote('These are the planets where they really are today. Drag the slider to travel 10 years either way, and tap a planet to learn about it!'),
     canvas,
     h('div.row', { style: { marginTop: '8px' } }, h('span.small.muted', '−10 yr'), slider, h('span.small.muted', '+10 yr')),
     h('div.row.wrap', dateLbl, h('div.spacer'), h('button.btn.sm', { onclick: () => ((slider.value = 0), slider.oninput()) }, 'Today'), h('button.btn.sm', { onclick: () => ((logScale = !logScale), draw()) }, 'Toggle scale')),

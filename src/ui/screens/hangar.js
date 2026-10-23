@@ -3,6 +3,7 @@ import { h, fitCanvas } from '../dom.js';
 import { progress, BADGES, SKINS } from '../../game/progress.js';
 import { createRenderer } from '../../arcade/draw.js';
 import { sfx } from '../audio.js';
+import { vyomNote } from '../guide.js';
 
 export function hangarScreen(app) {
   const prog = progress(app);
@@ -32,6 +33,7 @@ export function hangarScreen(app) {
   const el = h(
     'div.screen',
     h('div.topbar', h('button.btn.icon.ghost', { 'aria-label': 'Back', onclick: () => app.go('home') }, '←'), h('h2', 'Badges & rockets')),
+    vyomNote(total ? 'Collect stars to unlock new rocket colours. Tap one to fly it!' : 'Win levels to earn stars, badges and new rocket colours!', 'happy'),
     h('p.muted', `You have ★ ${total} stars and ${Object.keys(prog.data.badges).length} of ${BADGES.length} badges. Quiz: ${prog.data.quizRight} answered right.`),
     h('div.section', h('h3', 'Badges')),
     h(

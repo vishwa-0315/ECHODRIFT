@@ -35,13 +35,23 @@ export function playScreen(app, { id, demo = false }) {
   const aimRow = h('div.aim-row', { style: { display: L.control === 'aim+tap' ? '' : 'none' } }, h('button.btn.icon.sm', { onclick: nudge(-0.01), 'aria-label': 'Aim left a little' }, '−'), aimInput, h('button.btn.icon.sm', { onclick: nudge(0.01), 'aria-label': 'Aim right a little' }, '+'));
   aimInput.addEventListener('input', () => (aim = +aimInput.value));
 
+  const CAMS = [['auto', '🎥 Auto'], ['wide', '🔭 Wide'], ['follow', '🚀 Follow']];
+  let camMode = app.settings.cam || 'auto';
+  const camBtn = h('button.btn.sm.cam-btn', { 'aria-label': 'Change camera', 'data-testid': 'cam', style: { visibility: game.kind === 'orbit' ? 'visible' : 'hidden' } });
+  const paintCam = () => (camBtn.textContent = CAMS.find((c) => c[0] === camMode)[1]);
+  paintCam();
+  camBtn.addEventListener('click', () => {
+    camMode = CAMS[(CAMS.findIndex((c) => c[0] === camMode) + 1) % CAMS.length][0];
+    app.setSetting('cam', camMode);
+    paintCam();
+    sfx.tap();
+  });
   const el = h(
     'div.screen.full.play',
     canvas,
-    h('div.play-top', h('button.btn.icon.sm.ghost', { 'aria-label': 'Back to levels', onclick: () => leave() }, '✕'), h('div.play-title', h('div.lvl', `Level ${ri + 1} · ${L.mission}`), h('div.t', L.title)), h('div.play-goal-stars', '☆☆☆')),
-    h('div.play-hud', info, fuel, light),
+    h('div.play-top', h('button.btn.icon.sm.ghost', { 'aria-label': 'Back to levels', onclick: () => leave() }, '✕'), h('div.play-title', h('div.lvl', `Level ${ri + 1} · ${L.mission}`), h('div.t', L.title)), camBtn),
+    h('div.play-hud', info, fuel, light, demoBanner),
     alertEl,
-    demoBanner,
     h('div.play-bottom', g.el, aimRow, mainBtn),
   );
 
@@ -100,7 +110,7 @@ export function playScreen(app, { id, demo = false }) {
     const r = fitCanvas(canvas);
     const top = el.querySelector('.play-hud')?.getBoundingClientRect().bottom ?? 120;
     const bottom = el.querySelector('.play-bottom')?.getBoundingClientRect().top ?? r.h - 120;
-    renderer.draw(r.ctx, r.w, r.h, game, skin, { top, bottom, dpr: r.dpr });
+    renderer.draw(r.ctx, r.w, r.h, game, skin, { top, bottom, dpr: r.dpr, camMode });
     hud();
   }
 

@@ -84,15 +84,22 @@ export function createRenderer() {
   }
 
   /* ---------------- orbital ---------------- */
-  function orbital(ctx, W, H, game, skin, view, dt) {
-    const sc = game.scene();
-    const w = game.w;
-    ctx.fillStyle = '#04060b';
-    ctx.fillRect(0, 0, W, H);
-    stars(ctx, W, H);
-    // camera: fit the interesting points into the free area
-    const pts = sc.focus.slice();
-    if (!sc.shipHidden) pts.push([w.y[0], w.y[1]]);
+  const ZOOM_R = { jupiter: 70, saturn: 60, sun: 0 };
+  /** The body the ship is "at" right now (for close-ups), if any. */
+  function nearBody(w, sc) {
+    let best = null;
+    const names = [sc.central, ...sc.bodies];
+    for (const n of names) {
+      const R = n === w.central.name ? w.central.R : w.body(n).R;
+      const k = ZOOM_R[n] ?? 22;
+      if (!k) continue;
+      const b = w.bodyAt(n);
+      const d = Math.hypot(w.y[0] - b.x, w.y[1] - b.y);
+      if (d < k * R && (!best || d / (k * R) < best.q)) best = { name: n, x: b.x, y: b.y, R, d, q: d / (k * R) };
+    }
+    return best;
+  }
+  function fitBox(pts, aw, ah) {
     let x0 = Infinity, x1 = -Infinity, y0 = Infinity, y1 = -Infinity;
     for (const [x, y] of pts) {
       x0 = Math.min(x0, x);
@@ -100,43 +107,117 @@ export function createRenderer() {
       y0 = Math.min(y0, y);
       y1 = Math.max(y1, y);
     }
-    const aw = W - 24, ah = view.bottom - view.top - 24;
-    const s = Math.min(aw / Math.max(1, x1 - x0), ah / Math.max(1, y1 - y0)) * 0.92;
-    const tx = (x0 + x1) / 2, ty = (y0 + y1) / 2;
-    if (!cam.s) Object.assign(cam, { x: tx, y: ty, s });
-    const k = Math.min(1, dt * 3);
-    cam.x += (tx - cam.x) * k;
-    cam.y += (ty - cam.y) * k;
-    cam.s *= Math.pow(s / cam.s, k);
-    const ox = W / 2, oy = (view.top + view.bottom) / 2;
-    const X = (x) => ox + (x - cam.x) * cam.s;
-    const Y = (y) => oy - (y - cam.y) * cam.s;
+    return { x: (x0 + x1) / 2, y: (y0 + y1) / 2, s: Math.min(aw / Math.max(1, x1 - x0), ah / Math.max(1, y1 - y0)) * 0.9 };
+  }
+  /** Camera box around the ship and the body it is close to. */
+  function closeBox(w, nb, aw, ah, fallbackSpan) {
+    const sx = w.y[0], sy = w.y[1];
+    if (!nb) {
+      const h2 = fallbackSpan / 2;
+      return fitBox([[sx - h2, sy - h2], [sx + h2, sy + h2]], aw, ah);
+    }
+    const span = Math.max(nb.d * 1.25, nb.R * 3.2);
+    const cx = nb.x + (sx - nb.x) * 0.5, cy = nb.y + (sy - nb.y) * 0.5;
+    return fitBox([[cx - span / 2, cy - span / 2], [cx + span / 2, cy + span / 2]], aw, ah);
+  }
+  let shake = 0;
+  let insetCorner = 0;
+
+  function orbital(ctx, W, H, game, skin, view, dt) {
+    const sc = game.scene();
+    const w = game.w;
+    ctx.fillStyle = '#04060b';
+    ctx.fillRect(0, 0, W, H);
+    stars(ctx, W, H);
+    // leave room above for ring labels and below for the guide/banner
+    const aw = W - 24, ah = view.bottom - view.top - 48;
+    const pts = sc.focus.slice();
+    if (!sc.shipHidden) pts.push([w.y[0], w.y[1]]);
+    const wide = fitBox(pts, aw, ah);
+    const nb = sc.shipHidden ? null : nearBody(w, sc);
+    const mode = view.camMode || 'auto';
+    let target = wide, inset = false;
+    if (mode === 'follow' && !sc.shipHidden) target = closeBox(w, nb, aw, ah, Math.min(aw, ah) / wide.s / 6);
+    else if (mode === 'auto' && nb && !sc.keepWide) target = closeBox(w, nb, aw, ah, 0);
+    if (nb && target === wide) inset = true;
+    if (!cam.s) Object.assign(cam, target);
+    const k = Math.min(1, dt * 2.2);
+    cam.x += (target.x - cam.x) * k;
+    cam.y += (target.y - cam.y) * k;
+    cam.s *= Math.pow(target.s / cam.s, k);
+    if (game.status === 'lost' && w.status === 'hit' && shake === 0) shake = 0.6;
+    let jx = 0, jy = 0;
+    if (shake > 0) {
+      shake = Math.max(0.0001, shake - dt);
+      const m = (shake / 0.6) * 9;
+      jx = (Math.random() - 0.5) * m;
+      jy = (Math.random() - 0.5) * m;
+    }
+    const ox = W / 2 + jx, oy = (view.top + 22 + view.bottom) / 2 + jy;
+    layer(ctx, game, skin, sc, cam.x, cam.y, cam.s, ox, oy, view, dt, true);
+    if (inset && game.status === 'play') {
+      // close-up window: the ship skimming the planet, while the main view stays wide
+      const r = Math.min(74, W * 0.19);
+      // put the close-up in the corner farthest from anything important on screen
+      const X = (x) => ox + (x - cam.x) * cam.s, Y = (y) => oy - (y - cam.y) * cam.s;
+      const keys = [[X(w.y[0]), Y(w.y[1])], [X(0), Y(0)], ...sc.bodies.map((n) => w.bodyAt(n)).map((b) => [X(b.x), Y(b.y)]), ...(sc.rings || []).map((rg) => w.bodyAt(rg.body)).map((b) => [X(b.x), Y(b.y)])];
+      const corners = [[W - r - 10, view.top + r + 26], [r + 10, view.top + r + 26], [r + 10, view.bottom - r - 60], [W - r - 10, view.bottom - r - 60]];
+      const ds = corners.map(([cx2, cy2]) => Math.min(...keys.map(([kx, ky]) => Math.hypot(kx - cx2, ky - cy2))));
+      const best = ds.indexOf(Math.max(...ds));
+      if (ds[best] > ds[insetCorner] + 60) insetCorner = best; // only move when clearly better (no flicker)
+      const [ix, iy] = corners[insetCorner];
+      const cb = closeBox(w, nb, r * 2, r * 2, 0);
+      ctx.save();
+      ctx.beginPath();
+      ctx.arc(ix, iy, r, 0, Math.PI * 2);
+      ctx.clip();
+      ctx.fillStyle = '#04060b';
+      ctx.fillRect(ix - r, iy - r, r * 2, r * 2);
+      layer(ctx, game, skin, sc, cb.x, cb.y, cb.s, ix, iy, view, 0, false);
+      ctx.restore();
+      ctx.strokeStyle = 'rgba(76,201,240,0.85)';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.arc(ix, iy, r, 0, Math.PI * 2);
+      ctx.stroke();
+      ctx.fillStyle = '#4cc9f0';
+      ctx.font = '700 10px Inter, system-ui, sans-serif';
+      ctx.fillText('CLOSE-UP', ix - 22, iy + r + 12);
+    }
+  }
+
+  /** Draw the whole scene with a given camera (used for the main view and the close-up). */
+  function layer(ctx, game, skin, sc, camX, camY, scl, ox, oy, view, dt, main) {
+    const w = game.w;
+    const X = (x) => ox + (x - camX) * scl;
+    const Y = (y) => oy - (y - camY) * scl;
     const light = (bx, by) => (sc.central === 'sun' ? Math.atan2(Y(0) - Y(by), X(0) - X(bx)) : Math.PI);
-    // orbits of bodies
     for (const name of sc.showOrbit || []) {
       const b = w.body(name);
       ctx.strokeStyle = 'rgba(141,156,181,0.25)';
       ctx.lineWidth = 1;
       ctx.beginPath();
-      ctx.arc(X(0), Y(0), b.a * cam.s, 0, Math.PI * 2);
+      ctx.arc(X(0), Y(0), b.a * scl, 0, Math.PI * 2);
       ctx.stroke();
     }
-    // launch-window angle helper
-    if (sc.angle) {
+    if (sc.angle && main) {
       const e = w.bodyAt(sc.angle.a), m = w.bodyAt(sc.angle.b);
       const ae = Math.atan2(e.y, e.x);
       ctx.lineWidth = 2;
       ctx.setLineDash([6, 6]);
       ctx.strokeStyle = 'rgba(82,210,115,0.8)';
-      const ra = w.body(sc.angle.b).a * cam.s;
+      const ra = w.body(sc.angle.b).a * scl;
+      const gx = X(0) + Math.cos(ae + sc.angle.ideal) * ra, gy = Y(0) - Math.sin(ae + sc.angle.ideal) * ra;
       ctx.beginPath();
       ctx.moveTo(X(0), Y(0));
       ctx.lineTo(X(0) + Math.cos(ae + sc.angle.ideal) * ra * 1.08, Y(0) - Math.sin(ae + sc.angle.ideal) * ra * 1.08);
       ctx.stroke();
       ctx.setLineDash([]);
-      ctx.fillStyle = '#52d273';
-      ctx.font = '600 12px Inter, system-ui, sans-serif';
-      ctx.fillText('Mars should be here', X(0) + Math.cos(ae + sc.angle.ideal) * ra * 1.1 - 50, Y(0) - Math.sin(ae + sc.angle.ideal) * ra * 1.1);
+      ctx.strokeStyle = '#52d273';
+      ctx.beginPath();
+      ctx.arc(gx, gy, 9, 0, Math.PI * 2);
+      ctx.stroke();
+      label(ctx, 'Target', gx, gy + 24, '#52d273', true);
       ctx.strokeStyle = 'rgba(255,153,51,0.7)';
       ctx.beginPath();
       ctx.moveTo(X(0), Y(0));
@@ -148,10 +229,9 @@ export function createRenderer() {
       ctx.arc(X(0), Y(0), 40, -ae, -Math.atan2(m.y, m.x), true);
       ctx.stroke();
     }
-    // target rings
     for (const r of sc.rings || []) {
       const b = w.bodyAt(r.body);
-      const rr = Math.max(16, r.r * cam.s);
+      const rr = Math.max(16, r.r * scl);
       ctx.strokeStyle = 'rgba(82,210,115,0.9)';
       ctx.fillStyle = 'rgba(82,210,115,0.08)';
       ctx.lineWidth = 2;
@@ -161,11 +241,8 @@ export function createRenderer() {
       ctx.fill();
       ctx.stroke();
       ctx.setLineDash([]);
-      ctx.fillStyle = '#52d273';
-      ctx.font = '600 12px Inter, system-ui, sans-serif';
-      ctx.fillText(r.label, X(b.x) - ctx.measureText(r.label).width / 2, Y(b.y) - rr - 6);
+      if (main) label(ctx, r.label, X(b.x), Y(b.y) - rr - 6, '#52d273', true);
     }
-    // trail
     if (game.trail.length > 1) {
       ctx.strokeStyle = 'rgba(255,153,51,0.55)';
       ctx.lineWidth = 2;
@@ -174,50 +251,66 @@ export function createRenderer() {
       ctx.lineTo(X(w.y[0]), Y(w.y[1]));
       ctx.stroke();
     }
-    // prediction (dotted)
     const pr = game.pred;
     if (pr && pr.path.length > 3 && game.status === 'play') {
-      ctx.strokeStyle = 'rgba(223,232,255,0.8)';
+      ctx.strokeStyle = 'rgba(223,232,255,0.85)';
       ctx.lineWidth = 2;
       ctx.setLineDash([2, 6]);
       ctx.beginPath();
-      for (let i = 0; i < pr.path.length; i += 3) (i ? ctx.lineTo(X(pr.path[i]), Y(pr.path[i + 1])) : ctx.moveTo(X(pr.path[i]), Y(pr.path[i + 1])));
+      ctx.moveTo(X(w.y[0]), Y(w.y[1]));
+      for (let i = 0; i < pr.path.length; i += 3) ctx.lineTo(X(pr.path[i]), Y(pr.path[i + 1]));
       ctx.stroke();
       ctx.setLineDash([]);
-      if (pr.hit) {
+      if (pr.hit && main) {
         ctx.fillStyle = '#ff5c5c';
-        ctx.font = '700 16px Inter, system-ui, sans-serif';
+        ctx.font = '800 16px Inter, system-ui, sans-serif';
         ctx.fillText('✕', X(pr.hit.x) - 5, Y(pr.hit.y) + 5);
       }
     }
-    // bodies
     const minR = sc.minR || {};
+    const placed = [];
     const drawB = (name, x, y) => {
       const R = name === w.central.name ? w.central.R : w.body(name).R;
-      const r = R * cam.s;
+      const r = R * scl;
       drawBody(ctx, name, X(x), Y(y), r, light(x, y), { minR: minR[name] ?? 4, dpr: view.dpr });
-      ctx.fillStyle = '#c9d4e6';
-      ctx.font = '500 11px Inter, system-ui, sans-serif';
       const rr = Math.max(r, minR[name] ?? 4);
-      ctx.fillText(LABEL[name] || name, X(x) + rr + 4, Y(y) + 4);
+      if (main && rr < 120) {
+        // keep body labels clear of each other and of the ship
+        let lx = X(x) + rr + 5, ly = Y(y) + 4;
+        for (const p of placed) if (Math.abs(p[0] - lx) < 60 && Math.abs(p[1] - ly) < 14) ly += 14;
+        placed.push([lx, ly]);
+        label(ctx, LABEL[name] || name, lx, ly, '#c9d4e6', false);
+      }
     };
     drawB(sc.central, 0, 0);
     for (const n of sc.bodies) {
       const b = w.bodyAt(n);
       drawB(n, b.x, b.y);
     }
-    // ship
     if (!sc.shipHidden) {
-      const ref = sc.central;
-      const v = w.rel(ref);
+      const v = w.rel(sc.central);
       let ang = Math.atan2(-v.vy, v.vx);
       if (game.burning && w.burn?.dir === 'retro') ang += Math.PI;
       const sx = X(w.y[0]), sy = Y(w.y[1]);
-      if (game.burning) emit(sx - Math.cos(ang) * 10, sy - Math.sin(ang) * 10, -Math.cos(ang), -Math.sin(ang), skin.flame, 2, 70);
-      drawParts(ctx, dt);
-      rocket(ctx, sx, sy, ang, skin, game.burning, 12);
+      if (main) {
+        if (game.burning) emit(sx - Math.cos(ang) * 10, sy - Math.sin(ang) * 10, -Math.cos(ang), -Math.sin(ang), skin.flame, 2, 70);
+        drawParts(ctx, dt);
+      }
+      rocket(ctx, sx, sy, ang, skin, game.burning, main ? 12 : 9);
       if (game.status === 'lost' && w.status === 'hit') boom(ctx, sx, sy);
-    } else drawParts(ctx, dt);
+    } else if (main) drawParts(ctx, dt);
+  }
+
+  /** Text with a dark halo so it stays readable over planets and lines. */
+  function label(ctx, text, x, y, color, centre) {
+    ctx.font = '600 11px Inter, system-ui, sans-serif';
+    const tw = ctx.measureText(text).width;
+    const lx = centre ? x - tw / 2 : x;
+    ctx.lineWidth = 3;
+    ctx.strokeStyle = 'rgba(4,6,11,0.85)';
+    ctx.strokeText(text, lx, y);
+    ctx.fillStyle = color;
+    ctx.fillText(text, lx, y);
   }
 
   function boom(ctx, x, y) {
@@ -247,9 +340,9 @@ export function createRenderer() {
     ctx.fillStyle = sky;
     ctx.fillRect(0, 0, W, H);
     if (!mars) stars(ctx, W, H * 0.8);
-    const groundY = view.bottom - 30;
+    const groundY = view.bottom - 56;
     const alt = Math.max(0, l.altitude);
-    const span = Math.max(40, Math.min(sc.z0 * 1.15, alt * 1.5 + 25));
+    const span = sc.span ?? Math.max(40, Math.min(sc.z0 * 1.15, alt * 1.5 + 25));
     const tgt = (groundY - view.top - 30) / span;
     if (!cam.s) cam.s = tgt;
     cam.s *= Math.pow(tgt / cam.s, Math.min(1, dt * 2));
@@ -276,7 +369,7 @@ export function createRenderer() {
     ctx.stroke();
     // lander
     const x = W / 2, y = groundY - alt * ppm;
-    const size = Math.max(30, Math.min(56, 4.2 * ppm));
+    const size = sc.span ? Math.min(64, 4.2 * ppm * 0.35) : Math.max(30, Math.min(56, 4.2 * ppm));
     ctx.fillStyle = 'rgba(0,0,0,0.35)';
     ctx.beginPath();
     ctx.ellipse(x, groundY + 2, size * (0.6 + 0.4 / (1 + alt / 20)), 4, 0, 0, Math.PI * 2);
@@ -411,6 +504,7 @@ export function createRenderer() {
   return {
     reset() {
       cam.s = 0;
+      shake = 0;
       parts.length = 0;
     },
     draw(ctx, W, H, game, skin, view) {

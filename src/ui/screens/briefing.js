@@ -2,6 +2,18 @@
 import { h } from '../dom.js';
 import { G0 } from '../../core/constants.js';
 import { kg, dv } from '../fmt.js';
+import { vyomNote } from '../guide.js';
+
+const TIPS = {
+  chandrayaan3: 'First raise your orbit near Earth, then head for the Moon, then brake to be caught. ✦ Mission Assist can plan each burn.',
+  apollo13: 'The crew needs a safe way home. Make a small burn so the entry angle turns green, then let time run.',
+  voyager2: 'A tiny nudge now decides whether Jupiter flings you on to Saturn. Watch the dashed line!',
+  mangalyaan: 'First pick a green square on the launch chart. Then correct your course and brake hard at Mars.',
+  aditya: 'L1 is like balancing a ball on a hilltop. Small burns every few weeks keep you on the dotted path.',
+  apollo11: 'Fly past the boulders to a flat spot and land gently, before the fuel runs out!',
+  vikram: 'Pick a safe, flat spot and come down slowly: under 3 m/s.',
+  perseverance: 'Steer with lift, open the parachute when the light says OPEN, then land with the engines.',
+};
 
 export function briefingScreen(app, { id }) {
   const m = app.content.missions.find((x) => x.id === id);
@@ -34,6 +46,7 @@ export function briefingScreen(app, { id }) {
     'div.screen',
     h('div.topbar', h('button.btn.icon.ghost', { 'aria-label': 'Back', onclick: () => app.go('expert') }, '←'), h('h2', m.title)),
     h('div.row.wrap', h('span.chip.' + (m.agency.startsWith('ISRO') ? 'isro' : 'nasa'), m.agency), h('span.chip', m.date.slice(0, 10)), h('span.chip', m.crew)),
+    TIPS[m.id] ? h('div', { style: { marginTop: '10px' } }, vyomNote(TIPS[m.id])) : null,
     h('div.story', { style: { marginTop: '12px' } }, m.story.map((s) => h('p', s))),
     h('div.panel', { style: { margin: '6px 0 12px', borderColor: 'var(--accent)' } }, h('div.label.accent', 'Your mission'), h('p', { style: { margin: '4px 0 0', fontSize: '1.05rem' } }, m.goal)),
     h('h3', 'The real spacecraft'),

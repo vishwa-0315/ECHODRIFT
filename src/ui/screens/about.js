@@ -1,12 +1,14 @@
 /** How the physics works, honest simplifications, sources and credits. */
 import { h } from '../dom.js';
 import { VERSION } from '../app.js';
+import { vyomNote } from '../guide.js';
 
 export function aboutScreen(app) {
   const sec = (t, ...c) => h('div', { style: { marginBottom: '14px' } }, h('h3', t), ...c);
   const el = h(
     'div.screen',
     h('div.topbar', h('button.btn.icon.ghost', { 'aria-label': 'Back', onclick: () => app.go('home') }, '←'), h('h2', 'How the physics works')),
+    vyomNote('Nothing in this game is made up. Here is the real science behind every level, and the few things we simplified.'),
     sec('Quick play', h('p', 'The eight quick levels use exactly the same laws: Newton’s gravity from every body in the level, real engine thrust and real fuel use (the rocket equation). Only two things are made friendlier. The clock speeds up far from planets and slows down near them, where the action is. Each level starts at a moment chosen to keep it short. A test plays every level with the real physics and checks it can be won.'), h('ul.small', h('li', 'Planets and moons move on circular orbits with their real size and period.'), h('li', 'Landers come straight down (sideways steering is left to the onboard computer).'), h('li', 'On the Mars launch-window and slingshot levels, only the Sun (and Jupiter and Saturn) pull on the spacecraft during the long cruise; the other planets are too far away to matter.'))),
     sec('Gravity', h('p', 'Newton’s law of gravitation, F = G·M·m / r², from every body that matters: the Earth, Moon and Sun for lunar missions; the Sun, planets and Jupiter for interplanetary ones. Nothing is scripted: if you miss, you miss.')),
     sec('Real positions on real dates', h('p', 'Planets and the Moon are where they really were on the mission dates, computed with the open-source astronomy-engine library (VSOP87 and lunar theories, accurate to about an arcminute). A test checks Mars against NASA JPL’s published orbital elements.')),

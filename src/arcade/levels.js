@@ -61,7 +61,7 @@ function orbitalGame(cfg) {
       g.burning = wantBurn;
       w.burn = wantBurn ? { dir: cfg.dir, ref: cfg.ref ?? null } : null;
       const r = cfg.clockR(g);
-      const rate = cfg.clock(r) * (wantBurn ? cfg.burnSlow ?? 0.5 : 1);
+      const rate = wantBurn && cfg.burnClock ? cfg.burnClock : cfg.clock(r) * (wantBurn ? cfg.burnSlow ?? 0.5 : 1);
       w.advance(Math.min(dt, 0.05) * rate);
       const last = g.trail[g.trail.length - 1];
       if (!last || Math.hypot(w.y[0] - last[0], w.y[1] - last[1]) > (cfg.trailStep ?? 2e5)) g.trail.push([w.y[0], w.y[1]]);
@@ -137,7 +137,7 @@ const L1 = {
         const o = g.w.orbitAbout('earth');
         return [['Far point', fmtKm(o.apo - R)], ['Goal', fmtKm(target - R)]];
       },
-      scene: (g) => ({ central: 'earth', bodies: [], rings: [{ body: 'earth', r: target, label: 'Goal' }], focus: [[0, 0], [g.w.y[0], g.w.y[1]], [target, 0], [-target, 0], [0, target * 0.6], [0, -target * 0.6]] }),
+      scene: (g) => ({ central: 'earth', bodies: [], keepWide: true, rings: [{ body: 'earth', r: target, label: 'Goal' }], focus: [[0, 0], [g.w.y[0], g.w.y[1]], [target, 0], [-target, 0], [0, target * 0.6], [0, -target * 0.6]] }),
       bot(g) {
         const o = g.w.orbitAbout('earth');
         const near = o.r < rp * 1.6;
@@ -213,7 +213,7 @@ const L2 = {
         const c = g.pred?.closest?.moon;
         return [['Closest to Moon', c ? fmtKm(Math.max(0, c.d - 1737e3)) : '—'], ['Goal', `< ${fmtKm(zone)}`]];
       },
-      scene: (g) => ({ central: 'earth', bodies: ['moon'], rings: [{ body: 'moon', r: zone, label: 'Moon zone' }], showOrbit: ['moon'], focus: [[0, 0], [g.w.y[0], g.w.y[1]], [aMoon, 0], [-aMoon, 0], [0, aMoon], [0, -aMoon]] }),
+      scene: (g) => ({ central: 'earth', bodies: ['moon'], keepWide: true, rings: [{ body: 'moon', r: zone, label: 'Moon zone' }], showOrbit: ['moon'], focus: [[0, 0], [g.w.y[0], g.w.y[1]], [aMoon, 0], [-aMoon, 0], [0, aMoon], [0, -aMoon]] }),
       bot(g) {
         const o = g.w.orbitAbout('earth');
         const c = g.pred?.closest?.moon;
@@ -501,7 +501,7 @@ const L6 = {
       periMin: 150e3,
       starsBy: (g) => (g.w.dvUsed <= 750 ? 3 : g.w.dvUsed <= 950 ? 2 : 1),
       botApo: 0.85,
-      info2: (o) => ['Orbit', o.energy < 0 ? `Caught! far point ${fmtKm(o.apo - 3389.5e3)}` : 'Flying past'],
+      info2: (o) => ['Far point', o.energy < 0 ? fmtKm(o.apo - 3389.5e3) : 'not caught yet'],
     }),
 };
 
@@ -732,9 +732,217 @@ const L8 = {
   },
 };
 
+/* ------------------------------------------------------------------ */
+/* 9. Vikram's hop (Chandrayaan-3 hop experiment, 3 Sept 2023)          */
+/* ------------------------------------------------------------------ */
+const LHOP = {
+  id: 'hop',
+  title: 'Vikram’s hop',
+  mission: 'Chandrayaan-3',
+  agency: 'ISRO',
+  year: 2023,
+  button: 'ENGINE',
+  control: 'hold',
+  goal: 'Lift Vikram at least 40 cm off the Moon, then land gently again.',
+  guide: ['Vikram is already on the Moon. Can it fly again?', 'Hold ENGINE to rise, let go to fall, and tap it again just before touchdown.'],
+  fact: 'On 3 September 2023 Vikram fired its engines, rose about 40 cm and landed 30–40 cm away: a test for future missions that must lift off from the Moon.',
+  create() {
+    const g = 1.62, engine = { thrust: 3200, isp: 300, minThrottle: 0.4 }, mass = 1300, dry = 1250;
+    const l = new Lander({ g, engine, mass, dryMass: dry, x: 0, z: 0, vx: 0, vz: 0, pitch: 0, pitchRate: 0, maxPitch: 0, limits: { vz: 2, vx: 1, tilt: 15 }, terrain: { base: 0 }, footprint: 2 });
+    let lifted = false, peak = 0;
+    const game = {
+      kind: 'lander',
+      l,
+      status: 'play',
+      stars: 0,
+      reason: '',
+      result: [],
+      burning: false,
+      update(dt, input) {
+        if (game.status !== 'play') return;
+        l.throttleCmd = input.hold && l.fuel > 0 ? 1 : 0;
+        game.burning = l.thrust() > 0;
+        const n = Math.ceil(dt / 0.005);
+        for (let i = 0; i < n; i++) {
+          l.step(dt / n);
+          if (!lifted && l.status !== 'flying') {
+            // still resting on the ground: the surface pushes back (no touchdown yet)
+            l.status = 'flying';
+            l.y[1] = 0;
+            l.y[3] = Math.max(0, l.y[3]);
+          }
+          if (l.altitude > 0.1) lifted = true;
+          peak = Math.max(peak, l.altitude);
+          if (l.status !== 'flying') break;
+        }
+        if (l.status === 'landed') {
+          if (peak < 0.4) {
+            game.status = 'lost';
+            game.reason = `Only ${(peak * 100).toFixed(0)} cm high. Hold ENGINE a little longer to reach 40 cm!`;
+            return;
+          }
+          const v = l.touch.vz;
+          game.status = 'won';
+          game.stars = v <= 0.5 ? 3 : v <= 1 ? 2 : 1;
+          game.result = [`Hop height: ${(peak * 100).toFixed(0)} cm (Vikram’s real hop: about 40 cm)`, `Touchdown at ${v.toFixed(2)} m/s`];
+        } else if (l.status === 'crashed') {
+          game.status = 'lost';
+          game.reason = `Landed at ${l.touch.vz.toFixed(1)} m/s: too hard. Tap ENGINE just before touchdown to soften it.`;
+        } else if (l.altitude > 6) {
+          game.status = 'lost';
+          game.reason = 'Too high! This was meant to be a little hop. Use short bursts.';
+        }
+      },
+      hud: () => ({ fuel: l.fuel / (mass - dry), info: [['Height', `${Math.round(Math.max(0, l.altitude) * 100)} cm`], ['Best', `${Math.round(peak * 100)} cm / 40 cm`]] }),
+      scene: () => ({ kind: 'lander', surface: 'moon', z0: 4, span: 4 }),
+      bot() {
+        if (!lifted || (l.vz > 0 && peak < 0.3)) return { hold: peak < 0.3 };
+        // coming down: brake late and gently
+        const aNet = engine.thrust / l.mass - g;
+        const v = -l.vz;
+        return { hold: v > 0.3 && (v * v) / (2 * aNet) + 0.05 > l.altitude };
+      },
+    };
+    return game;
+  },
+};
+
+/* ------------------------------------------------------------------ */
+/* 10. Get them home (Apollo 13, April 1970)                            */
+/* ------------------------------------------------------------------ */
+const L13 = {
+  id: 'home13',
+  title: 'Get them home',
+  mission: 'Apollo 13',
+  agency: 'NASA',
+  year: 1970,
+  button: 'BRAKE',
+  control: 'hold',
+  goal: 'Steer the crew into the safe re-entry window: between −5.3° and −7.4°.',
+  guide: ['Apollo 13 is coming home, but on the wrong path!', 'Too shallow and they skip off the air; too steep and it’s too hot. Hold BRAKE until the angle turns green.'],
+  fact: 'After an oxygen tank exploded, the Apollo 13 crew used the Lunar Module’s engine to steer home, and splashed down safely on 17 April 1970.',
+  create() {
+    const mu = MU.earth, R = 6378e3, rEI = R + 122e3;
+    const lo = -7.4, hi = -5.3;
+    // a return path from the Moon that would enter far too shallow (about −3°): computed, not scripted
+    const ra = 400000e3, r0 = 260000e3;
+    const gammaAt = (rp) => {
+      const e = (ra - rp) / (ra + rp), p = rp * (1 + e);
+      const cosnu = (p / rEI - 1) / e;
+      const nu = -Math.acos(Math.max(-1, Math.min(1, cosnu)));
+      const vr = Math.sqrt(mu / p) * e * Math.sin(nu), vt = Math.sqrt(mu / p) * (1 + e * Math.cos(nu));
+      return (Math.atan2(vr, vt) * 180) / Math.PI;
+    };
+    let a = rEI - 200e3, b = rEI;
+    for (let i = 0; i < 60; i++) {
+      const m = (a + b) / 2;
+      if (gammaAt(m) < -3.0) a = m;
+      else b = m;
+    }
+    const rp = (a + b) / 2, e = (ra - rp) / (ra + rp), p = rp * (1 + e);
+    const nu0 = -Math.acos((p / r0 - 1) / e);
+    const s = conicState(mu, rp, e, nu0, Math.PI * 0.75);
+    const moonAng = Math.atan2(s.y, s.x) + 0.6;
+    const moon = { name: 'moon', mu: MU.moon, R: 1737.4e3, a: 384400e3, phase0: moonAng };
+    const world = { central: { name: 'earth', mu, R }, bodies: [moon], ship: { ...s, mass: 44000, dry: 44000 - 1500, thrust: 18016, isp: 305 }, hitRadius: { earth: rEI }, hmax: 1800 };
+    const entryAngle = (y) => {
+      const r = Math.hypot(y[0], y[1]), v = Math.hypot(y[2], y[3]);
+      return (Math.asin((y[0] * y[2] + y[1] * y[3]) / (r * v)) * 180) / Math.PI;
+    };
+    return orbitalGame({
+      world,
+      dir: 'retro',
+      clock: orbitClock(mu, 7),
+      burnClock: 20,
+      clockR: (g) => Math.max(Math.hypot(g.w.y[0], g.w.y[1]), 20000e3),
+      horizon: () => 4 * DAY,
+      trailStep: 1e6,
+      check(g) {
+        const o = g.w.orbitAbout('earth');
+        if (o.radialV > 0 && Math.hypot(g.w.y[0], g.w.y[1]) < 100000e3) return g.lose('You missed Earth and swung back out into space! Brake a little more to aim lower.');
+        if (g.w.t > 6 * DAY) return g.lose('Time is up.');
+      },
+      onHit(g, b) {
+        if (b !== 'earth') return g.lose('Crashed into the Moon!');
+        const ang = entryAngle(g.w.y);
+        if (ang < lo) return g.lose(`Entry at ${ang.toFixed(1)}°: too steep! The capsule would get too hot. Brake less next time.`);
+        if (ang > hi) return g.lose(`Entry at ${ang.toFixed(1)}°: too shallow, the capsule skips off the air. Brake a little more.`);
+        const err = Math.abs(ang + 6.5);
+        g.win(err < 0.35 ? 3 : err < 0.8 ? 2 : 1, ['Splashdown! The crew is home safe.', `Entry angle ${ang.toFixed(2)}° (perfect is about −6.5°)`, `Burn used: ${g.w.dvUsed.toFixed(1)} m/s`]);
+      },
+      info(g) {
+        const h2 = g.pred?.hit;
+        const ang = h2 && h2.body === 'earth' ? (Math.asin((h2.x * h2.vx + h2.y * h2.vy) / (Math.hypot(h2.x, h2.y) * Math.hypot(h2.vx, h2.vy))) * 180) / Math.PI : null;
+        const ok = ang != null && ang >= lo && ang <= hi;
+        return [['Entry angle', ang == null ? 'missing Earth!' : `${ang.toFixed(2)}° ${ok ? '✅' : ang > hi ? '(too shallow)' : '(too steep)'}`], ['Safe window', '−5.3° to −7.4°']];
+      },
+      scene: (g) => ({ central: 'earth', bodies: ['moon'], rings: [], focus: [[0, 0], [g.w.y[0], g.w.y[1]], [r0 * 0.9, 0], [-r0 * 0.9, 0], [0, r0 * 0.9], [0, -r0 * 0.9]] }),
+      bot(g) {
+        const h2 = g.pred?.hit;
+        const ang = h2 && h2.body === 'earth' ? (Math.asin((h2.x * h2.vx + h2.y * h2.vy) / (Math.hypot(h2.x, h2.y) * Math.hypot(h2.vx, h2.vy))) * 180) / Math.PI : 0;
+        return { hold: !h2 || ang > -6.4 };
+      },
+    });
+  },
+};
+
+/* ------------------------------------------------------------------ */
+/* 11. Escape Earth (Mangalyaan trans-Mars injection, 1 Dec 2013)       */
+/* ------------------------------------------------------------------ */
+const LESC = {
+  id: 'escape',
+  title: 'Escape Earth',
+  mission: 'Mangalyaan',
+  agency: 'ISRO',
+  year: 2013,
+  button: 'BOOST',
+  control: 'hold',
+  goal: 'Break free of Earth’s gravity with at least 2.6 km/s to spare for the trip to Mars.',
+  guide: ['To reach Mars you must escape Earth completely!', 'Hold BOOST as you swoop past Earth, until the dotted line opens up and flies away.'],
+  fact: 'On 1 December 2013 Mangalyaan fired its engine for about 22 minutes near Earth and left for Mars.',
+  create() {
+    const mu = MU.earth, R = 6378e3;
+    const rp = R + 248e3, ra = R + 192874e3;
+    const e = (ra - rp) / (ra + rp);
+    const s = conicState(mu, rp, e, (-115 * Math.PI) / 180, -Math.PI / 2);
+    const reserve = 845, isp = 315;
+    const world = { central: { name: 'earth', mu, R }, bodies: [], ship: { ...s, mass: wetFor(reserve, 900, isp), dry: reserve, thrust: 440, isp }, hmax: 900 };
+    const need = 2600;
+    const vInf = (o) => (o.energy > 0 ? Math.sqrt(2 * o.energy) : 0);
+    return orbitalGame({
+      world,
+      dir: 'pro',
+      clock: orbitClock(mu, 9),
+      clockR: (g) => Math.hypot(g.w.y[0], g.w.y[1]),
+      horizon: () => 2 * DAY,
+      trailStep: 4e5,
+      check(g) {
+        const o = g.w.orbitAbout('earth');
+        if (!g.burning && vInf(o) >= need) {
+          const dv = g.w.dvUsed;
+          return g.win(dv <= 600 ? 3 : dv <= 720 ? 2 : 1, [`Escaped at ${(vInf(o) / 1000).toFixed(2)} km/s to spare`, `Fuel used: ${Math.round(dv)} m/s of Δv`]);
+        }
+        if (g.w.fuel <= 0 && !g.burning) return g.lose('Out of fuel before escaping. Burn closer to Earth, where you are fastest.');
+        if (o.r > 120000e3 && o.radialV > 0 && g.w.dvUsed > 1) return g.lose(o.energy > 0 ? 'You escaped, but too slowly to reach Mars. Burn longer next time.' : 'Not enough speed: Earth pulled you back. Hold BOOST longer near Earth.');
+        if (g.w.t > 4 * DAY) return g.lose('Time is up. Hold BOOST as you pass close to Earth.');
+      },
+      onHit: (g) => g.lose('Crashed into Earth.'),
+      info(g) {
+        const o = g.w.orbitAbout('earth');
+        return [['Spare speed', o.energy > 0 ? `${(vInf(o) / 1000).toFixed(2)} km/s` : 'still trapped'], ['Goal', '≥ 2.6 km/s']];
+      },
+      scene: (g) => ({ central: 'earth', bodies: [], rings: [], focus: [[0, 0], [g.w.y[0], g.w.y[1]], [rp * 6, 0], [-rp * 6, 0], [0, rp * 6], [0, -rp * 6]] }),
+      bot(g) {
+        const o = g.w.orbitAbout('earth');
+        return { hold: o.r < rp * 1.45 && vInf(o) < need * 1.01 };
+      },
+    });
+  },
+};
+
 export const CHAPTERS = [
-  { id: 'moon', title: 'To the Moon', levels: ['raise', 'moonshot', 'catchmoon', 'vikram'] },
-  { id: 'mars', title: 'Mars & beyond', levels: ['window', 'marscapture', 'terror', 'slingshot'] },
+  { id: 'moon', title: 'To the Moon', levels: ['raise', 'moonshot', 'catchmoon', 'vikram', 'hop', 'home13'] },
+  { id: 'mars', title: 'Mars & beyond', levels: ['escape', 'window', 'marscapture', 'terror', 'slingshot'] },
 ];
-export const LEVELS = [L1, L2, L3, L4, L5, L6, L7, L8];
+export const LEVELS = [L1, L2, L3, L4, LHOP, L13, LESC, L5, L6, L7, L8];
 export const levelById = (id) => LEVELS.find((l) => l.id === id);

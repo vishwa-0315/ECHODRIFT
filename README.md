@@ -10,8 +10,9 @@ Chandrayaan-3 · Vikram · Mangalyaan · Aditya-L1 · Apollo 11 · Apollo 13 · 
 > The earlier fictional prototype, *ECHO DRIFT*, lives on the [`echo-drift`](../../tree/echo-drift) branch.
 
 ## How it plays
-- **Quick play (for everyone):** 8 short levels from real missions, one big button each: *Raise the orbit*, *Moon shot*, *Catch the Moon*, *Vikram touchdown*, *Launch window*, *Mars orbit insertion*, *Seven minutes of terror*, *Jupiter slingshot*.
-- **Vyom**, a friendly robot guide, explains each level in two lines and can fly it for you ("Watch Vyom").
+- **Quick play (for everyone):** 11 short levels from real missions, one big button each: *Raise the orbit*, *Moon shot*, *Catch the Moon*, *Vikram touchdown*, *Vikram's hop*, *Get them home* (Apollo 13), *Escape Earth*, *Launch window*, *Mars orbit insertion*, *Seven minutes of terror*, *Jupiter slingshot*.
+- **Smart camera:** zooms in on flybys and captures, with a close-up window and Auto / Wide / Follow modes.
+- **Vyom**, a friendly robot guide, explains every level, mission and lab, and can fly a level for you ("Watch Vyom").
 - **Rewards:** stars, 8 badges, 5 rocket colours to unlock, music and sound effects, and a quiz card after every level.
 - **Expert mode:** the full missions on their real dates, where you plan every burn yourself, plus four discovery labs.
 

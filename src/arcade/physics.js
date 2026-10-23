@@ -13,7 +13,7 @@
  * The only arcade liberty is time: the clock runs fast far from planets and
  * slows down near them, where the action is.
  */
-import { createDopri } from '../core/ode.js';
+import { createDopri, rk4Step, rk4Scratch } from '../core/ode.js';
 import { G0 } from '../core/constants.js';
 
 export function circularBody(b) {
@@ -141,18 +141,42 @@ export function createWorld(def) {
     return null;
   }
 
+  /**
+   * A step ended inside a body: step again from the last state outside it in
+   * small RK4 steps to find the exact moment of contact (so entry angles and
+   * crash points are precise, whatever the integrator's step size was).
+   */
+  const scratch = rk4Scratch(5);
+  function refineHit(t0, y0, t1, y) {
+    const n = 400, h = (t1 - t0) / n;
+    const yy = y0.slice();
+    let t = t0;
+    for (let i = 0; i < n; i++) {
+      rk4Step(deriv, t, yy, h, 5, scratch);
+      t += h;
+      if (collided(t, yy)) {
+        for (let k = 0; k < 5; k++) y[k] = yy[k];
+        return t;
+      }
+    }
+    return t1;
+  }
+
   /** Advance dt simulated seconds (the engine burns while w.burn is set and fuel remains). */
   w.advance = (dt) => {
     if (w.status !== 'flying' || dt <= 0) return;
     const m0 = w.y[4];
     let hitBody = null;
+    let pt = w.t, py = w.y.slice();
     integ.advance(w.t, w.y, dt, (t, y) => {
       const c = collided(t, y);
       if (c) {
         hitBody = c;
-        w.t = t;
+        w.t = refineHit(pt, py, t, y);
         return true;
       }
+      pt = t;
+      py = y.slice();
       return false;
     });
     if (!hitBody) w.t += dt;
@@ -180,6 +204,7 @@ export function createWorld(def) {
     const dtS = horizon / samples;
     let t = w.t;
     let nextS = t;
+    let pt = t, py = y.slice();
     p.advance(t, y, horizon, (tt, yy) => {
       for (const b of bodies) {
         const q = bodyState(b, tt, tmp);
@@ -194,9 +219,14 @@ export function createWorld(def) {
       }
       const c = collided(tt, yy);
       if (c) {
-        hit = { body: c, t: tt, x: yy[0], y: yy[1], vx: yy[2], vy: yy[3] };
-        path.push(yy[0], yy[1], tt);
+        const th = refineHit(pt, py, tt, yy);
+        hit = { body: c, t: th, x: yy[0], y: yy[1], vx: yy[2], vy: yy[3] };
+        path.push(yy[0], yy[1], th);
         return true;
+      }
+      if (!c) {
+        pt = tt;
+        py = yy.slice();
       }
       return false;
     });

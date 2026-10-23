@@ -1,5 +1,6 @@
 /** App shell: navigation, progress save, settings, modals, toasts, audio. */
 import { h, clear, put } from './dom.js';
+import { vyomSVG } from './guide.js';
 
 export const VERSION = '1.0.0';
 const KEY = 'launchwindow.save.v1';
@@ -71,8 +72,12 @@ export function createApp(root, content, screens) {
       s.mounted?.();
       window.scrollTo(0, 0);
     },
-    toast(msg, ms = 3200) {
-      const el = h('div.toast', { role: 'status', 'aria-live': 'polite' }, msg);
+    toast(msg, ms = 3200, mood = 'normal') {
+      // hints are spoken by Vyom
+      root.querySelectorAll('.toast').forEach((t) => t.remove());
+      const face = h('span.toast-vyom');
+      face.innerHTML = vyomSVG(mood, 34);
+      const el = h('div.toast', { role: 'status', 'aria-live': 'polite' }, face, h('span', msg));
       root.appendChild(el);
       setTimeout(() => el.remove(), ms);
     },
@@ -83,7 +88,11 @@ export function createApp(root, content, screens) {
           ov.remove();
           resolve(v);
         };
-        put(ov, h('div.modal', body, h('div.row.wrap', { style: { justifyContent: 'flex-end', marginTop: '14px' } }, buttons.map((b) => h('button.btn' + (b.cls ? '.' + b.cls : ''), { onclick: () => close(b.value), 'data-testid': 'modal-' + String(b.value) }, b.label)))));
+        // Vyom reacts to results: happy on success, sad on failure
+        const mood = body?.querySelector?.('h2.ok') ? 'happy' : body?.querySelector?.('h2.no') ? 'sad' : null;
+        const face = mood ? h('div.modal-vyom') : null;
+        if (face) face.innerHTML = vyomSVG(mood, 64);
+        put(ov, h('div.modal', face, body, h('div.row.wrap', { style: { justifyContent: 'flex-end', marginTop: '14px' } }, buttons.map((b) => h('button.btn' + (b.cls ? '.' + b.cls : ''), { onclick: () => close(b.value), 'data-testid': 'modal-' + String(b.value) }, b.label)))));
         root.appendChild(ov);
         ov.querySelector('button:last-child')?.focus();
       });

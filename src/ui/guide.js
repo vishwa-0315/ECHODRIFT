@@ -71,3 +71,10 @@ export function guide({ compact = false } = {}) {
     },
   };
 }
+
+/** A static Vyom tip for normal pages: face + speech bubble (no tapping needed). */
+export function vyomNote(text, mood = 'normal') {
+  const face = h('div.vyom-face');
+  face.innerHTML = vyomSVG(mood, 52);
+  return h('div.vyom-note', { role: 'note' }, face, h('div.bubble', Array.isArray(text) ? text.map((t) => h('div', t)) : text));
+}

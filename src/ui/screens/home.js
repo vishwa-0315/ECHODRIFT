@@ -8,7 +8,7 @@ import { progress } from '../../game/progress.js';
 import { guide } from '../guide.js';
 import { setAudio, setMood, startMusic, sfx, unlockAudio } from '../audio.js';
 
-const ICON = { raise: '🛰️', moonshot: '🌙', catchmoon: '🎯', vikram: '🛬', window: '🪐', marscapture: '🔴', terror: '🪂', slingshot: '☄️' };
+const ICON = { raise: '🛰️', moonshot: '🌙', catchmoon: '🎯', vikram: '🛬', window: '🪐', marscapture: '🔴', terror: '🪂', slingshot: '☄️', hop: '🦘', home13: '🌊', escape: '🚀' };
 
 export function homeScreen(app, params = {}) {
   const prog = progress(app);

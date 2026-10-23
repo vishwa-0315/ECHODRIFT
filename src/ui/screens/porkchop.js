@@ -3,6 +3,7 @@ import { h, clear, put, fitCanvas } from '../dom.js';
 import { porkchop } from '../../missions/orbital.js';
 import { dv, kg } from '../fmt.js';
 import { DAY } from '../../core/constants.js';
+import { vyomNote } from '../guide.js';
 
 export function porkchopScreen(app, { id }) {
   const m = app.content.missions.find((x) => x.id === id);
@@ -94,6 +95,7 @@ export function porkchopScreen(app, { id }) {
   const el = h(
     'div.screen',
     h('div.topbar', h('button.btn.icon.ghost', { 'aria-label': 'Back', onclick: () => app.go('briefing', { id }) }, '←'), h('h2', 'Choose your launch window')),
+    vyomNote('Green squares mean Mangalyaan has enough fuel. The white circle is ISRO’s real choice. Tap a square, then launch!'),
     h('p', 'Earth and Mars line up for an affordable trip only once every 26 months. Each square is a real trajectory, computed from the planets’ real positions with Lambert’s problem. Green means Mangalyaan’s small fuel tank is enough.'),
     canvas,
     h('div.row.wrap.small.muted', { style: { margin: '6px 0' } }, h('span', '■ ', h('span', { style: { color: '#2f8f4e' } }, 'plenty')), h('span', '■ ', h('span', { style: { color: '#52d273' } }, 'ok')), h('span', '■ ', h('span', { style: { color: '#ffcc4d' } }, 'tight')), h('span', '■ ', h('span', { style: { color: '#a8582a' } }, 'not enough')), h('span', '○ the real 2013 choice')),

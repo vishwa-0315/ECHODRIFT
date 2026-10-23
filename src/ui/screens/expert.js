@@ -4,6 +4,7 @@ import { utc } from '../fmt.js';
 import { starField, drawBody } from '../render.js';
 import { helioState } from '../../core/ephem.js';
 import { AU } from '../../core/constants.js';
+import { vyomNote } from '../guide.js';
 
 export const LABS = [
   { id: 'galileo', year: 1610, title: 'Weigh Jupiter like Galileo', who: 'Galileo Galilei · Kepler’s 3rd law', desc: 'Track Io across real nights and use its orbit to measure Jupiter’s mass.' },
@@ -75,6 +76,7 @@ export function expertScreen(app) {
       sky,
       h('div.inner', h('div.row', h('button.btn.icon.sm', { 'aria-label': 'Back', onclick: () => app.go('home') }, '←'), h('div.label', 'Expert mode')), h('h1', 'Full missions'), h('p', { style: { maxWidth: '40ch' } }, 'Plan every burn yourself, on the real dates, with the real spacecraft. For experienced pilots.'), clock),
     ),
+    vyomNote('These are the full missions, on their real dates. You plan every burn yourself. Stuck? Press ✦ Mission Assist and I’ll plan it for you!', 'happy'),
     h('div.row.wrap', h('button.btn.primary', { onclick: () => app.go('explorer') }, '🪐 Solar System now'), h('button.btn', { onclick: () => app.go('about') }, 'How the physics works')),
     h('div.section', h('h3', 'ISRO missions'), h('span.small.muted', 'India’s journey to the Moon, Mars and the Sun')),
     h('div.cards', isro.map(card)),

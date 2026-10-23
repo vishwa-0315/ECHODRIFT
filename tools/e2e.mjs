@@ -52,7 +52,7 @@ if (!ONLY || ONLY === 'quick') {
   await page.click('[data-testid=quiz-1]');
   await page.click('[data-testid=quiz-next]');
   await page.waitForSelector('[data-testid=main-btn]');
-  for (const id of ['moonshot', 'catchmoon', 'vikram', 'window', 'marscapture', 'terror', 'slingshot']) {
+  for (const id of ['moonshot', 'catchmoon', 'vikram', 'hop', 'home13', 'escape', 'window', 'marscapture', 'terror', 'slingshot']) {
     await page.evaluate((id) => window.__LW.go('play', { id, demo: true }), id);
     await page.waitForSelector('.result-card', { timeout: 120000 });
     result['quick-' + id] = await page.evaluate(() => window.__LW.current.game.status + ' ' + window.__LW.current.game.stars + '★');

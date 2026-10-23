@@ -5,11 +5,19 @@ import { keplerMass, rvMinMass, chirpFrequency, chirpMassOf } from '../../core/l
 import { G, C, MSUN, MJUP, DAY, PC, LY } from '../../core/constants.js';
 import { sci } from '../fmt.js';
 import { LABS } from './expert.js';
+import { vyomNote } from '../guide.js';
+
+const LAB_TIPS = {
+  galileo: 'Slide to a moment when Io is farthest to the right (east) and press Mark peak. Do it for two peaks: I’ll do the maths!',
+  exoplanet: 'Move the three sliders until the blue curve runs through the yellow dots.',
+  gw: 'Slide the chirp mass until your template rises in pitch just like the data. Try the 🔊 buttons!',
+  blackhole: 'Drag the two blue lines onto the brightest part of the ring, one on each side.',
+};
 
 export function labScreen(app, { id }) {
   const meta = LABS.find((l) => l.id === id);
   const body = h('div.col');
-  const el = h('div.screen', h('div.topbar', h('button.btn.icon.ghost', { 'aria-label': 'Back', onclick: () => app.go('expert') }, '←'), h('h2', meta.title)), h('div.label', meta.who), body);
+  const el = h('div.screen', h('div.topbar', h('button.btn.icon.ghost', { 'aria-label': 'Back', onclick: () => app.go('expert') }, '←'), h('h2', meta.title)), h('div.label', meta.who), vyomNote(LAB_TIPS[id] || 'Let’s discover something!'), body);
   const labs = { galileo, exoplanet, gw, blackhole };
   let cleanup = () => {};
   const finish = async (title, lines, real) => {
