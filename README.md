@@ -42,7 +42,7 @@ After every content or code change, run `npm run android:sync` again.
 The repo includes `.github/workflows/android.yml`. Once it's on GitHub:
 
 - **Every push to `main`** runs the tests and builds an APK. Open the repo's **Actions** tab, click the latest run, and download **EchoDrift-apk** from the Artifacts section. It downloads as a zip with the .apk inside, and you need to be signed in to GitHub.
-- **To get a phone-friendly download link**, create a tag: `git tag v1.0.1 && git push origin v1.0.1`. The APK then appears on the repo's **Releases** page. Open that page on your phone, tap the .apk, and install it (allow "Install unknown apps" when asked).
+- **Phone-friendly download:** every successful build on `main` also publishes the APK on the repo's **Releases** page (as "Echo Drift build N"). Open that page on your phone, tap the .apk, and install it (allow "Install unknown apps" when asked). Pushing a tag like `v1.0.1` creates a release with that name instead.
 - You can also start a build without pushing: Actions › Build Android APK › **Run workflow**.
 
 ## Project layout

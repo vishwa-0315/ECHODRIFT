@@ -1,6 +1,7 @@
 # Builds the ECHO DRIFT Android app on GitHub's servers.
 # - Every push to main (or "Run workflow" on the Actions tab): tests + APK, downloadable from the run page.
-# - Pushing a tag like v1.0.1: also publishes the APK on the Releases page (easy to open on a phone).
+# - Every successful build on main also publishes the APK on the Releases page
+#   (a release named "Echo Drift build N"), which is the easiest place to download it on a phone.
 name: Build Android APK
 
 on:
@@ -44,7 +45,7 @@ jobs:
           ./gradlew assembleDebug --no-daemon
 
       - name: Rename APK
-        run: cp android/app/build/outputs/apk/debug/app-debug.apk EchoDrift-${{ github.ref_name }}.apk
+        run: cp android/app/build/outputs/apk/debug/app-debug.apk EchoDrift-build${{ github.run_number }}.apk
 
       - name: Upload APK (download from this run's page)
         uses: actions/upload-artifact@v4
@@ -52,10 +53,14 @@ jobs:
           name: EchoDrift-apk
           path: EchoDrift-*.apk
 
-      - name: Publish release (tags only)
-        if: startsWith(github.ref, 'refs/tags/v')
+      - name: Publish release (APK download for phones)
+        if: github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/v')
         uses: softprops/action-gh-release@v2
         with:
+          tag_name: ${{ startsWith(github.ref, 'refs/tags/v') && github.ref_name || format('build-{0}', github.run_number) }}
+          name: Echo Drift ${{ startsWith(github.ref, 'refs/tags/v') && github.ref_name || format('build {0}', github.run_number) }}
+          target_commitish: ${{ github.sha }}
+          make_latest: true
           files: EchoDrift-*.apk
           body: |
             Install on Android: download the .apk below on your phone, open it, and allow "Install unknown apps" when asked.
