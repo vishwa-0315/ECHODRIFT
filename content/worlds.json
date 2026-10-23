@@ -1,0 +1,290 @@
+[
+  {
+    "id": "cinder",
+    "order": 1,
+    "name": "Cinder",
+    "tagline": "A scorched world under a crater-pocked sky.",
+    "status": "playable",
+    "color": "#ff8a3d",
+    "distanceLy": 38,
+    "levels": [
+      "cinder-1",
+      "cinder-2",
+      "cinder-3"
+    ],
+    "map": {
+      "x": 0.2,
+      "y": 0.86
+    },
+    "objectives": [
+      {
+        "id": "gravity-distance",
+        "text": "Gravity gets weaker with distance, and stronger with more mass.",
+        "tags": [
+          "gravity",
+          "NGSS MS-PS2-4",
+          "CBSE Gravitation"
+        ],
+        "grade": "6-9",
+        "chapter": "CBSE Class 9 Science: Gravitation"
+      },
+      {
+        "id": "orbits-falling",
+        "text": "An orbit is falling around a world while moving sideways fast enough to keep missing it.",
+        "tags": [
+          "gravity",
+          "orbits",
+          "NGSS MS-ESS1-2"
+        ],
+        "grade": "6-9",
+        "chapter": "CBSE Class 9 Science: Gravitation"
+      },
+      {
+        "id": "gravity-assist",
+        "text": "Flying past a moving moon or planet can add speed for free (a gravity assist).",
+        "tags": [
+          "gravity",
+          "energy"
+        ],
+        "grade": "8-10"
+      },
+      {
+        "id": "superposition",
+        "text": "In undisturbed rock layers, deeper layers are older.",
+        "tags": [
+          "earth-science",
+          "evidence"
+        ],
+        "grade": "6-8",
+        "chapter": "ICSE Geography: Rocks"
+      }
+    ]
+  },
+  {
+    "id": "veil",
+    "order": 2,
+    "name": "Veil",
+    "tagline": "Yellow clouds hide a surface hotter than an oven.",
+    "status": "playable",
+    "color": "#d6c75a",
+    "distanceLy": 38,
+    "levels": [
+      "veil-1",
+      "veil-2"
+    ],
+    "map": {
+      "x": 0.68,
+      "y": 0.72
+    },
+    "objectives": [
+      {
+        "id": "greenhouse",
+        "text": "Gases like carbon dioxide trap heat; too much makes a world far hotter.",
+        "tags": [
+          "atmosphere",
+          "greenhouse",
+          "NGSS MS-ESS3-5"
+        ],
+        "grade": "6-9",
+        "chapter": "CBSE Class 8 Science: Pollution of Air and Water"
+      },
+      {
+        "id": "habitable-zone",
+        "text": "Liquid water needs a world at the right distance from its star: the habitable zone.",
+        "tags": [
+          "atmosphere",
+          "stellar life cycle"
+        ],
+        "grade": "8-10"
+      },
+      {
+        "id": "atmosphere-drag",
+        "text": "Air pushes back on fast-moving objects; spacecraft can use it to slow down.",
+        "tags": [
+          "atmosphere",
+          "forces"
+        ],
+        "grade": "7-9"
+      },
+      {
+        "id": "hohmann",
+        "text": "The most fuel-efficient way between two orbits uses two well-timed burns.",
+        "tags": [
+          "orbits",
+          "energy"
+        ],
+        "grade": "9-10"
+      }
+    ]
+  },
+  {
+    "id": "hollow",
+    "order": 3,
+    "name": "Hollow",
+    "tagline": "A world scoured by its own star's light.",
+    "status": "playable",
+    "color": "#8f7bff",
+    "distanceLy": 38,
+    "levels": [
+      "hollow-1",
+      "hollow-2",
+      "hollow-3"
+    ],
+    "map": {
+      "x": 0.3,
+      "y": 0.58
+    },
+    "objectives": [
+      {
+        "id": "light-delay",
+        "text": "Light takes time to travel, so we see distant stars as they were in the past.",
+        "tags": [
+          "light",
+          "stellar life cycle",
+          "NGSS MS-PS4-2"
+        ],
+        "grade": "6-10",
+        "chapter": "CBSE Class 8 Science: Stars and the Solar System"
+      },
+      {
+        "id": "star-change",
+        "text": "Stars change over their lives; a Sun-like star slowly brightens, then swells into a red giant.",
+        "tags": [
+          "stellar life cycle"
+        ],
+        "grade": "8-10"
+      },
+      {
+        "id": "lagrange",
+        "text": "There are balance points where a small object can ride along with a planet.",
+        "tags": [
+          "gravity",
+          "orbits"
+        ],
+        "grade": "9-10"
+      },
+      {
+        "id": "escape-velocity",
+        "text": "To leave a world for good you need enough speed: escape velocity.",
+        "tags": [
+          "gravity",
+          "energy"
+        ],
+        "grade": "8-10"
+      }
+    ]
+  },
+  {
+    "id": "tides",
+    "order": 4,
+    "name": "Tides",
+    "tagline": "A moon being slowly pulled apart.",
+    "status": "comingSoon",
+    "color": "#4fc3f7",
+    "map": {
+      "x": 0.74,
+      "y": 0.45
+    },
+    "teaser": "Something tore a moon into rings. Tidal forces, the Roche limit, and a world that always shows one face.",
+    "objectives": [
+      {
+        "id": "tides",
+        "text": "Tidal forces stretch moons and can lock their spin.",
+        "tags": [
+          "gravity",
+          "tides"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "ice",
+    "order": 5,
+    "name": "Ice",
+    "tagline": "An ocean hidden under a frozen shell.",
+    "status": "comingSoon",
+    "color": "#b3e5fc",
+    "map": {
+      "x": 0.22,
+      "y": 0.34
+    },
+    "teaser": "The Orrin tried to move outward, to where water stays liquid under ice.",
+    "objectives": [
+      {
+        "id": "ice-line",
+        "text": "Beyond the ice line, water freezes; some moons hide liquid oceans below.",
+        "tags": [
+          "astrobiology",
+          "habitable zone"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "spore",
+    "order": 6,
+    "name": "Spore",
+    "tagline": "Life that refused to give up.",
+    "status": "comingSoon",
+    "color": "#9ccc65",
+    "map": {
+      "x": 0.7,
+      "y": 0.22
+    },
+    "teaser": "Tough microbes adapted as their star brightened. What are the signs of life from far away?",
+    "objectives": [
+      {
+        "id": "biosignatures",
+        "text": "Some gases in an atmosphere can hint at life.",
+        "tags": [
+          "astrobiology"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "glass",
+    "order": 7,
+    "name": "Glass",
+    "tagline": "Air stripped away by a stellar wind.",
+    "status": "comingSoon",
+    "color": "#80deea",
+    "map": {
+      "x": 0.26,
+      "y": 0.15
+    },
+    "teaser": "Without a magnetic shield, a star's wind can blow a world's air into space.",
+    "objectives": [
+      {
+        "id": "magnetosphere",
+        "text": "A magnetic field can shield an atmosphere from the stellar wind.",
+        "tags": [
+          "atmosphere",
+          "magnetism"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "origin",
+    "order": 8,
+    "name": "Origin",
+    "tagline": "Where the signal began.",
+    "status": "comingSoon",
+    "color": "#ff5fa2",
+    "map": {
+      "x": 0.55,
+      "y": 0.09
+    },
+    "teaser": "The final message, a red giant's glow, and what the Orrin wanted us to know.",
+    "objectives": [
+      {
+        "id": "red-giant",
+        "text": "Sun-like stars end as red giants, planetary nebulae and white dwarfs.",
+        "tags": [
+          "stellar life cycle"
+        ]
+      }
+    ]
+  }
+]

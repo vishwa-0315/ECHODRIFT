@@ -1,0 +1,40 @@
+{
+  "ingredients": [
+    { "id": "H", "name": "Hydrogen", "color": "#7fd3ff", "desc": "The main fuel. Stars fuse it into helium." },
+    { "id": "He", "name": "Helium", "color": "#ffe27a", "desc": "What hydrogen becomes. Old stars burn it next." },
+    { "id": "C", "name": "Carbon", "color": "#a0a0a0", "desc": "Made inside ageing stars. It's in you, too!" },
+    { "id": "O", "name": "Oxygen", "color": "#8affc1", "desc": "Forged in stars and spread by dying ones." },
+    { "id": "Fe", "name": "Iron", "color": "#c46a4a", "desc": "Hmm… stars really don't like this one." }
+  ],
+  "massMin": 0.05,
+  "massMax": 40,
+  "types": {
+    "browndwarf": { "name": "Brown dwarf", "color": "#8a4b3a", "joke": "Too small to ignite. It's basically a very warm potato." },
+    "reddwarf": { "name": "Red dwarf", "color": "#ff6a4d", "joke": "Small, cosy and slow-cooked. It'll simmer for TRILLIONS of years." },
+    "sunlike": { "name": "Sun-like star", "color": "#ffd25e", "joke": "Golden brown, done to perfection. Chef's kiss!" },
+    "whitestar": { "name": "Hot white star", "color": "#e9f1ff", "joke": "Extra crispy. Bright, but it won't last as long." },
+    "bluegiant": { "name": "Blue giant", "color": "#7fb2ff", "joke": "WAY too much heat! Lives fast, ends with a BANG." }
+  },
+  "stages": {
+    "reddwarf": "Red dwarf: burns slowly for trillions of years",
+    "slowfade": "Slowly runs out of fuel… longer than the universe has existed so far",
+    "whitedwarf": "White dwarf: a hot, Earth-sized leftover core that cools forever",
+    "sunlike": "Main sequence: steady, slowly brightening, for about 10 billion years",
+    "whitestar": "Main sequence: hot and bright, for under a billion years",
+    "bluegiant": "Main sequence: blazing, for only a few million years",
+    "redgiant": "Red giant: the core runs low on hydrogen and the star swells hundreds of times wider",
+    "nebula": "Planetary nebula: outer layers drift away as a glowing shell",
+    "supergiant": "Supergiant: fuses heavier elements, all the way up to iron",
+    "supernova": "Supernova: the iron core collapses and the star explodes",
+    "neutronstar": "Neutron star: a city-sized ball, denser than anything on Earth",
+    "blackhole": "Black hole: gravity so strong that not even light escapes",
+    "browndwarf": "Never ignites. Not quite a star."
+  },
+  "brightenPerGyr": { "sunlike": 0.1, "whitestar": 0.25, "reddwarf": 0.0, "bluegiant": 0.4 },
+  "ironFizzle": "FZZZT! Fusing iron takes energy instead of giving it out. That's why a big star's iron core collapses!",
+  "worlds": {
+    "cinder": { "requirement": { "types": ["sunlike"], "minHydrogen": 2 }, "goal": "The jump drive needs a steady, Sun-like star to lock onto.", "success": "Jump drive locked on! Next stop: Veil." },
+    "veil": { "requirement": { "types": ["reddwarf"], "minHydrogen": 2 }, "goal": "Tobo wants a calm, long-lasting star to recharge slowly.", "success": "Slow and steady. Recharged. Hollow, here we come." },
+    "hollow": { "requirement": { "types": ["sunlike"], "minHydrogen": 2 }, "goal": "Forge a star like the Orrin's, then watch its whole life.", "success": "Now we know what the Orrin saw coming." }
+  }
+}

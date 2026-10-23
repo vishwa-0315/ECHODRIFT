@@ -1,0 +1,10 @@
+{
+  "_note": "Art/audio swap list. Each entry says where the placeholder is generated, so real art can replace it without touching game logic.",
+  "portraits": { "where": "src/ui/art.js › portrait(who, mood)", "ids": ["asha", "kiran", "tobo", "mc1", "orrin"], "moods": ["happy", "excited", "calm", "thinking", "worried", "sad", "determined"] },
+  "bodies": { "where": "src/ui/art.js › drawBody()", "kinds": ["planet", "moon", "star", "blackhole"], "colorsFrom": "content/flight_levels.json › bodies[].color" },
+  "scenes": { "where": "src/ui/art.js › sceneSVG()", "featureTypes": ["crater", "cliff", "vent", "ruin", "volcano", "seabed", "clouds", "bigstar", "dome", "tubes"], "dataFrom": "content/investigations.json › scene" },
+  "glyphs": { "where": "src/ui/art.js › glyphSVG()", "styles": ["dots", "binary"] },
+  "gallery": { "dataFrom": "content/extras.json › gallery (image: null = placeholder)" },
+  "audio": { "where": "src/ui/audio.js › sfx", "effects": ["click", "blip", "ping", "burn", "whoosh", "success", "fail", "boom", "scan", "fizzle", "boing", "tick", "star"], "music": "ambient pad (startPad)" },
+  "fonts": ["Atkinson Hyperlegible (default)", "OpenDyslexic (option)"]
+}

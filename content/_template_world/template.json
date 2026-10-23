@@ -1,0 +1,668 @@
+{
+  "_comment": "Copy each block into the matching content file. See README.md in this folder.",
+  "world": {
+    "id": "veil",
+    "order": 2,
+    "name": "Veil",
+    "tagline": "Yellow clouds hide a surface hotter than an oven.",
+    "status": "playable",
+    "color": "#d6c75a",
+    "distanceLy": 38,
+    "levels": [
+      "veil-1",
+      "veil-2"
+    ],
+    "map": {
+      "x": 0.68,
+      "y": 0.72
+    },
+    "objectives": [
+      {
+        "id": "greenhouse",
+        "text": "Gases like carbon dioxide trap heat; too much makes a world far hotter.",
+        "tags": [
+          "atmosphere",
+          "greenhouse",
+          "NGSS MS-ESS3-5"
+        ],
+        "grade": "6-9",
+        "chapter": "CBSE Class 8 Science: Pollution of Air and Water"
+      },
+      {
+        "id": "habitable-zone",
+        "text": "Liquid water needs a world at the right distance from its star: the habitable zone.",
+        "tags": [
+          "atmosphere",
+          "stellar life cycle"
+        ],
+        "grade": "8-10"
+      },
+      {
+        "id": "atmosphere-drag",
+        "text": "Air pushes back on fast-moving objects; spacecraft can use it to slow down.",
+        "tags": [
+          "atmosphere",
+          "forces"
+        ],
+        "grade": "7-9"
+      },
+      {
+        "id": "hohmann",
+        "text": "The most fuel-efficient way between two orbits uses two well-timed burns.",
+        "tags": [
+          "orbits",
+          "energy"
+        ],
+        "grade": "9-10"
+      }
+    ]
+  },
+  "flightLevels": [
+    {
+      "id": "veil-1",
+      "world": "veil",
+      "title": "Skim the Haze",
+      "brief": "You're coming in way too fast to stop with fuel. Dip into Veil's thick air to slow down, but not too deep!",
+      "bounds": {
+        "w": 600,
+        "h": 1000
+      },
+      "bodies": [
+        {
+          "id": "veil",
+          "type": "planet",
+          "name": "Veil",
+          "mass": 80000,
+          "radius": 50,
+          "x": 300,
+          "y": 520,
+          "color": "#d6c75a"
+        }
+      ],
+      "atmospheres": [
+        {
+          "body": "veil",
+          "height": 46,
+          "density": 0.03,
+          "scaleHeight": 11
+        }
+      ],
+      "heatLimit": 75,
+      "ship": {
+        "x": 40,
+        "y": 60,
+        "vx": 26,
+        "vy": 30
+      },
+      "objective": {
+        "type": "aerobrake",
+        "target": "veil",
+        "rMin": 55,
+        "rMax": 320,
+        "hold": 4,
+        "strict": true
+      },
+      "fuel": 14,
+      "maxDvPerBurn": 14,
+      "maxBurns": 2,
+      "maxTime": 70,
+      "timeScale": 1.3,
+      "goals": {
+        "fuelLeftPct": 50,
+        "hull": 80,
+        "time": 30
+      },
+      "hints": [
+        "Aim your path so it grazes the glowing haze, not the planet.",
+        "Too much heat? Your path is too deep. Nudge it outward a little."
+      ],
+      "concepts": [
+        "atmosphere-drag",
+        "orbits-falling"
+      ],
+      "fact": "f-aerobraking"
+    },
+    {
+      "id": "veil-2",
+      "world": "veil",
+      "title": "Two-Burn Transfer",
+      "brief": "Climb from a low orbit up to the Orrin relay ring using as little fuel as possible.",
+      "bounds": {
+        "w": 600,
+        "h": 1000
+      },
+      "bodies": [
+        {
+          "id": "veil",
+          "type": "planet",
+          "name": "Veil",
+          "mass": 80000,
+          "radius": 50,
+          "x": 300,
+          "y": 500,
+          "color": "#d6c75a"
+        },
+        {
+          "id": "relay",
+          "type": "station",
+          "name": "Orrin relay",
+          "mass": 0,
+          "drawRadius": 9,
+          "color": "#3ff0d2",
+          "orbit": {
+            "parent": "veil",
+            "radius": 220,
+            "phaseDeg": 300
+          }
+        }
+      ],
+      "atmospheres": [
+        {
+          "body": "veil",
+          "height": 20,
+          "density": 0.01,
+          "scaleHeight": 8
+        }
+      ],
+      "ship": {
+        "orbit": {
+          "body": "veil",
+          "radius": 95,
+          "phaseDeg": 90
+        }
+      },
+      "objective": {
+        "type": "hohmann",
+        "target": "veil",
+        "rMin": 195,
+        "rMax": 250,
+        "hold": 6,
+        "strict": true
+      },
+      "fuel": 18,
+      "maxDvPerBurn": 12,
+      "maxBurns": 3,
+      "maxTime": 100,
+      "timeScale": 1.8,
+      "hazards": {
+        "gusts": [
+          {
+            "start": 14,
+            "duration": 2.5,
+            "angleDeg": 0,
+            "accel": 1.2
+          }
+        ]
+      },
+      "goals": {
+        "fuelLeftPct": 30,
+        "hull": 100,
+        "time": 40
+      },
+      "hints": [
+        "Burn FORWARD (the way you're moving). That raises the far side of your orbit.",
+        "Coast to the highest point, then burn forward again to round out the orbit."
+      ],
+      "concepts": [
+        "hohmann",
+        "orbits-falling"
+      ],
+      "fact": "f-hohmann"
+    }
+  ],
+  "investigation": {
+    "world": "veil",
+    "charges": 4,
+    "answer": "greenhouse",
+    "scene": {
+      "sky": "#5a5420",
+      "ground": "#7a5a2a",
+      "features": [
+        {
+          "type": "clouds",
+          "x": 0.5,
+          "w": 1
+        },
+        {
+          "type": "volcano",
+          "x": 0.78,
+          "w": 0.22
+        },
+        {
+          "type": "seabed",
+          "x": 0.3,
+          "w": 0.3
+        },
+        {
+          "type": "ruin",
+          "x": 0.55,
+          "w": 0.12
+        }
+      ]
+    },
+    "hotspots": [
+      {
+        "id": "clouds",
+        "label": "Thick clouds",
+        "x": 0.3,
+        "y": 0.2
+      },
+      {
+        "id": "plains",
+        "label": "Cracked plains",
+        "x": 0.6,
+        "y": 0.72
+      },
+      {
+        "id": "seabed",
+        "label": "Dry basin",
+        "x": 0.28,
+        "y": 0.66
+      },
+      {
+        "id": "volcano",
+        "label": "Old volcano",
+        "x": 0.8,
+        "y": 0.5
+      },
+      {
+        "id": "salt",
+        "label": "Salt crust",
+        "x": 0.44,
+        "y": 0.78
+      }
+    ],
+    "clues": [
+      {
+        "id": "v-co2",
+        "hotspot": "clouds",
+        "tool": "spectrometer",
+        "title": "CO₂ blanket",
+        "data": "Atmosphere 96% CO₂, about 90× thicker than Earth's, with sulfuric-acid clouds.",
+        "dataCadet": "The air is almost all carbon dioxide, a gas that traps heat. And it's super thick!",
+        "weights": {
+          "greenhouse": 3,
+          "volcanism": 1
+        }
+      },
+      {
+        "id": "v-heat",
+        "hotspot": "plains",
+        "tool": "thermal",
+        "title": "Oven world",
+        "data": "Surface 460 °C, almost the same day and night, pole to equator. Heat is trapped everywhere.",
+        "dataCadet": "It's 460 °C everywhere, day AND night. The heat can't escape.",
+        "weights": {
+          "greenhouse": 3
+        }
+      },
+      {
+        "id": "v-sea",
+        "hotspot": "seabed",
+        "tool": "drill",
+        "title": "Lost oceans",
+        "data": "Ripple marks and salt layers: this basin was a sea. The water is gone.",
+        "dataCadet": "Ripples and salt, so this was once a sea!",
+        "weights": {
+          "greenhouse": 2
+        }
+      },
+      {
+        "id": "v-clock",
+        "hotspot": "salt",
+        "tool": "radiation",
+        "title": "Isotope clock",
+        "data": "Radioactive clock in the salt: the seas dried up slowly over ~1 billion years while starlight kept rising.",
+        "dataCadet": "A natural clock in the salt says the seas dried slowly while the starlight got stronger.",
+        "weights": {
+          "greenhouse": 2,
+          "stellar": 2
+        }
+      },
+      {
+        "id": "v-volc",
+        "hotspot": "volcano",
+        "tool": "thermal",
+        "title": "Sleeping volcano",
+        "data": "Cold summit. The lava flows are hundreds of millions of years old.",
+        "dataCadet": "The volcano is cold and asleep, and has been for ages.",
+        "weights": {
+          "volcanism": -1
+        },
+        "redHerring": true
+      },
+      {
+        "id": "v-sulfur",
+        "hotspot": "volcano",
+        "tool": "drill",
+        "title": "Sulfur rock",
+        "data": "Rocks rich in sulfur: volcanoes were active long ago.",
+        "dataCadet": "Smelly sulfur rocks. Volcanoes were busy long ago.",
+        "weights": {
+          "volcanism": 1
+        },
+        "redHerring": true
+      },
+      {
+        "id": "v-craters",
+        "hotspot": "plains",
+        "tool": "crater",
+        "title": "Few craters",
+        "data": "Very few craters. Old lava paved over the surface long ago.",
+        "dataCadet": "Hardly any craters. Old lava covered them up.",
+        "weights": {
+          "volcanism": 1,
+          "impact": -1
+        },
+        "redHerring": true
+      }
+    ],
+    "explanations": {
+      "greenhouse": "Thick CO₂ traps heat, the oceans boiled away, and the salt clock shows it happened as the starlight rose. A runaway greenhouse.",
+      "impact": "There are hardly any craters, so no giant impact here.",
+      "stellar": "Close! The star's rising light started it, but what's cooking Veil now is its thick heat-trapping air.",
+      "volcanism": "Volcanoes added gas long ago, but they're cold now and can't explain heat that's still trapped today.",
+      "unknown": "Honest answer. Mission Control will send data that helps."
+    },
+    "glyph": {
+      "prompt": "Orrin bars: | = 1, ‖ = 2 … They count in twos (binary). What's next?",
+      "sequence": [
+        1,
+        2,
+        3,
+        4
+      ],
+      "answer": 5,
+      "options": [
+        5,
+        6,
+        8
+      ],
+      "fragment": "frag-veil",
+      "style": "binary"
+    },
+    "concepts": [
+      "greenhouse"
+    ]
+  },
+  "colony": {
+    "id": "veil",
+    "solar": 0.55,
+    "days": 5,
+    "budget": 16,
+    "events": [
+      {
+        "id": "acidstorm",
+        "day": 2,
+        "days": 2,
+        "solarMult": 0.5,
+        "morale": -0.2
+      },
+      {
+        "id": "heatwave",
+        "day": 4,
+        "days": 1,
+        "extraPower": 1.2
+      }
+    ],
+    "note": "Veil is closer to its star, but the thick clouds block much of the light."
+  },
+  "report": {
+    "questions": [
+      {
+        "id": "q-venus",
+        "label": "Is there a world like Veil near home?",
+        "answer": "Yes, Venus! 96% CO₂ and hotter than Mercury, even though it's farther from the Sun.",
+        "unlocks": "f-venus"
+      },
+      {
+        "id": "q-bright",
+        "label": "Do stars get brighter as they age?",
+        "answer": "Yes. Sun-like stars slowly brighten. When our Sun was young it shone about 30% dimmer than it does today.",
+        "unlocks": "f-sun-brightening"
+      },
+      {
+        "id": "q-oceans",
+        "label": "Could oceans really boil away?",
+        "answer": "If a planet gets hot enough, water vapour rises high and is split apart by starlight. Then the hydrogen escapes to space.",
+        "unlocks": null
+      },
+      {
+        "id": "q-snack",
+        "label": "Can you send snacks?",
+        "answer": "Shipped! ETA: 76 years. Please share with Tobo.",
+        "unlocks": null
+      }
+    ],
+    "unknownReveal": "Your data shows thick CO₂, lost oceans and trapped heat: a runaway greenhouse, triggered by a brightening star.",
+    "signal": {
+      "prompt": "A new signal from deep space. What is it?",
+      "readings": [
+        {
+          "crew": "asha",
+          "label": "Pulse period",
+          "value": "0.033 s, precise as an atomic clock"
+        },
+        {
+          "crew": "kiran",
+          "label": "Pattern",
+          "value": "No message, just ticks"
+        },
+        {
+          "crew": "tobo",
+          "label": "Source",
+          "value": "Tiny, super-dense object in a gas cloud"
+        }
+      ],
+      "options": [
+        {
+          "id": "pulsar",
+          "label": "Pulsar (spinning dead star)",
+          "why": "A super-precise, super-fast tick from a tiny dense object: a pulsar, the core left over from an exploded star."
+        },
+        {
+          "id": "probe",
+          "label": "Orrin probe",
+          "why": "No message pattern this time. It's natural."
+        },
+        {
+          "id": "accretion",
+          "label": "X-rays from gas falling into a black hole",
+          "why": "That glow flickers; it doesn't tick perfectly."
+        },
+        {
+          "id": "flare",
+          "label": "Flare star",
+          "why": "Flares don't repeat 30 times a second!"
+        }
+      ],
+      "answer": "pulsar"
+    }
+  },
+  "planetHunter": {
+    "nextWorld": "hollow",
+    "span": 40,
+    "planets": [
+      {
+        "id": "a",
+        "period": 6.0,
+        "depth": 0.008,
+        "phase": 2.0,
+        "duration": 0.4
+      },
+      {
+        "id": "b",
+        "period": 14.0,
+        "depth": 0.005,
+        "phase": 5.0,
+        "duration": 0.6
+      }
+    ],
+    "target": "b",
+    "candidates": [
+      {
+        "id": "a",
+        "label": "Bigger world, 6-day year"
+      },
+      {
+        "id": "b",
+        "label": "Smaller world, 14-day year"
+      },
+      {
+        "id": "c",
+        "label": "Tiny world, 2-day year"
+      }
+    ]
+  },
+  "forge": {
+    "requirement": {
+      "types": [
+        "reddwarf"
+      ],
+      "minHydrogen": 2
+    },
+    "goal": "Tobo wants a calm, long-lasting star to recharge slowly.",
+    "success": "Slow and steady. Recharged. Hollow, here we come."
+  },
+  "quiz": {
+    "world": "veil",
+    "questions": [
+      {
+        "id": "q1",
+        "speaker": "kiran",
+        "q": "Veil is hotter than the planet closest to its star. Why?",
+        "options": [
+          "It's closer to the star",
+          "Its thick CO₂ air traps heat",
+          "Its core is on fire"
+        ],
+        "correct": 1,
+        "misconception": "Only distance from the star sets a planet's temperature.",
+        "feedback": "The air matters as much as the distance. In our Solar System, Venus is hotter than Mercury for the same reason.",
+        "concept": "greenhouse"
+      },
+      {
+        "id": "q2",
+        "speaker": "tobo",
+        "q": "\"Greenhouse gases are always bad!\" says Tobo. Hmm?",
+        "options": [
+          "True, any amount is bad",
+          "No. A little keeps a planet warm enough for life, too much overheats it",
+          "They don't affect temperature"
+        ],
+        "correct": 1,
+        "misconception": "Any greenhouse effect is harmful.",
+        "feedback": "Without any greenhouse effect, Earth would be frozen. It's all about balance.",
+        "concept": "greenhouse"
+      },
+      {
+        "id": "q3",
+        "speaker": "asha",
+        "q": "Why did skimming the haze slow us down?",
+        "options": [
+          "Air pushes back on fast-moving things",
+          "Clouds are sticky",
+          "The haze has extra gravity"
+        ],
+        "correct": 0,
+        "misconception": "Atmosphere doesn't affect spacecraft.",
+        "feedback": "That push-back is drag. Real Mars orbiters used it to save fuel (aerobraking).",
+        "concept": "atmosphere-drag"
+      }
+    ]
+  },
+  "dialogue": {
+    "intro": [
+      {
+        "id": "vi1",
+        "s": "kiran",
+        "m": "worried",
+        "t": "Veil's surface is hot enough to melt lead."
+      },
+      {
+        "id": "vi2",
+        "s": "tobo",
+        "m": "happy",
+        "t": "Good news: no fuel needed to slow down! Bad news: we use the air instead."
+      },
+      {
+        "id": "vi3",
+        "s": "asha",
+        "m": "determined",
+        "t": "Skim the haze. Not too deep."
+      }
+    ],
+    "afterFly": [
+      {
+        "id": "vf1",
+        "s": "kiran",
+        "m": "excited",
+        "t": "We're in! Scanners up. Those clouds look… suspicious."
+      }
+    ],
+    "correct": [
+      {
+        "id": "vc1",
+        "s": "kiran",
+        "m": "thinking",
+        "t": "A runaway greenhouse. But it wasn't their factories. Their STAR got brighter."
+      },
+      {
+        "id": "vc2",
+        "s": "asha",
+        "m": "worried",
+        "t": "The safe zone around the star moved outward… and left Veil behind."
+      }
+    ],
+    "wrong": [
+      {
+        "id": "vw1",
+        "s": "tobo",
+        "m": "sad",
+        "t": "We built for the wrong problem. The base starts low on supplies."
+      }
+    ],
+    "unknown": [
+      {
+        "id": "vu1",
+        "s": "asha",
+        "m": "thinking",
+        "t": "Mixed evidence. We'll ask Earth."
+      }
+    ],
+    "afterBuild": [
+      {
+        "id": "vb1",
+        "s": "tobo",
+        "m": "happy",
+        "t": "Survived the acid storm. My paint job did not."
+      }
+    ],
+    "afterReport": [
+      {
+        "id": "vr1",
+        "s": "kiran",
+        "m": "excited",
+        "t": "Another dip in the starlight. Another world. Let's go."
+      }
+    ],
+    "outro": [
+      {
+        "id": "vo1",
+        "s": "orrin",
+        "m": "calm",
+        "t": "Fragment 2: \"OUR SKY GREW WARMER. THE LIGHT GREW STRONGER.\"",
+        "if": "glyphSolved"
+      },
+      {
+        "id": "vo2",
+        "s": "asha",
+        "m": "thinking",
+        "t": "The light grew stronger… they're telling us about their star."
+      }
+    ]
+  },
+  "fragment": {
+    "frag-veil": "OUR SKY GREW WARMER. THE LIGHT GREW STRONGER."
+  }
+}

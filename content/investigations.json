@@ -1,0 +1,132 @@
+{
+  "cinder": {
+    "world": "cinder",
+    "charges": 4,
+    "answer": "impact",
+    "scene": {
+      "sky": "#2a1030",
+      "ground": "#5a2a1c",
+      "features": [
+        { "type": "crater", "x": 0.18, "w": 0.3 },
+        { "type": "cliff", "x": 0.62, "w": 0.18 },
+        { "type": "vent", "x": 0.85, "w": 0.08 },
+        { "type": "ruin", "x": 0.45, "w": 0.16 }
+      ]
+    },
+    "hotspots": [
+      { "id": "basin", "label": "Giant basin", "x": 0.18, "y": 0.66 },
+      { "id": "cliff", "label": "Layered cliff", "x": 0.66, "y": 0.52 },
+      { "id": "vents", "label": "Warm vents", "x": 0.86, "y": 0.68 },
+      { "id": "city", "label": "Orrin ruins", "x": 0.45, "y": 0.6 },
+      { "id": "sky", "label": "Sky", "x": 0.5, "y": 0.18 }
+    ],
+    "clues": [
+      { "id": "c-crater", "hotspot": "basin", "tool": "crater", "title": "Huge round crater", "data": "Basin 62 km wide. Rock was thrown out to the north-east, so the hit came from the south-west.", "dataCadet": "A giant round hole. Rock was thrown out all on one side, like a splash!", "weights": { "impact": 3, "volcanism": -1 } },
+      { "id": "c-glass", "hotspot": "basin", "tool": "thermal", "title": "Glass beads", "data": "Tiny glass beads around the rim: rock that melted in a flash and froze in mid-air.", "dataCadet": "Little glass beads everywhere. Something melted rock in an instant.", "weights": { "impact": 2, "volcanism": 1 } },
+      { "id": "c-iridium", "hotspot": "cliff", "tool": "drill", "title": "Iridium spike", "data": "A thin dark layer with 120× normal iridium, a metal rare in surface rock but common in asteroids.", "dataCadet": "A thin dark stripe full of a rare metal that asteroids carry.", "weights": { "impact": 3 }, "opensLayers": true },
+      { "id": "c-air", "hotspot": "sky", "tool": "spectrometer", "title": "Ordinary air", "data": "N₂ 78%, O₂ 19%, CO₂ 0.9%. Thin, fairly ordinary air. Nothing that would trap lots of heat.", "dataCadet": "The air is pretty normal. Not much heat-trapping gas.", "weights": { "greenhouse": -2 }, "redHerring": true },
+      { "id": "c-vents", "hotspot": "vents", "tool": "thermal", "title": "Warm vents", "data": "Vents at 60 °C, but the rock below is old and cold. No fresh lava for ages.", "dataCadet": "Warm steam, but the ground underneath is old and cold.", "weights": { "volcanism": 1, "impact": 0 }, "redHerring": true },
+      { "id": "c-rad", "hotspot": "city", "tool": "radiation", "title": "Normal radiation", "data": "Radiation is normal for a world this far from its star.", "dataCadet": "Radiation is normal here.", "weights": { "stellar": -1 }, "redHerring": true },
+      { "id": "c-rebuilt", "hotspot": "city", "tool": "drill", "title": "Two cities", "data": "One Orrin city lies BELOW the iridium layer. A second, rebuilt city lies ABOVE it.", "dataCadet": "There's an old city under the dark stripe and a newer city on top!", "weights": { "impact": 1 } }
+    ],
+    "explanations": {
+      "impact": "The crater, glass beads and iridium layer all point to an asteroid strike.",
+      "greenhouse": "The air here is thin and ordinary, so it couldn't trap much heat.",
+      "stellar": "Radiation readings were normal, so the star wasn't the problem here. At least, not yet.",
+      "volcanism": "The vents are warm, but the rock below is old and cold. No big eruptions for ages.",
+      "unknown": "Fair! Saying 'we need more data' is real science. Mission Control will send what they know."
+    },
+    "layers": {
+      "prompt": "Put the layers in order from TOP (newest) to BOTTOM (oldest).",
+      "layers": [
+        { "id": "l-rebuilt", "label": "Rebuilt Orrin city", "depth": "top" },
+        { "id": "l-impact", "label": "Iridium + glass (the impact)", "depth": "middle" },
+        { "id": "l-first", "label": "First Orrin city", "depth": "lower" },
+        { "id": "l-bedrock", "label": "Ancient bedrock", "depth": "bottom" }
+      ]
+    },
+    "glyph": { "prompt": "The Orrin count in dots. What comes next?", "sequence": [1, 3, 5, 7], "answer": 9, "options": [8, 9, 11], "fragment": "frag-cinder", "style": "dots" },
+    "concepts": ["superposition"]
+  },
+  "veil": {
+    "world": "veil",
+    "charges": 4,
+    "answer": "greenhouse",
+    "scene": {
+      "sky": "#5a5420",
+      "ground": "#7a5a2a",
+      "features": [
+        { "type": "clouds", "x": 0.5, "w": 1 },
+        { "type": "volcano", "x": 0.78, "w": 0.22 },
+        { "type": "seabed", "x": 0.3, "w": 0.3 },
+        { "type": "ruin", "x": 0.55, "w": 0.12 }
+      ]
+    },
+    "hotspots": [
+      { "id": "clouds", "label": "Thick clouds", "x": 0.3, "y": 0.2 },
+      { "id": "plains", "label": "Cracked plains", "x": 0.6, "y": 0.72 },
+      { "id": "seabed", "label": "Dry basin", "x": 0.28, "y": 0.66 },
+      { "id": "volcano", "label": "Old volcano", "x": 0.8, "y": 0.5 },
+      { "id": "salt", "label": "Salt crust", "x": 0.44, "y": 0.78 }
+    ],
+    "clues": [
+      { "id": "v-co2", "hotspot": "clouds", "tool": "spectrometer", "title": "CO₂ blanket", "data": "Atmosphere 96% CO₂, about 90× thicker than Earth's, with sulfuric-acid clouds.", "dataCadet": "The air is almost all carbon dioxide, a gas that traps heat. And it's super thick!", "weights": { "greenhouse": 3, "volcanism": 1 } },
+      { "id": "v-heat", "hotspot": "plains", "tool": "thermal", "title": "Oven world", "data": "Surface 460 °C, almost the same day and night, pole to equator. Heat is trapped everywhere.", "dataCadet": "It's 460 °C everywhere, day AND night. The heat can't escape.", "weights": { "greenhouse": 3 } },
+      { "id": "v-sea", "hotspot": "seabed", "tool": "drill", "title": "Lost oceans", "data": "Ripple marks and salt layers: this basin was a sea. The water is gone.", "dataCadet": "Ripples and salt, so this was once a sea!", "weights": { "greenhouse": 2 } },
+      { "id": "v-clock", "hotspot": "salt", "tool": "radiation", "title": "Isotope clock", "data": "Radioactive clock in the salt: the seas dried up slowly over ~1 billion years while starlight kept rising.", "dataCadet": "A natural clock in the salt says the seas dried slowly while the starlight got stronger.", "weights": { "greenhouse": 2, "stellar": 2 } },
+      { "id": "v-volc", "hotspot": "volcano", "tool": "thermal", "title": "Sleeping volcano", "data": "Cold summit. The lava flows are hundreds of millions of years old.", "dataCadet": "The volcano is cold and asleep, and has been for ages.", "weights": { "volcanism": -1 }, "redHerring": true },
+      { "id": "v-sulfur", "hotspot": "volcano", "tool": "drill", "title": "Sulfur rock", "data": "Rocks rich in sulfur: volcanoes were active long ago.", "dataCadet": "Smelly sulfur rocks. Volcanoes were busy long ago.", "weights": { "volcanism": 1 }, "redHerring": true },
+      { "id": "v-craters", "hotspot": "plains", "tool": "crater", "title": "Few craters", "data": "Very few craters. Old lava paved over the surface long ago.", "dataCadet": "Hardly any craters. Old lava covered them up.", "weights": { "volcanism": 1, "impact": -1 }, "redHerring": true }
+    ],
+    "explanations": {
+      "greenhouse": "Thick CO₂ traps heat, the oceans boiled away, and the salt clock shows it happened as the starlight rose. A runaway greenhouse.",
+      "impact": "There are hardly any craters, so no giant impact here.",
+      "stellar": "Close! The star's rising light started it, but what's cooking Veil now is its thick heat-trapping air.",
+      "volcanism": "Volcanoes added gas long ago, but they're cold now and can't explain heat that's still trapped today.",
+      "unknown": "Honest answer. Mission Control will send data that helps."
+    },
+    "glyph": { "prompt": "Orrin bars: | = 1, ‖ = 2 … They count in twos (binary). What's next?", "sequence": [1, 2, 3, 4], "answer": 5, "options": [5, 6, 8], "fragment": "frag-veil", "style": "binary" },
+    "concepts": ["greenhouse"]
+  },
+  "hollow": {
+    "world": "hollow",
+    "charges": 4,
+    "answer": "stellar",
+    "scene": {
+      "sky": "#3a1028",
+      "ground": "#3b3350",
+      "features": [
+        { "type": "bigstar", "x": 0.75, "w": 0.35 },
+        { "type": "dome", "x": 0.3, "w": 0.22 },
+        { "type": "crater", "x": 0.65, "w": 0.12 },
+        { "type": "tubes", "x": 0.88, "w": 0.1 }
+      ]
+    },
+    "hotspots": [
+      { "id": "star", "label": "The star", "x": 0.75, "y": 0.2 },
+      { "id": "crust", "label": "Bleached crust", "x": 0.55, "y": 0.75 },
+      { "id": "domes", "label": "Shield domes", "x": 0.3, "y": 0.58 },
+      { "id": "frost", "label": "Crater frost", "x": 0.66, "y": 0.66 },
+      { "id": "tubes", "label": "Lava tubes", "x": 0.9, "y": 0.66 }
+    ],
+    "clues": [
+      { "id": "h-dose", "hotspot": "crust", "tool": "radiation", "title": "Radiation flood", "data": "UV and X-ray dose 40× higher than the Orrin domes were designed for.", "dataCadet": "WAY more harsh starlight than the Orrin buildings were made for.", "weights": { "stellar": 3 } },
+      { "id": "h-spectrum", "hotspot": "star", "tool": "spectrometer", "title": "Changed star", "data": "Today the star is larger, redder and brighter than in Orrin carvings.", "dataCadet": "The star today is bigger and redder than in Orrin pictures.", "weights": { "stellar": 3 } },
+      { "id": "h-domes", "hotspot": "domes", "tool": "crater", "title": "Rushed shields", "data": "Shield domes built in a hurry, all facing the star.", "dataCadet": "Shield domes built fast, all pointing at the star.", "weights": { "stellar": 2 } },
+      { "id": "h-sterile", "hotspot": "crust", "tool": "drill", "title": "Sterile soil", "data": "Soil sterilized 2 m down. Nothing survived near the surface.", "dataCadet": "The soil is cleaned out deep down. Nothing could live there.", "weights": { "stellar": 1 } },
+      { "id": "h-frost", "hotspot": "frost", "tool": "thermal", "title": "Last frost", "data": "Ice survives only in permanently shadowed craters.", "dataCadet": "The only ice left hides in dark crater shadows.", "weights": { "stellar": 1, "greenhouse": 1 } },
+      { "id": "h-air", "hotspot": "star", "tool": "radiation", "title": "Air blown away", "data": "Almost no air left, only thin traces of argon.", "dataCadet": "Almost no air left at all.", "weights": { "greenhouse": -2, "stellar": 1 } },
+      { "id": "h-small", "hotspot": "frost", "tool": "crater", "title": "Small craters", "data": "Only small craters. Nothing big enough to end a civilization.", "dataCadet": "Only little craters here.", "weights": { "impact": -2 }, "redHerring": true },
+      { "id": "h-tubes", "hotspot": "tubes", "tool": "thermal", "title": "Lava-tube shelters", "data": "Old, cold lava tubes, used by the Orrin as shelters.", "dataCadet": "Old lava tunnels the Orrin hid in.", "weights": { "volcanism": 1 }, "redHerring": true }
+    ],
+    "explanations": {
+      "stellar": "The star itself changed. It grew brighter and redder until its light scoured Hollow clean.",
+      "greenhouse": "There's almost no air left to trap heat. Something stripped it away.",
+      "impact": "The craters are all small. Not a world-ending hit.",
+      "volcanism": "The lava tubes are ancient and cold. The Orrin just used them as shelter.",
+      "unknown": "Good instinct to wait for more data. Mission Control can help."
+    },
+    "glyph": { "prompt": "Numbers only divisible by 1 and themselves. What's next?", "sequence": [2, 3, 5, 7, 11], "answer": 13, "options": [12, 13, 15], "fragment": "frag-hollow", "style": "dots" },
+    "concepts": ["star-change"]
+  }
+}

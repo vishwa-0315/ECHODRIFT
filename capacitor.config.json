@@ -1,0 +1,7 @@
+{
+  "appId": "com.echodrift.game",
+  "appName": "Echo Drift",
+  "webDir": "www",
+  "android": { "allowMixedContent": false, "backgroundColor": "#080a1c" },
+  "plugins": {}
+}

@@ -1,0 +1,190 @@
+[
+  {
+    "id": "cinder-1",
+    "world": "cinder",
+    "title": "Gentle Fall",
+    "brief": "Drop onto Cinder. Gravity speeds you up as you fall, so arrive slowly.",
+    "bounds": { "w": 600, "h": 1000 },
+    "bodies": [
+      { "id": "cinder", "type": "planet", "name": "Cinder", "mass": 60000, "radius": 46, "x": 300, "y": 330, "color": "#ff8a3d" },
+      { "id": "ash", "type": "moon", "name": "Ash", "mass": 1500, "radius": 12, "color": "#9a8f99", "orbit": { "parent": "cinder", "radius": 210, "phaseDeg": 200 } }
+    ],
+    "ship": { "x": 300, "y": 880 },
+    "objective": { "type": "land", "target": "cinder", "maxSpeed": 62 },
+    "fuel": 60,
+    "maxDvPerBurn": 45,
+    "maxBurns": 2,
+    "maxTime": 60,
+    "timeScale": 1.2,
+    "goals": { "fuelLeftPct": 45, "hull": 100, "time": 22 },
+    "hints": ["Pull back only a little. Cinder's gravity will do most of the work.", "Coming in too fast? Burn against your motion just before touchdown."],
+    "concepts": ["gravity-pull", "gravity-distance"],
+    "fact": "f-gravity-inverse-square"
+  },
+  {
+    "id": "cinder-2",
+    "world": "cinder",
+    "title": "Moon Kick",
+    "brief": "Not enough fuel to reach the beacon directly. Borrow speed from the moving moon.",
+    "bounds": { "w": 600, "h": 1000 },
+    "bodies": [
+      { "id": "cinder", "type": "planet", "name": "Cinder", "mass": 60000, "radius": 46, "x": 300, "y": 560, "color": "#ff8a3d" },
+      { "id": "ash", "type": "moon", "name": "Ash", "mass": 9000, "radius": 18, "color": "#9a8f99", "orbit": { "parent": "cinder", "radius": 240, "phaseDeg": 120 } }
+    ],
+    "ship": { "x": 520, "y": 930 },
+    "objective": { "type": "slingshot", "x": 90, "y": 90, "r": 55 },
+    "fuel": 40,
+    "maxDvPerBurn": 40,
+    "maxBurns": 2,
+    "maxTime": 60,
+    "timeScale": 1.3,
+    "goals": { "fuelLeftPct": 30, "hull": 100, "time": 30 },
+    "hints": ["Fly close behind the moon as it moves. Its pull drags you along and adds speed.", "Try aiming up and to the left of the moon, so you pass just behind it."],
+    "concepts": ["gravity-assist", "gravity-pull"],
+    "fact": "f-voyager-assist"
+  },
+  {
+    "id": "cinder-3",
+    "world": "cinder",
+    "title": "Catch an Orbit",
+    "brief": "You're coasting past Cinder. Slow down at the right moment and you'll keep falling around it: that's an orbit.",
+    "bounds": { "w": 600, "h": 1000 },
+    "bodies": [
+      { "id": "cinder", "type": "planet", "name": "Cinder", "mass": 60000, "radius": 46, "x": 300, "y": 470, "color": "#ff8a3d" }
+    ],
+    "ship": { "x": 30, "y": 640, "vx": 30, "vy": -6 },
+    "objective": { "type": "orbit", "target": "cinder", "rMin": 80, "rMax": 190, "hold": 6 },
+    "fuel": 45,
+    "maxDvPerBurn": 30,
+    "maxBurns": 3,
+    "maxTime": 70,
+    "timeScale": 1.4,
+    "hazards": {
+      "debris": [
+        { "x": 470, "y": 300, "r": 9 },
+        { "x": 500, "y": 340, "r": 7 },
+        { "x": 150, "y": 250, "r": 8 }
+      ]
+    },
+    "goals": { "fuelLeftPct": 50, "hull": 100, "time": 25 },
+    "hints": ["Tap COAST to watch first. Burn backwards when you're closest to Cinder.", "Watch the indicator: you want it to say ORBITING, not ESCAPING."],
+    "concepts": ["orbits-falling", "gravity-distance"],
+    "fact": "f-orbit-falling"
+  },
+  {
+    "id": "veil-1",
+    "world": "veil",
+    "title": "Skim the Haze",
+    "brief": "You're coming in way too fast to stop with fuel. Dip into Veil's thick air to slow down, but not too deep!",
+    "bounds": { "w": 600, "h": 1000 },
+    "bodies": [
+      { "id": "veil", "type": "planet", "name": "Veil", "mass": 80000, "radius": 50, "x": 300, "y": 520, "color": "#d6c75a" }
+    ],
+    "atmospheres": [{ "body": "veil", "height": 46, "density": 0.03, "scaleHeight": 11 }],
+    "heatLimit": 75,
+    "ship": { "x": 40, "y": 60, "vx": 26, "vy": 30 },
+    "objective": { "type": "aerobrake", "target": "veil", "rMin": 55, "rMax": 320, "hold": 4, "strict": true },
+    "fuel": 14,
+    "maxDvPerBurn": 14,
+    "maxBurns": 2,
+    "maxTime": 70,
+    "timeScale": 1.3,
+    "goals": { "fuelLeftPct": 50, "hull": 80, "time": 30 },
+    "hints": ["Aim your path so it grazes the glowing haze, not the planet.", "Too much heat? Your path is too deep. Nudge it outward a little."],
+    "concepts": ["atmosphere-drag", "orbits-falling"],
+    "fact": "f-aerobraking"
+  },
+  {
+    "id": "veil-2",
+    "world": "veil",
+    "title": "Two-Burn Transfer",
+    "brief": "Climb from a low orbit up to the Orrin relay ring using as little fuel as possible.",
+    "bounds": { "w": 600, "h": 1000 },
+    "bodies": [
+      { "id": "veil", "type": "planet", "name": "Veil", "mass": 80000, "radius": 50, "x": 300, "y": 500, "color": "#d6c75a" },
+      { "id": "relay", "type": "station", "name": "Orrin relay", "mass": 0, "drawRadius": 9, "color": "#3ff0d2", "orbit": { "parent": "veil", "radius": 220, "phaseDeg": 300 } }
+    ],
+    "atmospheres": [{ "body": "veil", "height": 20, "density": 0.01, "scaleHeight": 8 }],
+    "ship": { "orbit": { "body": "veil", "radius": 95, "phaseDeg": 90 } },
+    "objective": { "type": "hohmann", "target": "veil", "rMin": 195, "rMax": 250, "hold": 6, "strict": true },
+    "fuel": 18,
+    "maxDvPerBurn": 12,
+    "maxBurns": 3,
+    "maxTime": 100,
+    "timeScale": 1.8,
+    "hazards": {
+      "gusts": [{ "start": 14, "duration": 2.5, "angleDeg": 0, "accel": 1.2 }]
+    },
+    "goals": { "fuelLeftPct": 30, "hull": 100, "time": 40 },
+    "hints": ["Burn FORWARD (the way you're moving). That raises the far side of your orbit.", "Coast to the highest point, then burn forward again to round out the orbit."],
+    "concepts": ["hohmann", "orbits-falling"],
+    "fact": "f-hohmann"
+  },
+  {
+    "id": "hollow-1",
+    "world": "hollow",
+    "title": "The Calm Spot",
+    "brief": "Ahead of Hollow on its orbit there's a place where the star's and planet's pulls balance out. Park there.",
+    "bounds": { "w": 800, "h": 1000 },
+    "bodies": [
+      { "id": "sun", "type": "star", "name": "Orrin's star", "mass": 600000, "radius": 42, "x": 400, "y": 500, "color": "#ff6b5b" },
+      { "id": "hollow", "type": "planet", "name": "Hollow", "mass": 9000, "radius": 20, "color": "#8f7bff", "orbit": { "parent": "sun", "radius": 300, "phaseDeg": 180 } }
+    ],
+    "ship": { "orbit": { "body": "sun", "radius": 300, "phaseDeg": 140 } },
+    "objective": { "type": "lagrange", "planet": "hollow", "point": "L4", "r": 48, "hold": 6 },
+    "fuel": 30,
+    "maxDvPerBurn": 20,
+    "maxBurns": 3,
+    "maxTime": 80,
+    "timeScale": 1.6,
+    "hazards": { "flares": [{ "start": 3, "duration": 5 }] },
+    "goals": { "fuelLeftPct": 40, "hull": 100, "time": 35 },
+    "hints": ["The calm spot moves with Hollow. Match its speed rather than chasing it hard.", "Small burns! Being close and slow beats being fast."],
+    "concepts": ["lagrange", "gravity-pull"],
+    "fact": "f-lagrange"
+  },
+  {
+    "id": "hollow-2",
+    "world": "hollow",
+    "title": "Edge of the Dark",
+    "brief": "An Orrin probe orbits a black hole just ahead of you. To catch up, you have to slow down. Really!",
+    "bounds": { "w": 600, "h": 1000 },
+    "bodies": [
+      { "id": "bh", "type": "blackhole", "name": "Black hole", "mass": 120000, "horizon": 28, "x": 300, "y": 500, "color": "#000000" },
+      { "id": "probe", "type": "probe", "name": "Orrin probe", "mass": 0, "drawRadius": 8, "color": "#ffc04d", "orbit": { "parent": "bh", "radius": 170, "phaseDeg": 0 } }
+    ],
+    "ship": { "orbit": { "body": "bh", "radius": 170, "phaseDeg": -55 } },
+    "objective": { "type": "rendezvous", "target": "probe", "r": 26, "maxRelSpeed": 12 },
+    "fuel": 40,
+    "maxDvPerBurn": 25,
+    "maxBurns": 4,
+    "maxTime": 120,
+    "timeScale": 2,
+    "goals": { "fuelLeftPct": 35, "hull": 100, "time": 70 },
+    "hints": ["Burning backward drops you into a lower, FASTER orbit, so you'll gain on the probe.", "When you're close, burn to match the probe's speed."],
+    "concepts": ["orbits-falling", "black-holes"],
+    "fact": "f-black-hole"
+  },
+  {
+    "id": "hollow-3",
+    "world": "hollow",
+    "title": "Leave Hollow",
+    "brief": "Time to go. Break free of Hollow's gravity with the least fuel you can.",
+    "bounds": { "w": 600, "h": 1000, "margin": 600 },
+    "bodies": [
+      { "id": "hollow", "type": "planet", "name": "Hollow", "mass": 70000, "radius": 40, "x": 300, "y": 600, "color": "#8f7bff" }
+    ],
+    "ship": { "orbit": { "body": "hollow", "radius": 72, "phaseDeg": 0 } },
+    "objective": { "type": "escape", "target": "hollow", "distance": 480 },
+    "fuel": 24,
+    "maxDvPerBurn": 24,
+    "maxBurns": 2,
+    "maxTime": 60,
+    "timeScale": 1.4,
+    "hazards": { "flares": [{ "start": 6, "duration": 4 }] },
+    "goals": { "fuelLeftPct": 35, "hull": 100, "time": 25 },
+    "hints": ["Burn in the direction you're already moving. You keep the speed you already have.", "Pointing straight away from the planet wastes fuel."],
+    "concepts": ["escape-velocity"],
+    "fact": "f-escape-velocity"
+  }
+]
