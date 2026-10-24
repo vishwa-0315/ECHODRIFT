@@ -1,3 +1,6 @@
+/** For now every level is open; set to false to unlock levels one by one again. */
+export const ALL_LEVELS_OPEN = true;
+
 /** Quick-play progress: stars per level, unlocks, badges, rocket colours, quiz score. */
 import { LEVELS, CHAPTERS } from '../arcade/levels.js';
 
@@ -33,6 +36,7 @@ export function progress(app) {
     stars: (id) => s.stars[id] || 0,
     total: () => Object.values(s.stars).reduce((a, b) => a + b, 0),
     unlocked(id) {
+      if (ALL_LEVELS_OPEN) return true;
       const i = LEVELS.findIndex((l) => l.id === id);
       return i <= 0 || p.stars(id) > 0 || p.stars(LEVELS[i - 1].id) > 0;
     },
