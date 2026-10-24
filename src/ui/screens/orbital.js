@@ -8,6 +8,7 @@ import { drawBody, starField } from '../render.js';
 import { buildMission, toRotating } from '../../missions/orbital.js';
 import { runStageChecks } from '../../missions/autoplay.js';
 import { MU, RADIUS, DAY, G0, AU } from '../../core/constants.js';
+import { openGuide } from '../missionGuide.js';
 import { burnTime, propellantFor } from '../../core/ship.js';
 import { nextPeriapsis, nextApoapsis } from '../../core/targeting.js';
 
@@ -54,7 +55,7 @@ export function orbitalScreen(app, { id, choice = {} }) {
   const obj = h('div.objline');
   const clock = h('span.clock');
   const warpLbl = h('span.warp.mono');
-  const playBtn = h('button.btn.icon', { 'aria-label': 'Play or pause', 'data-testid': 'play', onclick: () => setPaused(!paused) });
+  const playBtn = h('button.btn.sm', { 'aria-label': 'Play or pause', 'data-testid': 'play', onclick: () => setPaused(!paused) });
   const editor = h('div');
   const focusSeg = h('div.seg', { role: 'group', 'aria-label': 'Centre the view on' });
   const banner = h('div.burned', { style: { display: 'none' } });
@@ -70,7 +71,7 @@ export function orbitalScreen(app, { id, choice = {} }) {
       clock,
       h('div.spacer'),
       h('button.btn.sm', { onclick: () => addNode(), 'data-testid': 'add-burn' }, '+ Burn'),
-      h('button.btn.sm.primary', { onclick: () => assist(), 'data-testid': 'assist' }, '✦ Mission Assist'),
+      h('button.btn.sm.primary', { onclick: () => assist(), 'data-testid': 'assist' }, 'Mission Assist'),
     ),
   );
   const zoom = h('div.col', h('button.btn.icon.sm', { 'aria-label': 'Zoom in', onclick: () => zoomBy(0.6) }, '+'), h('button.btn.icon.sm', { 'aria-label': 'Zoom out', onclick: () => zoomBy(1 / 0.6) }, '−'));
@@ -78,7 +79,7 @@ export function orbitalScreen(app, { id, choice = {} }) {
     'div.screen.full',
     h('div.view', canvas),
     h('div.hud-top', h('div.row', h('button.btn.icon.sm', { 'aria-label': 'Back to missions', onclick: () => leave() }, '←'), h('div.label.grow', m.title), focusSeg), tele, obj),
-    h('div.hud-side', zoom, h('button.btn.icon.sm', { 'aria-label': 'Restart mission', onclick: () => restart() }, '↺')),
+    h('div.hud-side', zoom, h('button.btn.icon.sm', { 'aria-label': 'Restart mission', onclick: () => restart() }, '↺'), h('button.btn.icon.sm', { 'aria-label': 'Open the full mission guide', 'data-testid': 'guide', onclick: () => (setPaused(true), openGuide(app, m.id)) }, '?')),
     dock,
   );
   dock.insertBefore(banner, dock.firstChild); // burn banner sits just above the controls, clear of the map and objective
@@ -128,8 +129,8 @@ export function orbitalScreen(app, { id, choice = {} }) {
     const changed = paused !== p;
     paused = p;
     if (changed && sim) renderEditor();
-    playBtn.textContent = paused ? '▶' : '⏸';
-    playBtn.className = 'btn icon' + (paused ? ' go' : '');
+    playBtn.textContent = paused ? 'Play' : 'Pause';
+    playBtn.className = 'btn sm' + (paused ? ' go' : '');
   }
   function zoomBy(f) {
     viewRadius = Math.max(2e6, Math.min(60 * AU, viewRadius * f));
@@ -240,11 +241,11 @@ export function orbitalScreen(app, { id, choice = {} }) {
 
   async function assist() {
     const stage = currentStage();
-    if (!stage?.assist) return app.toast('Nothing to burn now: just let time run (▶).');
+    if (!stage?.assist) return app.toast('Nothing to burn now: just let time run (press Play).');
     setPaused(true);
     if (stage.ready && !stage.ready(sim, ctx)) return app.toast('Too early: coast closer to your target first, then ask again.');
     refreshPrediction(true);
-    if (stage.onTrack && !sim.nodes.length && stage.onTrack(sim, ctx)) return app.toast('You are on track. No burn needed right now: let time run (▶).');
+    if (stage.onTrack && !sim.nodes.length && stage.onTrack(sim, ctx)) return app.toast('You are on track. No burn needed right now: let time run (press Play).');
     const plan = await app.busy('Mission Assist is computing…', () => stage.assist(sim));
     if (!plan || !plan.length) {
       refreshPrediction(true);
@@ -258,7 +259,7 @@ export function orbitalScreen(app, { id, choice = {} }) {
     refreshPrediction(true);
     renderEditor();
     const n0 = plan[0];
-    app.toast(`Suggested: ${fdv(n0.dv)} burn at ${utc(sim.date(n0.t))}. Check the dashed path, then press ▶.`, 5000);
+    app.toast(`Suggested: ${fdv(n0.dv)} burn at ${utc(sim.date(n0.t))}. Check the dashed path, then press Play.`, 5000);
   }
 
   function currentStage() {
@@ -287,7 +288,7 @@ export function orbitalScreen(app, { id, choice = {} }) {
         lastKeep = sim.t;
         setPaused(true);
         app.beep(880, 0.12);
-        app.toast('Time for your next burn: plan one (+ Burn) or press ✦ Mission Assist, then ▶.', 6000);
+        app.toast('Time for your next burn: plan one (+ Burn) or press Mission Assist, then Play.', 6000);
         return;
       }
     }
@@ -299,7 +300,7 @@ export function orbitalScreen(app, { id, choice = {} }) {
         lastKeep = sim.t;
         setPaused(true);
         app.beep(880, 0.12);
-        app.toast('Station-keeping due: L1 is unstable. Plan a small correction now (or press ✦ Mission Assist), then press ▶.', 6000);
+        app.toast('Station-keeping due: L1 is unstable. Plan a small correction now (or press Mission Assist), then press Play.', 6000);
         return;
       }
     }
@@ -316,7 +317,7 @@ export function orbitalScreen(app, { id, choice = {} }) {
         if (simDt > 0) sim.advance(simDt);
         setPaused(true);
         app.beep(880, 0.12);
-        app.toast(`Approaching ${V.target[0].toUpperCase() + V.target.slice(1)}: closest approach in ${dur(c.t - sim.t)}. Plan your burn now (or press ✦ Mission Assist).`, 6000);
+        app.toast(`Approaching ${V.target[0].toUpperCase() + V.target.slice(1)}: closest approach in ${dur(c.t - sim.t)}. Plan your burn now (or press Mission Assist).`, 6000);
         return;
       }
       if (c.t - sim.t < simDt * 3) simDt = Math.max(60, (c.t - sim.t) / 3);
@@ -334,7 +335,7 @@ export function orbitalScreen(app, { id, choice = {} }) {
         while (wi < WARPS.length - 1 && WARPS[wi + 1] <= durB / 6) wi++;
         setWarp(wi);
         banner.style.display = '';
-        banner.textContent = `🔥 Engine burning · ${fdv(next.dv)} · ${dur(durB)}`;
+        banner.textContent = `Engine burning · ${fdv(next.dv)} · ${dur(durB)}`;
         app.beep(220, 0.4, 0.05, 'sawtooth');
         app.vibrate(30);
       }
@@ -564,7 +565,7 @@ export function orbitalScreen(app, { id, choice = {} }) {
         c.fill();
         label(c, q.x + 8, q.y + 14, `entry ${pr.entry.gamma.toFixed(2)}°`, '#ffcc4d');
       }
-      if (pr.crashed && pr.crashed.body !== 'entry') label(c, sp.x + 10, sp.y + 30, `⚠ prediction hits ${pr.crashed.body}`, '#ff5c5c');
+      if (pr.crashed && pr.crashed.body !== 'entry') label(c, sp.x + 10, sp.y + 30, `prediction hits ${pr.crashed.body}`, '#ff5c5c');
     }
     // ship
     c.fillStyle = '#ffffff';

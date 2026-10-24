@@ -1,0 +1,250 @@
+{
+ "source": "NASA Planetary Fact Sheet and NASA Solar System Exploration. Moon counts change as new moons are found.",
+ "habitableZoneAU": {
+  "inner": 0.99,
+  "outer": 1.7,
+  "source": "Kopparapu et al. 2013 (conservative habitable zone for the Sun)"
+ },
+ "planets": {
+  "mercury": {
+   "type": "Rocky planet",
+   "diameterKm": 4879,
+   "massEarth": 0.055,
+   "gravity": 3.7,
+   "day": "176 Earth days (sunrise to sunrise)",
+   "year": "88 days",
+   "distanceAU": 0.387,
+   "tempC": "−173 °C at night to 427 °C by day",
+   "atmosphere": "Almost none",
+   "moons": "0",
+   "escape": 4.3,
+   "fact": "The smallest planet. A single day lasts longer than its year!"
+  },
+  "venus": {
+   "type": "Rocky planet",
+   "diameterKm": 12104,
+   "massEarth": 0.815,
+   "gravity": 8.9,
+   "day": "117 Earth days (spins backwards)",
+   "year": "225 days",
+   "distanceAU": 0.723,
+   "tempC": "About 464 °C, hot enough to melt lead",
+   "atmosphere": "96% carbon dioxide, crushing pressure (92× Earth's)",
+   "moons": "0",
+   "escape": 10.4,
+   "fact": "The hottest planet, even though Mercury is closer to the Sun. Its thick air traps heat."
+  },
+  "earth": {
+   "type": "Rocky planet",
+   "diameterKm": 12756,
+   "massEarth": 1,
+   "gravity": 9.8,
+   "day": "24 hours",
+   "year": "365.25 days",
+   "distanceAU": 1,
+   "tempC": "About 15 °C on average",
+   "atmosphere": "78% nitrogen, 21% oxygen",
+   "moons": "1",
+   "escape": 11.2,
+   "fact": "The only world known to have life, and liquid water on its surface."
+  },
+  "mars": {
+   "type": "Rocky planet",
+   "diameterKm": 6792,
+   "massEarth": 0.107,
+   "gravity": 3.7,
+   "day": "24 h 40 min",
+   "year": "687 days",
+   "distanceAU": 1.524,
+   "tempC": "About −65 °C on average",
+   "atmosphere": "95% carbon dioxide, very thin (under 1% of Earth's)",
+   "moons": "2",
+   "escape": 5.0,
+   "fact": "Home of Olympus Mons, the tallest volcano in the Solar System, about 22 km high."
+  },
+  "jupiter": {
+   "type": "Gas giant",
+   "diameterKm": 142984,
+   "massEarth": 317.8,
+   "gravity": 23.1,
+   "day": "9 h 56 min",
+   "year": "11.9 years",
+   "distanceAU": 5.2,
+   "tempC": "About −110 °C at the cloud tops",
+   "atmosphere": "Hydrogen and helium",
+   "moons": "95+",
+   "escape": 59.5,
+   "fact": "Its Great Red Spot is a storm bigger than Earth that has raged for centuries."
+  },
+  "saturn": {
+   "type": "Gas giant",
+   "diameterKm": 120536,
+   "massEarth": 95.2,
+   "gravity": 9.0,
+   "day": "10 h 33 min",
+   "year": "29.4 years",
+   "distanceAU": 9.58,
+   "tempC": "About −140 °C at the cloud tops",
+   "atmosphere": "Hydrogen and helium",
+   "moons": "270+",
+   "escape": 35.5,
+   "fact": "It is less dense than water. Its rings are hundreds of thousands of km wide but mostly tens of metres thick."
+  },
+  "uranus": {
+   "type": "Ice giant",
+   "diameterKm": 51118,
+   "massEarth": 14.5,
+   "gravity": 8.7,
+   "day": "17 h 14 min (spins on its side)",
+   "year": "84 years",
+   "distanceAU": 19.2,
+   "tempC": "About −195 °C",
+   "atmosphere": "Hydrogen, helium and methane (which makes it blue-green)",
+   "moons": "28+",
+   "escape": 21.3,
+   "fact": "It is tipped over by 98°, so each pole gets 42 years of sunlight, then 42 years of darkness."
+  },
+  "neptune": {
+   "type": "Ice giant",
+   "diameterKm": 49528,
+   "massEarth": 17.1,
+   "gravity": 11.0,
+   "day": "16 h 6 min",
+   "year": "165 years",
+   "distanceAU": 30.1,
+   "tempC": "About −200 °C",
+   "atmosphere": "Hydrogen, helium and methane",
+   "moons": "16",
+   "escape": 23.5,
+   "fact": "It has the fastest winds in the Solar System, over 2,000 km/h. It was found by maths before anyone saw it (1846)."
+  }
+ },
+ "moons": {
+  "mercury": [],
+  "venus": [],
+  "earth": [
+   {
+    "name": "The Moon",
+    "diameterKm": 3475,
+    "distanceKm": 384400,
+    "orbit": "27.3 days",
+    "fact": "Always shows us the same face. Humans walked on it in 1969–1972, and India's Vikram landed near its south pole in 2023."
+   }
+  ],
+  "mars": [
+   {
+    "name": "Phobos",
+    "diameterKm": 22.4,
+    "distanceKm": 9376,
+    "orbit": "7 h 39 min",
+    "fact": "Orbits faster than Mars spins, so it rises in the west. It is slowly spiralling inwards."
+   },
+   {
+    "name": "Deimos",
+    "diameterKm": 12.4,
+    "distanceKm": 23460,
+    "orbit": "30.3 hours",
+    "fact": "One of the smallest moons known: from Mars it looks like a bright star."
+   }
+  ],
+  "jupiter": [
+   {
+    "name": "Io",
+    "diameterKm": 3643,
+    "distanceKm": 421700,
+    "orbit": "1.8 days",
+    "fact": "The most volcanic world known, with hundreds of active volcanoes."
+   },
+   {
+    "name": "Europa",
+    "diameterKm": 3122,
+    "distanceKm": 671100,
+    "orbit": "3.6 days",
+    "fact": "An ocean of liquid water lies under its icy shell: a top place to look for life."
+   },
+   {
+    "name": "Ganymede",
+    "diameterKm": 5268,
+    "distanceKm": 1070400,
+    "orbit": "7.2 days",
+    "fact": "The largest moon in the Solar System, bigger than Mercury, with its own magnetic field."
+   },
+   {
+    "name": "Callisto",
+    "diameterKm": 4821,
+    "distanceKm": 1882700,
+    "orbit": "16.7 days",
+    "fact": "One of the most heavily cratered surfaces in the Solar System."
+   }
+  ],
+  "saturn": [
+   {
+    "name": "Titan",
+    "diameterKm": 5150,
+    "distanceKm": 1221870,
+    "orbit": "15.9 days",
+    "fact": "Has a thick orange atmosphere and lakes of liquid methane. Huygens landed there in 2005."
+   },
+   {
+    "name": "Enceladus",
+    "diameterKm": 504,
+    "distanceKm": 238040,
+    "orbit": "1.4 days",
+    "fact": "Shoots fountains of water ice from an ocean under its south pole."
+   },
+   {
+    "name": "Mimas",
+    "diameterKm": 396,
+    "distanceKm": 185540,
+    "orbit": "22.6 hours",
+    "fact": "A giant crater, Herschel, covers almost a third of its width."
+   },
+   {
+    "name": "Rhea",
+    "diameterKm": 1527,
+    "distanceKm": 527040,
+    "orbit": "4.5 days",
+    "fact": "Saturn's second-largest moon, an icy and cratered world."
+   },
+   {
+    "name": "Iapetus",
+    "diameterKm": 1469,
+    "distanceKm": 3560820,
+    "orbit": "79.3 days",
+    "fact": "Two-toned: one side is as dark as coal, the other bright as snow."
+   }
+  ],
+  "uranus": [
+   {
+    "name": "Titania",
+    "diameterKm": 1578,
+    "distanceKm": 435910,
+    "orbit": "8.7 days",
+    "fact": "Uranus's largest moon, with huge canyons."
+   },
+   {
+    "name": "Oberon",
+    "diameterKm": 1523,
+    "distanceKm": 583520,
+    "orbit": "13.5 days",
+    "fact": "The outermost of Uranus's big moons, old and heavily cratered."
+   },
+   {
+    "name": "Miranda",
+    "diameterKm": 472,
+    "distanceKm": 129390,
+    "orbit": "1.4 days",
+    "fact": "Has Verona Rupes, a cliff thought to be about 20 km tall, among the tallest known."
+   }
+  ],
+  "neptune": [
+   {
+    "name": "Triton",
+    "diameterKm": 2707,
+    "distanceKm": 354760,
+    "orbit": "5.9 days (backwards)",
+    "fact": "Orbits the wrong way round and has nitrogen geysers. It was probably captured from the Kuiper Belt."
+   }
+  ]
+ }
+}

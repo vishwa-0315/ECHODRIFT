@@ -2,6 +2,7 @@
  * Powered landing (Apollo 11 Eagle, Chandrayaan-3 Vikram, Perseverance sky crane).
  * Throttle + tilt control, real engine limits, fuel callouts, hazard map.
  */
+import { openGuide } from '../missionGuide.js';
 import { h, clear, put, fitCanvas } from '../dom.js';
 import { buildLander, nearestSafe, isSafe } from '../../missions/landing.js';
 import { guidance, terrainHeight } from '../../core/lander.js';
@@ -31,7 +32,7 @@ export function landerScreen(app, { id, handover }) {
   const callout = h('div.callout');
   const thr = h('input', { type: 'range', min: 0, max: 100, value: 0, 'aria-label': 'Throttle', 'data-testid': 'throttle' });
   const thrLbl = h('div.mono.small');
-  const assistBtn = h('button.btn.sm', { onclick: () => toggleAssist(), 'data-testid': 'autoland' }, '✦ Assist: OFF');
+  const assistBtn = h('button.btn.sm', { onclick: () => toggleAssist(), 'data-testid': 'autoland' }, 'Assist: OFF');
   const hold = (dir) => ({
     onpointerdown: (e) => (e.preventDefault(), (tiltDir = dir)),
     onpointerup: () => (tiltDir = 0),
@@ -41,12 +42,12 @@ export function landerScreen(app, { id, handover }) {
   const el = h(
     'div.screen.full',
     h('div.view', canvas),
-    h('div.hud-tl', h('div.row', h('button.btn.icon.sm', { 'aria-label': 'Back', onclick: () => app.go('expert') }, '←'), h('div.label', m.title)), tele),
+    h('div.hud-tl', h('div.row', h('button.btn.icon.sm', { 'aria-label': 'Back', onclick: () => app.go('expert') }, '←'), h('div.label.grow', m.title), h('button.btn.icon.sm', { 'aria-label': 'Open the full mission guide', 'data-testid': 'guide', onclick: () => ((paused = true), openGuide(app, m.id, { onClose: () => ((paused = false), (last = 0)) })) }, '?')), tele),
     h('div.throttle', h('div.label', 'Thrust'), thr, thrLbl),
     callout,
     h(
       'div.dock',
-      h('div.row.wrap', h('button.btn', { 'aria-label': 'Tilt left', ...hold(-1) }, '◀ Tilt'), h('button.btn', { 'aria-label': 'Level the lander', onclick: () => (l.pitchCmd = 0) }, 'Level'), h('button.btn', { 'aria-label': 'Tilt right', ...hold(1) }, 'Tilt ▶'), h('div.spacer'), P.safeSpots || mars ? h('button.btn.sm', { onclick: () => ((hazardOn = !hazardOn), app.toast(hazardOn ? 'Hazard map ON: green = safe ground.' : 'Hazard map OFF')) }, '◎ Hazard map') : null, assistBtn),
+      h('div.row.wrap', h('button.btn', { 'aria-label': 'Tilt left', ...hold(-1) }, 'Tilt left'), h('button.btn', { 'aria-label': 'Level the lander', onclick: () => (l.pitchCmd = 0) }, 'Level'), h('button.btn', { 'aria-label': 'Tilt right', ...hold(1) }, 'Tilt right'), h('div.spacer'), P.safeSpots || mars ? h('button.btn.sm', { onclick: () => ((hazardOn = !hazardOn), app.toast(hazardOn ? 'Hazard map ON: green = safe ground.' : 'Hazard map OFF')) }, '◎ Hazard map') : null, assistBtn),
       h('div.small.muted', 'Tap the ground to pick a landing spot. Assist flies there for you using the same physics.'),
     ),
   );
@@ -63,7 +64,7 @@ export function landerScreen(app, { id, handover }) {
     calls = new Set();
     targetX = null;
     assistOn = false;
-    assistBtn.textContent = '✦ Assist: OFF';
+    assistBtn.textContent = 'Assist: OFF';
     if (mars) {
       // the sky crane phase begins with the engines already running
       l.throttleCmd = 0.6;
@@ -73,7 +74,7 @@ export function landerScreen(app, { id, handover }) {
   function toggleAssist(on = !assistOn) {
     assistOn = on;
     if (on && targetX == null) targetX = nearestSafe(P.terrain, P.target ? (P.target.x0 + P.target.x1) / 2 : l.x, P.footprint);
-    assistBtn.textContent = on ? '✦ Assist: ON' : '✦ Assist: OFF';
+    assistBtn.textContent = on ? 'Assist: ON' : 'Assist: OFF';
     assistBtn.classList.toggle('on', on);
   }
 

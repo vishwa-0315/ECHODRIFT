@@ -18,6 +18,7 @@ const COLORS = {
   saturn: ['#efdcad', '#cfb47e', '#e6d3a0'],
   uranus: ['#bfe7ef', '#94cfdc'],
   neptune: ['#6f8fe6', '#3f5cc2'],
+  pluto: ['#e6d3b8', '#9c7556'],
 };
 export const BODY_COLOR = (b) => (COLORS[b] || ['#aaa'])[0];
 

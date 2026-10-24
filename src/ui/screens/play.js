@@ -25,19 +25,19 @@ export function playScreen(app, { id, demo = false }) {
   const g = guide();
   const info = h('div.play-info');
   const fuelFill = h('div.fuel-fill');
-  const fuel = h('div.fuel', h('span.fuel-label', '⛽ Fuel'), h('div.fuel-bar', fuelFill));
+  const fuel = h('div.fuel', h('span.fuel-label', 'Fuel'), h('div.fuel-bar', fuelFill));
   const light = h('div.chute-light', { style: { display: 'none' } });
   const alertEl = h('div.play-alert');
-  const demoBanner = h('div.demo-banner', { style: { display: demoMode ? '' : 'none' } }, '👀 Vyom is flying. Watch the button!');
+  const demoBanner = h('div.demo-banner', { style: { display: demoMode ? '' : 'none' } }, 'Vyom is flying. Watch the button!');
   const mainBtn = h('button.big-btn', { 'data-testid': 'main-btn' }, h('span.big-label', L.button));
   const aimInput = h('input', { type: 'range', min: -1, max: 1, step: 0.005, value: 0, 'aria-label': 'Aim', 'data-testid': 'aim' });
   const nudge = (d) => () => ((aimInput.value = Math.max(-1, Math.min(1, +aimInput.value + d))), (aim = +aimInput.value), sfx.tap());
   const aimRow = h('div.aim-row', { style: { display: L.control === 'aim+tap' ? '' : 'none' } }, h('button.btn.icon.sm', { onclick: nudge(-0.01), 'aria-label': 'Aim left a little' }, '−'), aimInput, h('button.btn.icon.sm', { onclick: nudge(0.01), 'aria-label': 'Aim right a little' }, '+'));
   aimInput.addEventListener('input', () => (aim = +aimInput.value));
 
-  const CAMS = [['auto', '🎥 Auto'], ['wide', '🔭 Wide'], ['follow', '🚀 Follow']];
+  const CAMS = [['auto', 'Auto'], ['wide', 'Wide'], ['follow', 'Follow']];
   let camMode = app.settings.cam || 'auto';
-  const camBtn = h('button.btn.sm.cam-btn', { 'aria-label': 'Change camera', 'data-testid': 'cam', style: { visibility: game.kind === 'orbit' ? 'visible' : 'hidden' } });
+  const camBtn = h('button.btn.sm.cam-btn', { 'aria-label': 'Change camera', 'data-testid': 'cam', style: { display: game.kind === 'orbit' ? '' : 'none' } });
   const paintCam = () => (camBtn.textContent = CAMS.find((c) => c[0] === camMode)[1]);
   paintCam();
   camBtn.addEventListener('click', () => {
@@ -49,7 +49,7 @@ export function playScreen(app, { id, demo = false }) {
   const el = h(
     'div.screen.full.play',
     canvas,
-    h('div.play-top', h('button.btn.icon.sm.ghost', { 'aria-label': 'Back to levels', onclick: () => leave() }, '✕'), h('div.play-title', h('div.lvl', `Level ${ri + 1} · ${L.mission}`), h('div.t', L.title)), camBtn),
+    h('div.play-top', h('button.btn.icon.sm.ghost', { 'aria-label': 'Back to levels', onclick: () => leave() }, '←'), h('div.play-title', h('div.lvl', `Level ${ri + 1} · ${L.mission}`), h('div.t' + (L.title.length > 17 ? '.long' : ''), L.title)), camBtn),
     h('div.play-hud', info, fuel, light, demoBanner),
     alertEl,
     h('div.play-bottom', g.el, aimRow, mainBtn),
@@ -204,8 +204,8 @@ export function playScreen(app, { id, demo = false }) {
     if (!badges.length && !skins.length) return null;
     return h(
       'div.unlocks',
-      badges.map((b) => h('div.unlock', h('span.ic', b.icon), h('div', h('b', 'New badge: ' + b.name), h('div.small.muted', b.desc)))),
-      skins.map((k) => h('div.unlock', h('span.ic', '🎨'), h('div', h('b', 'New rocket colour: ' + k.name), h('div.small.muted', 'Choose it in Badges & rockets')))),
+      badges.map((b) => h('div.unlock', h('span.medal', '★'), h('div', h('b', 'New badge: ' + b.name), h('div.small.muted', b.desc)))),
+      skins.map((k) => h('div.unlock', h('span.medal.skin', '★'), h('div', h('b', 'New rocket colour: ' + k.name), h('div.small.muted', 'Choose it in Badges & rockets')))),
     );
   }
 
@@ -234,7 +234,7 @@ export function playScreen(app, { id, demo = false }) {
     if (!q) return goNext();
     const opts = h('div.quiz-opts');
     const after = h('div.quiz-after');
-    const ov = overlay([h('div.quiz-head', h('span.chip', '🧠 Bonus question'), h('span.small.muted', `${prog.data.quizRight} right so far`)), h('h2.quiz-q', q.q), opts, after]);
+    const ov = overlay([h('div.quiz-head', h('span.chip', 'Bonus question'), h('span.small.muted', `${prog.data.quizRight} right so far`)), h('h2.quiz-q', q.q), opts, after]);
     q.options.forEach((o, k) =>
       opts.appendChild(
         h(
@@ -250,7 +250,7 @@ export function playScreen(app, { id, demo = false }) {
                 b.classList.toggle('wrong', j === k && !right);
               });
               const badges = prog.quiz(right, q.i);
-              put(after, h('p', h('b', right ? '✅ Correct! ' : '❌ Not quite. '), q.explain), badgeChips(badges), h('div.row', h('div.spacer'), h('button.btn.primary', { onclick: () => (ov.remove(), goNext()), 'data-testid': 'quiz-next' }, next ? `Next: ${next.title} ▸` : 'Back to levels ▸')));
+              put(after, h('p', h('b', right ? 'Correct! ' : 'Not quite. '), q.explain), badgeChips(badges), h('div.row', h('div.spacer'), h('button.btn.primary', { onclick: () => (ov.remove(), goNext()), 'data-testid': 'quiz-next' }, next ? `Next: ${next.title} ▸` : 'Back to levels ▸')));
             },
           },
           o,
@@ -269,7 +269,7 @@ export function playScreen(app, { id, demo = false }) {
       h(
         'div.row.wrap.result-btns',
         h('button.btn', { onclick: () => app.go('home') }, 'Levels'),
-        h('button.btn', { onclick: () => app.go('play', { id, demo: true }), 'data-testid': 'watch' }, '👀 Watch Vyom'),
+        h('button.btn', { onclick: () => app.go('play', { id, demo: true }), 'data-testid': 'watch' }, 'Watch Vyom'),
         h('button.btn.primary.grow', { onclick: () => replay(), 'data-testid': 'retry' }, '↺ Try again'),
       ),
     ]);

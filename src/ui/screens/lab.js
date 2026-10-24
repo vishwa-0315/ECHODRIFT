@@ -10,7 +10,7 @@ import { vyomNote } from '../guide.js';
 const LAB_TIPS = {
   galileo: 'Slide to a moment when Io is farthest to the right (east) and press Mark peak. Do it for two peaks: I’ll do the maths!',
   exoplanet: 'Move the three sliders until the blue curve runs through the yellow dots.',
-  gw: 'Slide the chirp mass until your template rises in pitch just like the data. Try the 🔊 buttons!',
+  gw: 'Slide the chirp mass until your template rises in pitch just like the data. Try the buttons!',
   blackhole: 'Drag the two blue lines onto the brightest part of the ring, one on each side.',
 };
 
@@ -170,7 +170,7 @@ export function labScreen(app, { id }) {
       const good = rms < 9;
       put(
         res,
-        h('div.mono', `Fit error (RMS) = ${rms.toFixed(1)} m/s ${good ? '✓' : ''}`),
+        h('div.mono', `Fit error (RMS) = ${rms.toFixed(1)} m/s ${good ? '' : ''}`),
         h('div.mono', `Planet minimum mass = ${(m / MJUP).toFixed(2)} Jupiter masses · year = ${fit.P.toFixed(2)} days`),
         good ? h('p.ok', `A planet half Jupiter’s mass that orbits in ${fit.P.toFixed(1)} days, far closer to its star than Mercury is to the Sun. Astronomers didn’t think that was possible!`) : h('p.muted', 'Adjust period, wobble size and phase until the blue curve passes through the yellow measurements.'),
         good ? h('button.btn.primary', { onclick: () => finish('Exoplanet discovered', [`51 Pegasi b: about ${(m / MJUP).toFixed(2)} Jupiter masses (minimum), year of ${fit.P.toFixed(2)} days.`, 'Michel Mayor and Didier Queloz announced it on 6 October 1995 and shared the 2019 Nobel Prize in Physics.'], 'The measurements here are simulated from the real published orbit (K = 55.77 m/s, P = 4.2308 d) with realistic noise. Formula: m sin i = K · (P / 2πG)^(1/3) · M★^(2/3).') }, 'Finish lab') : null,
@@ -264,7 +264,7 @@ export function labScreen(app, { id }) {
         good ? h('button.btn.primary', { onclick: () => finish('Black holes weighed', [`Chirp mass ≈ ${McMsun.toFixed(0)} Suns. LIGO measured black holes of about 36 and 29 Suns, 1.3 billion light-years away.`, 'The waves stretched the 4 km LIGO arms by less than a thousandth of the width of a proton.'], 'The waveform is the leading-order (Newtonian) chirp f(τ) = (1/8π)(5/τ)^(3/8)(GMc/c³)^(−5/8), using GW150914’s real chirp mass. The true signal also includes the merger and ringdown.') }, 'Finish lab') : null,
       );
     }
-    put(body, h('p', 'On 14 September 2015 both LIGO detectors felt a tiny ripple in space itself: two black holes spiralling together. As they get closer they orbit faster, so the waves “chirp” up in pitch. How fast the pitch rises tells you their mass.'), canvas, h('div.row', h('span.label', 'Chirp mass'), inp), h('div.row', h('button.btn', { onclick: () => play('data') }, '🔊 Data'), h('button.btn', { onclick: () => play('tmpl') }, '🔊 Template')), res);
+    put(body, h('p', 'On 14 September 2015 both LIGO detectors felt a tiny ripple in space itself: two black holes spiralling together. As they get closer they orbit faster, so the waves “chirp” up in pitch. How fast the pitch rises tells you their mass.'), canvas, h('div.row', h('span.label', 'Chirp mass'), inp), h('div.row', h('button.btn', { onclick: () => play('data') }, 'Play data'), h('button.btn', { onclick: () => play('tmpl') }, 'Play template')), res);
     requestAnimationFrame(() => (draw(), evaluate()));
   }
 
@@ -368,7 +368,7 @@ export function labScreen(app, { id }) {
       body,
       h('p', 'In April 2019 the Event Horizon Telescope showed the first image of a black hole’s shadow, in the galaxy M87, 55 million light-years away. Light bends around the black hole and forms a ring. Its size tells us the mass.'),
       canvas,
-      h('div.row.wrap', h('button.btn.sm', { onclick: nudge(0, -0.5) }, '◀ left'), h('button.btn.sm', { onclick: nudge(0, 0.5) }, 'left ▶'), h('div.spacer'), h('button.btn.sm', { onclick: nudge(1, -0.5) }, '◀ right'), h('button.btn.sm', { onclick: nudge(1, 0.5) }, 'right ▶')),
+      h('div.row.wrap', h('button.btn.sm', { onclick: nudge(0, -0.5) }, 'Left: in'), h('button.btn.sm', { onclick: nudge(0, 0.5) }, 'Left: out'), h('div.spacer'), h('button.btn.sm', { onclick: nudge(1, -0.5) }, 'Right: in'), h('button.btn.sm', { onclick: nudge(1, 0.5) }, 'Right: out')),
       res,
     );
     requestAnimationFrame(() => (draw(), evaluate()));

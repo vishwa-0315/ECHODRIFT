@@ -38,26 +38,41 @@ if (!ONLY || ONLY === 'quick') {
     let held = false;
     s.__bot = setInterval(() => {
       const b = s.game.bot();
-      if (b.hold && !held) (btn.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true })), (held = true));
-      if (!b.hold && held) (btn.dispatchEvent(new PointerEvent('pointerup', { bubbles: true })), (held = false));
+      const press = b.hold || b.tap;
+      if (press && !held) (btn.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true })), (held = true));
+      if (!press && held) (btn.dispatchEvent(new PointerEvent('pointerup', { bubbles: true })), (held = false));
     }, 16);
   });
   await page.waitForSelector('.result-card', { timeout: 60000 });
   await wait(1800);
   await shot('quick-raise-win');
-  result['quick-raise (real button)'] = await page.evaluate(() => window.__LW.current.game.status + ' ' + window.__LW.current.game.stars + '★');
+  result['quick-level1 (real button)'] = await page.evaluate(() => window.__LW.current.game.status + ' ' + window.__LW.current.game.stars + '★');
   await page.click('[data-testid=continue]');
   await page.waitForSelector('[data-testid=quiz-0]');
   await shot('quick-quiz');
   await page.click('[data-testid=quiz-1]');
   await page.click('[data-testid=quiz-next]');
   await page.waitForSelector('[data-testid=main-btn]');
-  for (const id of ['moonshot', 'catchmoon', 'vikram', 'hop', 'home13', 'escape', 'window', 'marscapture', 'terror', 'slingshot']) {
+  const ids = ['earthrise', 'eagle', 'home13', 'slingshot', 'rohini', 'cassini', 'mip', 'window', 'escape', 'marscapture', 'pluto', 'juno', 'sats104', 'terror', 'raise', 'moonshot', 'catchmoon', 'vikram', 'hop', 'spadex'];
+  for (const id of ids.slice(1)) {
     await page.evaluate((id) => window.__LW.go('play', { id, demo: true }), id);
     await page.waitForSelector('.result-card', { timeout: 120000 });
     result['quick-' + id] = await page.evaluate(() => window.__LW.current.game.status + ' ' + window.__LW.current.game.stars + '★');
     log('quick', id, result['quick-' + id]);
   }
+  // Quiz to Orbit: answer every gate correctly
+  await page.evaluate(() => window.__LW.go('quizgame'));
+  await page.click('[data-testid=qg-start]');
+  for (let k = 0; k < 20 && !(await page.$('.result-card')); k++) {
+    await page.waitForFunction(() => window.__LW.current.state === 'gates' || document.querySelector('.result-card'), null, { timeout: 30000 });
+    if (await page.$('.result-card')) break;
+    await page.evaluate(() => document.querySelector('.qg-gate[data-right="1"]').dispatchEvent(new PointerEvent('pointerdown', { bubbles: true })));
+    await page.waitForFunction(() => window.__LW.current.state !== 'gates', null, { timeout: 30000 });
+  }
+  await page.waitForSelector('.result-card', { timeout: 60000 });
+  await shot('quizgame');
+  result['quiz-to-orbit'] = await page.evaluate(() => document.querySelector('.result-card h2').textContent);
+  log('quiz game', result['quiz-to-orbit']);
   await page.evaluate(() => window.__LW.go('hangar'));
   await wait(300);
   await shot('hangar');
@@ -216,14 +231,17 @@ if (!ONLY || ONLY === 'labs') {
     await page.$eval('[data-testid=mc]', (el) => ((el.value = 28.1), el.oninput()));
   });
   await lab('blackhole', async () => {
-    for (let i = 0; i < 18; i++) await page.click('text=left ▶');
-    for (let i = 0; i < 18; i++) await page.click('text=◀ right');
+    for (let i = 0; i < 18; i++) await page.click('text=Left: in');
+    for (let i = 0; i < 18; i++) await page.click('text=Right: in');
   });
 }
 
 /* ---------- explorer & about ---------- */
 if (!ONLY) {
   await page.click('text=Solar System now');
+  await page.click('.sx-chip[data-p=saturn]');
+  await page.click('.sx-tabs button:nth-child(2)');
+  await page.click('.sx-tabs button:nth-child(3)');
   await wait(600);
   await shot('explorer');
   await page.click('text=When is the next Mars launch window?');

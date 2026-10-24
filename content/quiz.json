@@ -310,5 +310,353 @@
   ],
   "answer": 1,
   "explain": "The PSLV rocket put it in an Earth orbit. Mangalyaan then fired its engine at perigee several times to build up speed before escaping."
+ },
+ {
+  "level": "general",
+  "q": "Which planet is closest to the Sun?",
+  "options": [
+   "Venus",
+   "Mercury",
+   "Mars",
+   "Earth"
+  ],
+  "answer": 1,
+  "explain": "Mercury orbits closest to the Sun, at about 58 million km."
+ },
+ {
+  "level": "general",
+  "q": "Which is the largest planet?",
+  "options": [
+   "Saturn",
+   "Earth",
+   "Jupiter",
+   "Neptune"
+  ],
+  "answer": 2,
+  "explain": "Jupiter is so big that more than 1,300 Earths could fit inside it."
+ },
+ {
+  "level": "general",
+  "q": "What is the Sun?",
+  "options": [
+   "A planet",
+   "A star",
+   "A moon",
+   "A comet"
+  ],
+  "answer": 1,
+  "explain": "The Sun is a star: a giant ball of hot gas powered by nuclear fusion."
+ },
+ {
+  "level": "general",
+  "q": "About how long does sunlight take to reach Earth?",
+  "options": [
+   "8 seconds",
+   "8 minutes",
+   "8 hours",
+   "8 days"
+  ],
+  "answer": 1,
+  "explain": "Light takes about 8 minutes 20 seconds to travel the 150 million km from the Sun."
+ },
+ {
+  "level": "general",
+  "q": "Who was the first human in space?",
+  "options": [
+   "Neil Armstrong",
+   "Yuri Gagarin",
+   "Rakesh Sharma",
+   "Valentina Tereshkova"
+  ],
+  "answer": 1,
+  "explain": "Yuri Gagarin orbited Earth on 12 April 1961."
+ },
+ {
+  "level": "general",
+  "q": "Who was the first Indian in space?",
+  "options": [
+   "Kalpana Chawla",
+   "Rakesh Sharma",
+   "Sunita Williams",
+   "Vikram Sarabhai"
+  ],
+  "answer": 1,
+  "explain": "Rakesh Sharma flew on a Soviet Soyuz in April 1984."
+ },
+ {
+  "level": "general",
+  "q": "Which planet is known as the Red Planet?",
+  "options": [
+   "Jupiter",
+   "Venus",
+   "Mars",
+   "Mercury"
+  ],
+  "answer": 2,
+  "explain": "Iron oxide (rust) in its dust makes Mars look red."
+ },
+ {
+  "level": "general",
+  "q": "How many planets are in our Solar System?",
+  "options": [
+   "7",
+   "8",
+   "9",
+   "10"
+  ],
+  "answer": 1,
+  "explain": "There are eight planets. Pluto has been classed as a dwarf planet since 2006."
+ },
+ {
+  "level": "general",
+  "q": "What was India's first satellite?",
+  "options": [
+   "Rohini",
+   "Aryabhata",
+   "INSAT-1A",
+   "Bhaskara"
+  ],
+  "answer": 1,
+  "explain": "Aryabhata was launched on 19 April 1975 by a Soviet rocket."
+ },
+ {
+  "level": "general",
+  "q": "Where is India's main rocket launch centre?",
+  "options": [
+   "Thiruvananthapuram",
+   "Sriharikota",
+   "Bengaluru",
+   "Ahmedabad"
+  ],
+  "answer": 1,
+  "explain": "The Satish Dhawan Space Centre is at Sriharikota in Andhra Pradesh."
+ },
+ {
+  "level": "general",
+  "q": "Which is the hottest planet?",
+  "options": [
+   "Mercury",
+   "Venus",
+   "Mars",
+   "Jupiter"
+  ],
+  "answer": 1,
+  "explain": "Venus's thick carbon-dioxide air traps heat, making it hotter than Mercury."
+ },
+ {
+  "level": "general",
+  "q": "What does a light-year measure?",
+  "options": [
+   "Time",
+   "Distance",
+   "Brightness",
+   "Speed"
+  ],
+  "answer": 1,
+  "explain": "A light-year is the distance light travels in one year: about 9.5 trillion km."
+ },
+ {
+  "level": "general",
+  "q": "What keeps the Moon in orbit around Earth?",
+  "options": [
+   "Magnetism",
+   "Gravity",
+   "Air",
+   "Sunlight"
+  ],
+  "answer": 1,
+  "explain": "Earth's gravity keeps pulling the Moon, so it keeps falling around us instead of flying off."
+ },
+ {
+  "level": "general",
+  "q": "Who was the first person to walk on the Moon?",
+  "options": [
+   "Buzz Aldrin",
+   "Neil Armstrong",
+   "Yuri Gagarin",
+   "Michael Collins"
+  ],
+  "answer": 1,
+  "explain": "Neil Armstrong stepped onto the Moon on 20 July 1969 (21 July in UTC)."
+ },
+ {
+  "level": "general",
+  "q": "Which is the largest moon in the Solar System?",
+  "options": [
+   "Titan",
+   "Our Moon",
+   "Ganymede",
+   "Europa"
+  ],
+  "answer": 2,
+  "explain": "Jupiter's moon Ganymede is even bigger than the planet Mercury."
+ },
+ {
+  "level": "general",
+  "q": "What does Aditya-L1 study?",
+  "options": [
+   "The Moon",
+   "Mars",
+   "The Sun",
+   "Saturn"
+  ],
+  "answer": 2,
+  "explain": "Aditya-L1 watches the Sun from the L1 point, 1.5 million km from Earth."
+ },
+ {
+  "level": "general",
+  "q": "About how fast must you go to stay in orbit just above Earth?",
+  "options": [
+   "0.8 km/s",
+   "7.8 km/s",
+   "78 km/s",
+   "780 km/s"
+  ],
+  "answer": 1,
+  "explain": "About 7.8 km/s, roughly 28,000 km/h. Fast enough that you keep falling around the curve of Earth."
+ },
+ {
+  "level": "general",
+  "q": "Why do we always see the same side of the Moon?",
+  "options": [
+   "The Moon doesn't spin",
+   "It spins once for every orbit",
+   "Earth blocks the other side",
+   "It's a coincidence"
+  ],
+  "answer": 1,
+  "explain": "The Moon is tidally locked: it turns once on its axis each time it orbits Earth."
+ },
+ {
+  "level": "general",
+  "q": "Which planet has the biggest, brightest rings?",
+  "options": [
+   "Jupiter",
+   "Uranus",
+   "Saturn",
+   "Neptune"
+  ],
+  "answer": 2,
+  "explain": "Saturn's rings are made of ice and rock, from tiny grains to house-sized chunks."
+ },
+ {
+  "level": "general",
+  "q": "What do astronauts feel in orbit?",
+  "options": [
+   "No gravity at all",
+   "Weightless, because they are falling",
+   "Heavier than on Earth",
+   "Pushed by the wind"
+  ],
+  "answer": 1,
+  "explain": "Gravity is still about 90% as strong in low orbit. Astronauts float because they and their spacecraft are falling together."
+ },
+ {
+  "level": "earthrise",
+  "q": "Which mission took the famous 'Earthrise' photo?",
+  "options": [
+   "Apollo 8",
+   "Apollo 11",
+   "Voyager 1",
+   "Chandrayaan-1"
+  ],
+  "answer": 0,
+  "explain": "Apollo 8, the first crewed flight around the Moon, in December 1968."
+ },
+ {
+  "level": "eagle",
+  "q": "What was the Apollo 11 lunar module called?",
+  "options": [
+   "Columbia",
+   "Eagle",
+   "Falcon",
+   "Aquarius"
+  ],
+  "answer": 1,
+  "explain": "The lunar module was Eagle; the command module that stayed in orbit was Columbia."
+ },
+ {
+  "level": "rohini",
+  "q": "Which rocket gave India its first satellite launch from Indian soil?",
+  "options": [
+   "PSLV",
+   "SLV-3",
+   "GSLV",
+   "LVM3"
+  ],
+  "answer": 1,
+  "explain": "SLV-3 put Rohini into orbit on 18 July 1980."
+ },
+ {
+  "level": "cassini",
+  "q": "What did Cassini drop onto Saturn's moon Titan?",
+  "options": [
+   "A rover",
+   "The Huygens probe",
+   "A flag",
+   "Nothing"
+  ],
+  "answer": 1,
+  "explain": "The European Huygens probe landed on Titan in January 2005: the farthest landing ever made."
+ },
+ {
+  "level": "mip",
+  "q": "What is the Moon Impact Probe's crash site called?",
+  "options": [
+   "Shiv Shakti Point",
+   "Jawahar Point",
+   "Tiranga Point",
+   "Vikram Point"
+  ],
+  "answer": 1,
+  "explain": "Chandrayaan-1's probe hit near Shackleton crater on 14 November 2008, at Jawahar Point."
+ },
+ {
+  "level": "pluto",
+  "q": "What shape is the famous bright region on Pluto?",
+  "options": [
+   "A star",
+   "A heart",
+   "A circle",
+   "A triangle"
+  ],
+  "answer": 1,
+  "explain": "The heart-shaped plain is called Tombaugh Regio, after Pluto's discoverer Clyde Tombaugh."
+ },
+ {
+  "level": "juno",
+  "q": "Juno is named after a goddess who could see through…",
+  "options": [
+   "Walls",
+   "Clouds",
+   "Water",
+   "Mountains"
+  ],
+  "answer": 1,
+  "explain": "In myth, Juno saw through the clouds Jupiter hid behind. The spacecraft also peers beneath Jupiter's clouds."
+ },
+ {
+  "level": "sats104",
+  "q": "How many satellites did PSLV-C37 launch in one flight?",
+  "options": [
+   "10",
+   "42",
+   "104",
+   "1,000"
+  ],
+  "answer": 2,
+  "explain": "104 satellites on 15 February 2017, a world record at the time."
+ },
+ {
+  "level": "spadex",
+  "q": "Why is docking in space tricky?",
+  "options": [
+   "There is wind",
+   "Nothing slows you down, so you must brake yourself",
+   "Satellites are magnetic",
+   "It is always dark"
+  ],
+  "answer": 1,
+  "explain": "With no air, a spacecraft keeps moving at the same speed until its thrusters change it. That's Newton's first law."
  }
 ]

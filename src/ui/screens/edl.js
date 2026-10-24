@@ -1,4 +1,5 @@
 /** Perseverance entry: steer with lift, open the parachute in its window, hand over to the sky crane. */
+import { openGuide } from '../missionGuide.js';
 import { h, clear, put, fitCanvas } from '../dom.js';
 import { buildEntry, entryGuidance, rangeTrigger, predictHandover } from '../../missions/landing.js';
 import { heatFlux } from '../../core/edl.js';
@@ -17,17 +18,18 @@ export function edlScreen(app, { id }) {
   let predAt = 0;
   let ended = false;
   let k = 0;
+  let guidePause = false;
   const canvas = h('canvas', { role: 'img', 'aria-label': 'Entry profile: altitude versus distance travelled' });
   const tele = h('div.tele');
   const lift = h('input', { type: 'range', min: -100, max: 100, value: 100, 'aria-label': 'Lift direction: down to up', 'data-testid': 'lift' });
-  const chuteBtn = h('button.btn.go', { onclick: () => deploy(), 'data-testid': 'chute' }, '☂ Deploy parachute');
+  const chuteBtn = h('button.btn.go', { onclick: () => deploy(), 'data-testid': 'chute' }, 'Deploy parachute');
   const lamp = h('span.chip');
-  const guideBtn = h('button.btn.sm', { onclick: () => setGuided(!guided), 'data-testid': 'guided' }, '✦ Guided entry: OFF');
+  const guideBtn = h('button.btn.sm', { onclick: () => setGuided(!guided), 'data-testid': 'guided' }, 'Guided entry: OFF');
   const spdBtn = h('button.btn.sm', { onclick: () => ((speedUp = speedUp === 1 ? 4 : speedUp === 4 ? 10 : 1), (spdBtn.textContent = `×${speedUp}`)) }, '×1');
   const el = h(
     'div.screen.full',
     h('div.view', canvas),
-    h('div.hud-tl', h('div.row', h('button.btn.icon.sm', { 'aria-label': 'Back', onclick: () => app.go('expert') }, '←'), h('div.label', m.title)), tele),
+    h('div.hud-tl', h('div.row', h('button.btn.icon.sm', { 'aria-label': 'Back', onclick: () => app.go('expert') }, '←'), h('div.label.grow', m.title), h('button.btn.icon.sm', { 'aria-label': 'Open the full mission guide', 'data-testid': 'guide', onclick: () => ((guidePause = true), openGuide(app, m.id, { onClose: () => ((guidePause = false), (last = 0)) })) }, '?')), tele),
     h(
       'div.dock',
       h('div.row.wrap', h('span.label', 'Lift down'), lift, h('span.label', 'Lift up')),
@@ -40,7 +42,7 @@ export function edlScreen(app, { id }) {
   });
   function setGuided(on) {
     guided = on;
-    guideBtn.textContent = on ? '✦ Guided entry: ON' : '✦ Guided entry: OFF';
+    guideBtn.textContent = on ? 'Guided entry: ON' : 'Guided entry: OFF';
     guideBtn.classList.toggle('on', on);
   }
   function init() {
@@ -76,7 +78,7 @@ export function edlScreen(app, { id }) {
     raf = requestAnimationFrame(frame);
     const dtR = Math.min(0.05, (now - (last || now)) / 1000);
     last = now;
-    if (!ended && !document.hidden) {
+    if (!ended && !guidePause && !document.hidden) {
       acc += dtR * speedUp;
       while (acc >= 0.05 && (e.phase === 'entry' || e.phase === 'chute')) {
         if (guided && e.phase === 'entry') {

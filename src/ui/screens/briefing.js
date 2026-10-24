@@ -3,9 +3,10 @@ import { h } from '../dom.js';
 import { G0 } from '../../core/constants.js';
 import { kg, dv } from '../fmt.js';
 import { vyomNote } from '../guide.js';
+import { openGuide, hasGuide } from '../missionGuide.js';
 
 const TIPS = {
-  chandrayaan3: 'First raise your orbit near Earth, then head for the Moon, then brake to be caught. ✦ Mission Assist can plan each burn.',
+  chandrayaan3: 'First raise your orbit near Earth, then head for the Moon, then brake to be caught. Mission Assist can plan each burn.',
   apollo13: 'The crew needs a safe way home. Make a small burn so the entry angle turns green, then let time run.',
   voyager2: 'A tiny nudge now decides whether Jupiter flings you on to Saturn. Watch the dashed line!',
   mangalyaan: 'First pick a green square on the launch chart. Then correct your course and brake hard at Mars.',
@@ -53,7 +54,7 @@ export function briefingScreen(app, { id }) {
     h('table.spec', h('tbody', rows.map(([k, v]) => h('tr', h('td', k), h('td', v))))),
     h('p.small.muted', { style: { marginTop: '10px' } }, 'Rocket equation: Δv = Isp · g₀ · ln(m_full / m_empty). The heavier you are, the less each kilogram of fuel buys.'),
     h('div.spacer'),
-    h('div.row', { style: { marginTop: '12px' } }, h('button.btn.primary.grow', { onclick: start, 'data-testid': 'start' }, 'Begin mission ▸')),
+    h('div.row', { style: { marginTop: '12px' } }, hasGuide(m.id) ? h('button.btn', { onclick: () => openGuide(app, m.id), 'data-testid': 'guide' }, 'Read the full guide') : null, h('button.btn.primary.grow', { onclick: start, 'data-testid': 'start' }, 'Begin mission ▸')),
   );
   return { el };
 }

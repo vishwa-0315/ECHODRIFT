@@ -61,41 +61,72 @@ function tone(freq, t, dur, { type = 'sine', vol = 0.3, attack = 0.01, out = sfx
 }
 
 /* ---------------- music ---------------- */
-// C major pentatonic, four chords: C – Am – F – G (I–vi–IV–V)
-const CHORDS = [
-  [261.63, 329.63, 392.0],
-  [220.0, 261.63, 329.63],
-  [174.61, 220.0, 261.63],
-  [196.0, 246.94, 293.66],
+// New soundtrack: D Dorian, chords Dm9 – Bbmaj7 – Fmaj7 – C6 (menus: dreamy bells; levels: bass + arpeggio + hats)
+const N = (semis) => 293.66 * Math.pow(2, semis / 12); // relative to D4
+const PROG = [
+  { root: -12, notes: [0, 3, 7, 10, 14] }, // Dm9
+  { root: -16, notes: [-4, 0, 3, 7] }, // Bbmaj7
+  { root: -21, notes: [-9, -5, -2, 2] }, // Fmaj7 (voiced low)
+  { root: -14, notes: [-2, 2, 5, 7] }, // C6
 ];
-const PENTA = [523.25, 587.33, 659.25, 783.99, 880.0, 1046.5];
-const ARP = [0, 2, 4, 2, 3, 1, 4, 5];
+const MELODY = [14, 12, 10, 7, 9, 10, 12, 17, 15, 14, 12, 10, 9, 7, 5, 7];
+let hat = null;
+
+function bell(f, t, dur, vol) {
+  tone(f, t, dur, { type: 'sine', vol, attack: 0.005, out: musicGain });
+  tone(f * 2.01, t, dur * 0.6, { type: 'sine', vol: vol * 0.25, attack: 0.005, out: musicGain });
+}
+function hiHat(t, vol) {
+  hat ||= (() => {
+    const b = ctx.createBuffer(1, ctx.sampleRate * 0.05, ctx.sampleRate);
+    const d = b.getChannelData(0);
+    for (let i = 0; i < d.length; i++) d[i] = (Math.random() * 2 - 1) * (1 - i / d.length);
+    return b;
+  })();
+  const src = ctx.createBufferSource();
+  src.buffer = hat;
+  const f = ctx.createBiquadFilter();
+  f.type = 'highpass';
+  f.frequency.value = 7000;
+  const g = ctx.createGain();
+  g.gain.value = vol;
+  src.connect(f).connect(g).connect(musicGain);
+  src.start(t);
+}
 
 function scheduleBar(t, bar) {
-  const spb = mood === 'play' ? 0.33 : 0.4; // seconds per beat
-  const chord = CHORDS[bar % 4];
-  // soft pad
-  for (const f of chord) tone(f / 2, t, spb * 4.2, { type: 'triangle', vol: 0.05, attack: 0.4, out: musicGain });
-  // plucked arpeggio (8th notes)
-  for (let i = 0; i < 8; i++) {
-    const n = PENTA[(ARP[i] + bar) % PENTA.length];
-    if (mood === 'menu' && i % 2) continue;
-    tone(n, t + i * (spb / 2), 0.35, { type: 'sine', vol: 0.06, out: musicGain });
+  const play = mood === 'play';
+  const spb = play ? 0.3 : 0.5; // seconds per beat
+  const ch = PROG[bar % 4];
+  // warm pad (detuned pair) under everything
+  for (const n of ch.notes) {
+    tone(N(n), t, spb * 4.3, { type: 'triangle', vol: play ? 0.03 : 0.045, attack: 0.6, out: musicGain, detune: -6 });
+    tone(N(n), t, spb * 4.3, { type: 'triangle', vol: play ? 0.03 : 0.045, attack: 0.6, out: musicGain, detune: 6 });
   }
-  // gentle beat in play mode
-  if (mood === 'play') {
-    for (let b = 0; b < 4; b++) {
-      const k = ctx.createOscillator(), g = ctx.createGain();
-      const tt = t + b * spb;
-      k.frequency.setValueAtTime(120, tt);
-      k.frequency.exponentialRampToValueAtTime(45, tt + 0.12);
-      g.gain.setValueAtTime(0.12, tt);
-      g.gain.exponentialRampToValueAtTime(0.0001, tt + 0.15);
-      k.connect(g).connect(musicGain);
-      k.start(tt);
-      k.stop(tt + 0.2);
-    }
+  if (!play) {
+    // menus: slow bell melody, two notes per bar
+    for (let i = 0; i < 2; i++) bell(N(MELODY[(bar * 2 + i) % MELODY.length]), t + i * spb * 2, 1.6, 0.05);
+    return spb * 4;
   }
+  // levels: pulsing bass on 8ths, rising arpeggio on 16ths, soft kick + hats
+  for (let i = 0; i < 8; i++) tone(N(ch.root) / (i % 2 ? 1 : 2) * 1, t + i * (spb / 2), spb * 0.45, { type: 'sawtooth', vol: 0.025, attack: 0.01, out: musicGain });
+  for (let i = 0; i < 16; i++) {
+    const n = ch.notes[i % ch.notes.length] + (i >= 8 ? 12 : 0);
+    tone(N(n), t + i * (spb / 4), 0.16, { type: 'square', vol: 0.012, attack: 0.003, out: musicGain });
+  }
+  for (let b2 = 0; b2 < 4; b2++) {
+    const tt = t + b2 * spb;
+    const k = ctx.createOscillator(), g = ctx.createGain();
+    k.frequency.setValueAtTime(110, tt);
+    k.frequency.exponentialRampToValueAtTime(40, tt + 0.12);
+    g.gain.setValueAtTime(0.14, tt);
+    g.gain.exponentialRampToValueAtTime(0.0001, tt + 0.16);
+    k.connect(g).connect(musicGain);
+    k.start(tt);
+    k.stop(tt + 0.2);
+    hiHat(tt + spb / 2, 0.05);
+  }
+  if (bar % 4 === 3) bell(N(MELODY[(bar >> 2) % MELODY.length] + 12), t + spb * 3, 0.9, 0.035);
   return spb * 4;
 }
 

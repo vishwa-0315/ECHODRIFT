@@ -10,10 +10,12 @@ Chandrayaan-3 · Vikram · Mangalyaan · Aditya-L1 · Apollo 11 · Apollo 13 · 
 > The earlier fictional prototype, *ECHO DRIFT*, lives on the [`echo-drift`](../../tree/echo-drift) branch.
 
 ## How it plays
-- **Quick play (for everyone):** 11 short levels from real missions, one big button each: *Raise the orbit*, *Moon shot*, *Catch the Moon*, *Vikram touchdown*, *Vikram's hop*, *Get them home* (Apollo 13), *Escape Earth*, *Launch window*, *Mars orbit insertion*, *Seven minutes of terror*, *Jupiter slingshot*.
+- **Quick play (for everyone):** 20 short levels on a mission timeline from 1968 to 2025 (Earthrise, Apollo 11 and 13, Voyager 2, SLV-3, Cassini, Chandrayaan-1, Mangalyaan, New Horizons, Juno, PSLV-C37, Perseverance, Chandrayaan-3, SpaDeX), one big button each, plus the coming missions (Gaganyaan, Chandrayaan-4, Artemis, Shukrayaan, Bharatiya Antariksh Station).
+- **Quiz to Orbit:** a mini-game where right answers are engine burns: reach the real orbital speed of 7.8 km/s.
+- **Solar System explorer:** real planet positions on any date, the habitable zone, distances between any planets, full planet facts and their main moons.
 - **Smart camera:** zooms in on flybys and captures, with a close-up window and Auto / Wide / Follow modes.
 - **Vyom**, a friendly robot guide, explains every level, mission and lab, and can fly a level for you ("Watch Vyom").
-- **Rewards:** stars, 8 badges, 5 rocket colours to unlock, music and sound effects, and a quiz card after every level.
+- **Rewards:** stars, 9 badges, 10 rocket colours to unlock, music and sound effects, and a quiz card after every level (55 questions).
 - **Expert mode:** the full missions on their real dates, where you plan every burn yourself, plus four discovery labs.
 
 ## What makes it different

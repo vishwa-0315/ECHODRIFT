@@ -7,7 +7,7 @@
 import { build } from 'esbuild';
 import { readFileSync, writeFileSync, mkdirSync, copyFileSync, statSync } from 'node:fs';
 const root = new URL('..', import.meta.url).pathname;
-const res = await build({ entryPoints: [root + 'src/main.js'], bundle: true, minify: true, format: 'iife', target: ['chrome80', 'safari14'], write: false, loader: { '.json': 'json', '.jpg': 'dataurl' }, legalComments: 'none' });
+const res = await build({ entryPoints: [root + 'src/main.js'], bundle: true, minify: true, format: 'iife', target: ['chrome80', 'safari14'], write: false, loader: { '.json': 'json', '.jpg': 'dataurl' }, legalComments: 'none', define: { __BUILD__: JSON.stringify(process.env.GITHUB_RUN_NUMBER || '0') } });
 const js = res.outputFiles[0].text.replace(/<\/script/gi, '<\\/script');
 const css = readFileSync(root + 'src/styles.css', 'utf8');
 const f = (pkg, file) => readFileSync(root + `node_modules/@fontsource/${pkg}/files/${file}`).toString('base64');

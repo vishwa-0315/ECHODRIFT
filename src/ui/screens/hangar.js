@@ -11,7 +11,7 @@ export function hangarScreen(app) {
   const r = createRenderer();
   const previews = [];
   const skinCard = (k) => {
-    const open = total >= k.need;
+    const open = prog.skinOpen(k);
     const c = h('canvas.skin-prev', { 'aria-hidden': 'true' });
     previews.push([c, k]);
     return h(
@@ -27,7 +27,7 @@ export function hangarScreen(app) {
       },
       c,
       h('div.b', k.name),
-      h('div.small.muted', open ? (prog.data.skin === k.id ? 'Flying this one' : 'Tap to choose') : `🔒 ${k.need} ★ needed`),
+      h('div.small.muted', open ? (prog.data.skin === k.id ? 'Flying this one' : 'Tap to choose') : k.quiz ? `Locked: ${k.quiz === 3 ? 'Quiz to Orbit with 3 ★' : 'reach orbit in Quiz to Orbit'}` : `Locked: ${k.need} ★ needed`),
     );
   };
   const el = h(
@@ -40,7 +40,7 @@ export function hangarScreen(app) {
       'div.badge-grid',
       BADGES.map((b) => {
         const got = !!prog.data.badges[b.id];
-        return h('div.badge' + (got ? '.got' : ''), h('div.ic', got ? b.icon : '🔒'), h('div.b', b.name), h('div.small.muted', b.desc));
+        return h('div.badge' + (got ? '.got' : ''), h('div.medal' + (got ? '' : '.off'), '★'), h('div.b', b.name), h('div.small.muted', b.desc));
       }),
     ),
     h('div.section', h('h3', 'Rocket colours')),

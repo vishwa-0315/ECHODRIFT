@@ -18,6 +18,7 @@ import { MU, RADIUS, AU, DAY, G0 } from '../core/constants.js';
 import { Lander } from '../core/lander.js';
 import { EntrySim } from '../core/edl.js';
 
+const BODY_NAME = { moon: 'the Moon', mars: 'Mars', jupiter: 'Jupiter', earth: 'Earth', pluto: 'Pluto' };
 const km = (m) => m / 1000;
 const fmtKm = (m) => `${Math.round(km(m)).toLocaleString('en-US')} km`;
 const wetFor = (dry, dv, isp) => dry * Math.exp(dv / (isp * G0));
@@ -101,6 +102,7 @@ const L1 = {
   mission: 'Chandrayaan-3',
   agency: 'ISRO',
   year: 2023,
+  date: '2023-07-15',
   button: 'BOOST',
   control: 'hold',
   goal: 'Push the far end of your orbit out to the green ring.',
@@ -156,6 +158,7 @@ const L2 = {
   mission: 'Chandrayaan-3',
   agency: 'ISRO',
   year: 2023,
+  date: '2023-08-01',
   button: 'BOOST',
   control: 'hold',
   goal: 'Stretch your path until it reaches the green zone around the Moon.',
@@ -258,12 +261,12 @@ function captureLevel({ body, mu, R, vInf, periAlt, startR, dry, wetDv, thrust, 
       if (nuNow < (100 * Math.PI) / 180 || g.burning) return;
       const o = g.w.orbitAbout(body);
       const apoAlt = o.apo - R, periAlt2 = o.peri - R;
-      if (o.energy >= 0) return g.lose(`Not caught: you flew past ${body === 'moon' ? 'the Moon' : 'Mars'}. Hold BRAKE longer near the closest point.`);
+      if (o.energy >= 0) return g.lose(`Not caught: you flew past ${BODY_NAME[body]}. Hold BRAKE longer near the closest point.`);
       if (periAlt2 < periMin) return g.lose('Your orbit dips too low: it would hit the surface. Brake a little less.');
       if (apoAlt > apoMax) return g.lose(`Caught, but the orbit is too stretched (far point ${fmtKm(apoAlt)}). Brake a bit more.`);
       return g.win(starsBy(g, apoAlt), [`Orbit: ${fmtKm(periAlt2)} × ${fmtKm(apoAlt)}`, `Fuel used: ${Math.round(g.w.dvUsed)} m/s of Δv`]);
     },
-    onHit: (g) => g.lose(`Crashed into ${body === 'moon' ? 'the Moon' : 'Mars'}! Brake less, or check your path.`),
+    onHit: (g) => g.lose(`Crashed into ${BODY_NAME[body]}! Brake less, or check your path.`),
     info(g) {
       const o = g.w.orbitAbout(body);
       return [['Height', fmtKm(o.r - R)], info2(o)];
@@ -283,6 +286,7 @@ const L3 = {
   mission: 'Chandrayaan-3',
   agency: 'ISRO',
   year: 2023,
+  date: '2023-08-05',
   button: 'BRAKE',
   control: 'hold',
   goal: 'Brake so the Moon’s gravity catches you in orbit.',
@@ -367,6 +371,7 @@ const L4 = {
   mission: 'Chandrayaan-3',
   agency: 'ISRO',
   year: 2023,
+  date: '2023-08-23',
   button: 'ENGINE',
   control: 'hold',
   goal: 'Land gently: under 3 m/s.',
@@ -397,6 +402,7 @@ const L5 = {
   mission: 'Mangalyaan',
   agency: 'ISRO',
   year: 2013,
+  date: '2013-11-05',
   button: 'LAUNCH',
   control: 'tap',
   goal: 'Launch when Mars is about 44° ahead of Earth, so you arrive where Mars will be.',
@@ -480,6 +486,7 @@ const L6 = {
   mission: 'Mangalyaan',
   agency: 'ISRO',
   year: 2014,
+  date: '2014-09-24',
   button: 'BRAKE',
   control: 'hold',
   goal: 'Brake to be caught by Mars, using as little fuel as you can.',
@@ -514,6 +521,7 @@ const L7 = {
   mission: 'Perseverance',
   agency: 'NASA',
   year: 2021,
+  date: '2021-02-18',
   button: 'PARACHUTE',
   control: 'tap+hold',
   goal: 'Open the parachute in its safe window, then land gently with the engines.',
@@ -642,6 +650,7 @@ const L8 = {
   mission: 'Voyager 2',
   agency: 'NASA',
   year: 1979,
+  date: '1979-07-09',
   button: 'LAUNCH',
   control: 'aim+tap',
   goal: 'Aim so Jupiter’s gravity flings you on to Saturn.',
@@ -741,6 +750,7 @@ const LHOP = {
   mission: 'Chandrayaan-3',
   agency: 'ISRO',
   year: 2023,
+  date: '2023-09-03',
   button: 'ENGINE',
   control: 'hold',
   goal: 'Lift Vikram at least 40 cm off the Moon, then land gently again.',
@@ -816,6 +826,7 @@ const L13 = {
   mission: 'Apollo 13',
   agency: 'NASA',
   year: 1970,
+  date: '1970-04-17',
   button: 'BRAKE',
   control: 'hold',
   goal: 'Steer the crew into the safe re-entry window: between −5.3° and −7.4°.',
@@ -874,7 +885,7 @@ const L13 = {
         const h2 = g.pred?.hit;
         const ang = h2 && h2.body === 'earth' ? (Math.asin((h2.x * h2.vx + h2.y * h2.vy) / (Math.hypot(h2.x, h2.y) * Math.hypot(h2.vx, h2.vy))) * 180) / Math.PI : null;
         const ok = ang != null && ang >= lo && ang <= hi;
-        return [['Entry angle', ang == null ? 'missing Earth!' : `${ang.toFixed(2)}° ${ok ? '✅' : ang > hi ? '(too shallow)' : '(too steep)'}`], ['Safe window', '−5.3° to −7.4°']];
+        return [['Entry angle', ang == null ? 'missing Earth!' : `${ang.toFixed(2)}° ${ok ? '(safe)' : ang > hi ? '(too shallow)' : '(too steep)'}`], ['Safe window', '−5.3° to −7.4°']];
       },
       scene: (g) => ({ central: 'earth', bodies: ['moon'], rings: [], focus: [[0, 0], [g.w.y[0], g.w.y[1]], [r0 * 0.9, 0], [-r0 * 0.9, 0], [0, r0 * 0.9], [0, -r0 * 0.9]] }),
       bot(g) {
@@ -895,6 +906,7 @@ const LESC = {
   mission: 'Mangalyaan',
   agency: 'ISRO',
   year: 2013,
+  date: '2013-12-01',
   button: 'BOOST',
   control: 'hold',
   goal: 'Break free of Earth’s gravity with at least 2.6 km/s to spare for the trip to Mars.',
@@ -940,9 +952,513 @@ const LESC = {
   },
 };
 
+/* ------------------------------------------------------------------ */
+/* Apollo 11: The Eagle has landed (20 July 1969)                      */
+/* ------------------------------------------------------------------ */
+const LA11 = {
+  id: 'eagle',
+  title: 'The Eagle has landed',
+  mission: 'Apollo 11',
+  agency: 'NASA',
+  year: 1969,
+  date: '1969-07-20',
+  button: 'ENGINE',
+  control: 'hold',
+  goal: 'Land the Eagle gently on the Moon: under 3 m/s, before the fuel runs out.',
+  guide: ['Neil Armstrong is flying the Eagle down to the Moon!', 'Hold ENGINE to slow down. Fuel is very low, so don’t hover too long.'],
+  fact: 'On 20 July 1969 Neil Armstrong steered the Eagle past a field of boulders and landed with less than a minute of fuel to spare.',
+  create: () =>
+    landerLevel({
+      g: 1.62,
+      engine: { thrust: 45040, isp: 305, minThrottle: 0.1 },
+      mass: 7330,
+      dry: 6930,
+      z0: 300,
+      vz0: -9,
+      speed: 1.6,
+      holdThrottle: 0.6,
+      limits: { vz: 3, vx: 1.2, tilt: 12 },
+      stars: (v) => (v <= 1 ? 3 : v <= 2 ? 2 : 1),
+      surface: 'moon',
+    }),
+};
+
+/* ------------------------------------------------------------------ */
+/* Chandrayaan-1: Moon Impact Probe (14 November 2008)                 */
+/* ------------------------------------------------------------------ */
+const LMIP = {
+  id: 'mip',
+  title: 'Moon Impact Probe',
+  mission: 'Chandrayaan-1',
+  agency: 'ISRO',
+  year: 2008,
+  date: '2008-11-14',
+  button: 'DROP',
+  control: 'tap',
+  goal: 'Drop the probe so it lands near the south pole target.',
+  guide: ['The probe falls in a curve, not straight down!', 'The red cross shows where it would land. Tap DROP when it reaches the green target.'],
+  fact: 'On 14 November 2008 Chandrayaan-1’s Moon Impact Probe was released from 100 km up and hit near Shackleton crater at the south pole. The spot is called Jawahar Point.',
+  create() {
+    const mu = MU.moon, R = 1737.4e3, r0 = R + 100e3;
+    const v0 = Math.sqrt(mu / r0);
+    const kick = 60; // m/s retro push on release (gives a ~25-minute fall, like the real probe)
+    const tgtAng = -Math.PI / 2; // south pole, at the bottom of the view
+    // how far ahead of the drop point does the probe land? (computed with the same physics)
+    const lead = (() => {
+      const t = createWorld({ central: { name: 'moon', mu, R }, bodies: [], ship: { x: r0, y: 0, vx: 0, vy: v0 - kick, mass: 1, dry: 1, thrust: 0, isp: 1 }, hmax: 30 });
+      t.advance(3 * 3600);
+      return Math.atan2(t.y[1], t.y[0]);
+    })();
+    // start about 6 seconds of play before the ideal drop moment
+    const ang0 = tgtAng - lead - ((v0 / r0) * 55 * 6);
+    const world = { central: { name: 'moon', mu, R }, bodies: [], ship: { x: r0 * Math.cos(ang0), y: r0 * Math.sin(ang0), vx: -v0 * Math.sin(ang0), vy: v0 * Math.cos(ang0), mass: 35, dry: 35, thrust: 0, isp: 1 }, hmax: 60 };
+    let dropped = false;
+    const surfDist = (x, y) => {
+      let d = Math.atan2(y, x) - tgtAng;
+      d = Math.atan2(Math.sin(d), Math.cos(d));
+      return Math.abs(d) * R;
+    };
+    // where would it land if dropped now? (same physics, computed ahead)
+    const impactIfDropped = (w) => {
+      const v = Math.hypot(w.y[2], w.y[3]);
+      const t = createWorld({ central: { name: 'moon', mu, R }, bodies: [], ship: { x: w.y[0], y: w.y[1], vx: w.y[2] * (1 - kick / v), vy: w.y[3] * (1 - kick / v), mass: 1, dry: 1, thrust: 0, isp: 1 }, hmax: 30 });
+      t.advance(3 * 3600);
+      return t.status === 'hit' ? { x: t.y[0], y: t.y[1] } : null;
+    };
+    let aim = null, aimAt = -1;
+    const g = orbitalGame({
+      world,
+      noFuel: true,
+      dir: 'pro',
+      clock: () => (dropped ? 200 : 55),
+      clockR: () => 0,
+      horizon: () => (dropped ? 3600 : 1),
+      trailStep: 2e4,
+      beforeStep(gg, input) {
+        gg.noEngine = true;
+        if (!dropped && gg.realT - aimAt > 0.05) {
+          aim = impactIfDropped(gg.w);
+          aimAt = gg.realT;
+        }
+        if (!dropped && input.tap) {
+          dropped = true;
+          const v = Math.hypot(gg.w.y[2], gg.w.y[3]);
+          gg.w.y[2] *= 1 - kick / v;
+          gg.w.y[3] *= 1 - kick / v;
+          gg.predAt = -1;
+        }
+      },
+      check(gg) {
+        if (!dropped && gg.realT > 30) gg.lose('The probe was never dropped! Tap DROP when the red cross is on the green target.');
+      },
+      onHit(gg) {
+        const d = surfDist(gg.w.y[0], gg.w.y[1]);
+        if (d > 700e3) return gg.lose(`Impact ${fmtKm(d)} from the south pole. Watch the red cross and drop when it is on the target.`);
+        gg.win(d < 120e3 ? 3 : d < 300e3 ? 2 : 1, ['Impact! The probe reached the Moon’s south pole region.', `Distance from target: ${fmtKm(d)}`]);
+      },
+      info(gg) {
+        if (dropped) return [['Height', fmtKm(Math.hypot(gg.w.y[0], gg.w.y[1]) - R)], ['Status', 'Falling…']];
+        return [['Lands from target', aim ? fmtKm(surfDist(aim.x, aim.y)) : '—'], ['Goal', 'south pole']];
+      },
+      scene: (gg) => ({ central: 'moon', bodies: [], rings: [], marks: [{ x: R * Math.cos(tgtAng), y: R * Math.sin(tgtAng), kind: 'target', label: 'Shackleton crater' }, ...(!dropped && aim ? [{ x: aim.x, y: aim.y, kind: 'x' }] : [])], noPred: !dropped, focus: [[R * 1.25, 0], [-R * 1.25, 0], [0, R * 1.25], [0, -R * 1.25]] }),
+      bot(gg) {
+        return { tap: !dropped && aim && surfDist(aim.x, aim.y) < 25e3 };
+      },
+    });
+    return g;
+  },
+};
+
+/* ------------------------------------------------------------------ */
+/* New Horizons: snap Pluto (14 July 2015)                             */
+/* ------------------------------------------------------------------ */
+const LPLUTO = {
+  id: 'pluto',
+  title: 'Photo of Pluto',
+  mission: 'New Horizons',
+  agency: 'NASA',
+  year: 2015,
+  date: '2015-07-14',
+  button: 'SNAP',
+  control: 'tap',
+  goal: 'Take Pluto’s photo at the closest moment of the flyby.',
+  guide: ['New Horizons races past Pluto at almost 14 km per second!', 'You get one photo. Tap SNAP when you are closest, for the sharpest picture.'],
+  fact: 'On 14 July 2015 New Horizons flew 12,500 km above Pluto and took the first close-up pictures, including its famous heart-shaped plain.',
+  create() {
+    const mu = 869.6e9, R = 1188.3e3;
+    const rp = R + 12500e3, vInf = 13780;
+    const e = 1 + (rp * vInf * vInf) / mu, p = rp * (1 + e);
+    const startR = 260000e3;
+    const nu0 = -Math.acos((p / startR - 1) / e);
+    const s = conicState(mu, rp, e, nu0, Math.PI / 2);
+    const world = { central: { name: 'pluto', mu, R }, bodies: [], ship: { ...s, mass: 400, dry: 400, thrust: 0, isp: 1 }, hmax: 120 };
+    let snapped = null, best = Infinity;
+    return orbitalGame({
+      world,
+      noFuel: true,
+      dir: 'pro',
+      clock: (r) => Math.max(60, r / vInf / 3.2),
+      clockR: (g) => Math.hypot(g.w.y[0], g.w.y[1]),
+      horizon: () => 6 * 3600,
+      trailStep: 2e6,
+      beforeStep(gg, input) {
+        gg.noEngine = true;
+        if (!snapped && input.tap) snapped = Math.hypot(gg.w.y[0], gg.w.y[1]);
+      },
+      check(gg) {
+        const d = Math.hypot(gg.w.y[0], gg.w.y[1]);
+        best = Math.min(best, d);
+        if (snapped) {
+          const q = snapped / rp;
+          if (q > 1.6) return gg.lose(`Too far away (${fmtKm(snapped - R)} from Pluto): the photo is just a dot. Wait until you are closest!`);
+          return gg.win(q < 1.06 ? 3 : q < 1.25 ? 2 : 1, ['Photo taken!', `Distance: ${fmtKm(snapped - R)} (closest possible: 12,500 km)`]);
+        }
+        if (d > best * 2 && d > rp * 3) gg.lose('You flew past without taking the photo! Tap SNAP as you pass closest.');
+      },
+      onHit: (gg) => gg.lose('Crashed into Pluto!'),
+      info(gg) {
+        const d = Math.hypot(gg.w.y[0], gg.w.y[1]);
+        return [['Distance', fmtKm(d - R)], ['Speed', `${(Math.hypot(gg.w.y[2], gg.w.y[3]) / 1000).toFixed(2)} km/s`]];
+      },
+      scene: (gg) => ({ central: 'pluto', bodies: [], rings: [], focus: [[0, 0], [gg.w.y[0], gg.w.y[1]], [rp * 2.2, 0], [-rp * 2.2, 0]], minR: { pluto: 10 } }),
+      bot(gg) {
+        const o = gg.w.orbitAbout('pluto');
+        return { tap: !snapped && o.radialV >= 0 };
+      },
+    });
+  },
+};
+
+/* ------------------------------------------------------------------ */
+/* Juno: Jupiter orbit insertion (4 July 2016)                          */
+/* ------------------------------------------------------------------ */
+const LJUNO = {
+  id: 'juno',
+  title: 'Juno at Jupiter',
+  mission: 'Juno',
+  agency: 'NASA',
+  year: 2016,
+  date: '2016-07-04',
+  button: 'BRAKE',
+  control: 'hold',
+  goal: 'Brake as you swoop past Jupiter to be caught in orbit. Use as little fuel as you can.',
+  guide: ['Jupiter’s gravity is huge: you are falling at almost 58 km/s!', 'Hold BRAKE near the closest point and stop once you are caught.'],
+  fact: 'On 4 July 2016 Juno fired its main engine for 35 minutes and became the second spacecraft ever to orbit Jupiter.',
+  create: () =>
+    captureLevel({
+      body: 'jupiter',
+      mu: MU.jupiter,
+      R: 71492e3,
+      vInf: 5500,
+      periAlt: 4200e3,
+      startR: 2.2e9,
+      dry: 1600,
+      wetDv: 1500,
+      thrust: 645,
+      isp: 318,
+      apoMax: 8.3e9,
+      periMin: 1000e3,
+      starsBy: (g) => (g.w.dvUsed <= 650 ? 3 : g.w.dvUsed <= 820 ? 2 : 1),
+      botApo: 0.85,
+      info2: (o) => ['Far point', o.energy < 0 ? fmtKm(o.apo - 71492e3) : 'not caught yet'],
+    }),
+};
+
+/* ------------------------------------------------------------------ */
+/* Apollo 8: Earthrise (24 December 1968)                              */
+/* ------------------------------------------------------------------ */
+const LEARTH = {
+  id: 'earthrise',
+  title: 'Earthrise',
+  mission: 'Apollo 8',
+  agency: 'NASA',
+  year: 1968,
+  date: '1968-12-24',
+  button: 'SNAP',
+  control: 'tap',
+  goal: 'Photograph the Earth just as it rises over the Moon’s horizon.',
+  guide: ['You are orbiting the Moon. Earth is hidden behind it!', 'Watch the window view. Tap SNAP just after Earth peeks over the horizon.'],
+  fact: 'On 24 December 1968 astronaut Bill Anders took “Earthrise”, one of the most famous photos ever, from lunar orbit.',
+  create() {
+    const mu = MU.moon, R = 1737.4e3, r0 = R + 110e3;
+    const v0 = Math.sqrt(mu / r0);
+    const eDir = Math.PI / 2; // Earth far away, straight "up" in the view
+    const dip = Math.acos(R / r0); // the horizon is below the local horizontal by this angle
+    // elevation of Earth above the visible horizon, seen from the spacecraft (degrees)
+    const elev = (x, y) => {
+      const a = Math.atan2(y, x);
+      let d = eDir - a;
+      d = Math.atan2(Math.sin(d), Math.cos(d));
+      return ((Math.PI / 2 + dip - Math.abs(d)) * 180) / Math.PI;
+    };
+    const w0 = v0 / r0;
+    const angRise = eDir - (Math.PI / 2 + dip); // moving counter-clockwise, Earth rises here
+    const ang0 = angRise - w0 * 45 * 7; // ~7 s of play before Earthrise
+    const world = { central: { name: 'moon', mu, R }, bodies: [], ship: { x: r0 * Math.cos(ang0), y: r0 * Math.sin(ang0), vx: -v0 * Math.sin(ang0), vy: v0 * Math.cos(ang0), mass: 28000, dry: 28000, thrust: 0, isp: 1 }, hmax: 60 };
+    let snapped = null, peaked = -90;
+    return orbitalGame({
+      world,
+      noFuel: true,
+      dir: 'pro',
+      clock: () => 45,
+      clockR: () => 0,
+      horizon: () => 1800,
+      trailStep: 2e4,
+      beforeStep(gg, input) {
+        gg.noEngine = true;
+        if (snapped == null && input.tap) snapped = elev(gg.w.y[0], gg.w.y[1]);
+      },
+      check(gg) {
+        const e = elev(gg.w.y[0], gg.w.y[1]);
+        peaked = Math.max(peaked, e);
+        if (snapped != null) {
+          if (snapped < 0) return gg.lose('Too early: Earth was still hidden behind the Moon. Wait for it to peek over the horizon!');
+          if (snapped > 12) return gg.lose(`Too late: Earth was already ${snapped.toFixed(0)}° up. Snap it right as it rises!`);
+          return gg.win(snapped < 3 ? 3 : snapped < 6 ? 2 : 1, ['Earthrise!', `Earth was ${snapped.toFixed(1)}° above the Moon’s horizon`]);
+        }
+        if (e > 14) gg.lose('You missed the moment! Tap SNAP as soon as Earth peeks over the horizon.');
+      },
+      onHit: (gg) => gg.lose('Crashed into the Moon!'),
+      info(gg) {
+        const e = elev(gg.w.y[0], gg.w.y[1]);
+        return [['Earth above horizon', e < 0 ? 'not yet' : `${e.toFixed(1)}°`], ['Best photo', '0°–3°']];
+      },
+      scene: (gg) => ({ central: 'moon', bodies: [], rings: [], noPred: true, windowView: { elev: elev(gg.w.y[0], gg.w.y[1]) }, earthArrow: eDir, focus: [[R * 1.35, 0], [-R * 1.35, 0], [0, R * 1.35], [0, -R * 1.35]] }),
+      bot(gg) {
+        return { tap: snapped == null && elev(gg.w.y[0], gg.w.y[1]) > 0.8 };
+      },
+    });
+  },
+};
+
+/* ------------------------------------------------------------------ */
+/* SLV-3: Rohini to orbit (18 July 1980)                               */
+/* ------------------------------------------------------------------ */
+const LSLV = {
+  id: 'rohini',
+  title: 'Rohini to orbit',
+  mission: 'SLV-3',
+  agency: 'ISRO',
+  year: 1980,
+  date: '1980-07-18',
+  button: 'BOOST',
+  control: 'hold',
+  goal: 'Speed up sideways until you stop falling back: a real orbit, above the air.',
+  guide: ['Orbit means falling around Earth so fast that you keep missing it!', 'Hold BOOST until the dotted line goes all the way round Earth without touching the air.'],
+  fact: 'On 18 July 1980 India’s own SLV-3 rocket put the Rohini satellite into orbit. India became the sixth country able to launch its own satellites.',
+  create() {
+    const mu = MU.earth, R = 6378e3, rAir = R + 100e3, r0 = R + 300e3;
+    const world = { central: { name: 'earth', mu, R }, bodies: [], ship: { x: 0, y: r0, vx: -6500, vy: 120, mass: 480, dry: 270, thrust: 4200, isp: 280 }, hitRadius: { earth: rAir }, hmax: 30 };
+    return orbitalGame({
+      world,
+      dir: 'pro',
+      clock: () => 40,
+      burnClock: 40,
+      clockR: () => 0,
+      horizon: () => 6000,
+      trailStep: 3e4,
+      check(g) {
+        const o = g.w.orbitAbout('earth');
+        if (!g.burning && o.energy < 0 && o.peri > R + 150e3) {
+          const ecc = (o.apo - o.peri) / 1000;
+          return g.win(ecc < 700 ? 3 : ecc < 2000 ? 2 : 1, ['In orbit! You are falling around Earth.', `Orbit: ${fmtKm(o.peri - R)} × ${fmtKm(o.apo - R)}`]);
+        }
+        if (!g.burning && o.energy >= 0) return g.lose('Too fast: you escaped from Earth! An orbit needs about 7.8 km/s, not more than 11.');
+        if (g.w.fuel <= 0 && !g.burning) return g.lose('Out of fuel before reaching orbit.');
+      },
+      onHit: (g) => g.lose('You fell back into the atmosphere. Hold BOOST longer to go faster sideways!'),
+      info(g) {
+        const o = g.w.orbitAbout('earth');
+        return [['Speed', `${(o.v / 1000).toFixed(2)} km/s`], ['Lowest point', o.peri < rAir ? 'inside the air' : fmtKm(o.peri - R)]];
+      },
+      scene: (g) => ({ central: 'earth', bodies: [], rings: [{ body: 'earth', r: rAir, label: '', thin: true }], focus: [[R * 1.25, 0], [-R * 1.25, 0], [0, R * 1.25], [0, -R * 1.25]] }),
+      bot(g) {
+        const o = g.w.orbitAbout('earth');
+        return { hold: o.peri < R + 260e3 };
+      },
+    });
+  },
+};
+
+/* ------------------------------------------------------------------ */
+/* Cassini: Saturn orbit insertion (1 July 2004)                        */
+/* ------------------------------------------------------------------ */
+const LCAS = {
+  id: 'cassini',
+  title: 'Cassini at Saturn',
+  mission: 'Cassini–Huygens',
+  agency: 'NASA / ESA',
+  year: 2004,
+  date: '2004-07-01',
+  button: 'BRAKE',
+  control: 'hold',
+  goal: 'Brake as you skim past Saturn’s rings to be caught in orbit.',
+  guide: ['Cassini flew through a gap in Saturn’s rings!', 'Hold BRAKE near the closest point, and stop as soon as you are caught.'],
+  fact: 'On 1 July 2004 Cassini fired its engine for 96 minutes and became the first spacecraft to orbit Saturn. It studied Saturn for 13 years.',
+  create: () =>
+    captureLevel({
+      body: 'saturn',
+      mu: MU.saturn,
+      R: 60268e3,
+      vInf: 5200,
+      periAlt: 19880e3,
+      startR: 1.2e9,
+      dry: 3500,
+      wetDv: 1300,
+      thrust: 445,
+      isp: 308,
+      apoMax: 9.5e9,
+      periMin: 5000e3,
+      starsBy: (g) => (g.w.dvUsed <= 700 ? 3 : g.w.dvUsed <= 880 ? 2 : 1),
+      botApo: 0.85,
+      info2: (o) => ['Far point', o.energy < 0 ? fmtKm(o.apo - 60268e3) : 'not caught yet'],
+    }),
+};
+
+/* ------------------------------------------------------------------ */
+/* PSLV-C37: 104 satellites (15 February 2017)                          */
+/* ------------------------------------------------------------------ */
+const L104 = {
+  id: 'sats104',
+  title: '104 satellites',
+  mission: 'PSLV-C37',
+  agency: 'ISRO',
+  year: 2017,
+  date: '2017-02-15',
+  button: 'RELEASE',
+  control: 'tap',
+  goal: 'Release all 104 satellites in 13 groups, leaving a safe gap so none bump into each other.',
+  guide: ['Each group gets a gentle push from a spring and drifts away.', 'Wait until the gap bar is green, then tap RELEASE. Too soon and they bump!'],
+  fact: 'On 15 February 2017 ISRO’s PSLV-C37 launched 104 satellites in one flight, a world record at the time.',
+  create() {
+    // relative motion over a few minutes is a straight line at the spring speed (orbital effects are tiny)
+    const push = 0.55, safe = 4.0, groups = 13, simRate = 6;
+    const sats = [];
+    let t = 0;
+    const game = {
+      kind: 'deploy',
+      status: 'play',
+      stars: 0,
+      reason: '',
+      result: [],
+      burning: false,
+      sats,
+      get t() {
+        return t;
+      },
+      gap() {
+        const last = sats[sats.length - 1];
+        return last ? (t - last.t0) * push : Infinity;
+      },
+      update(dt, input) {
+        if (game.status !== 'play') return;
+        t += dt * simRate;
+        if (input.tap) {
+          if (game.gap() < safe) {
+            game.status = 'lost';
+            game.reason = `Too close! The new group was only ${game.gap().toFixed(1)} m from the last one. Wait for the green bar.`;
+            return;
+          }
+          const k = sats.length;
+          sats.push({ t0: t, dir: (k * 2.39996) % (2 * Math.PI) });
+        }
+        if (sats.length >= groups) {
+          const total = t / 60;
+          game.status = 'won';
+          game.stars = total < 2.2 ? 3 : total < 3 ? 2 : 1;
+          game.result = ['All 104 satellites released safely!', `Time taken: ${total.toFixed(1)} minutes (the real release took about 11 minutes)`];
+          return;
+        }
+        if (t > 8 * 60) {
+          game.status = 'lost';
+          game.reason = 'Too slow: the rocket stage drifted out of the planned orbit window. Release a little faster.';
+        }
+      },
+      hud: () => ({ fuel: null, info: [['Released', `${Math.min(104, sats.length * 8)} / 104`], ['Gap', game.gap() === Infinity ? 'clear' : `${game.gap().toFixed(1)} m ${game.gap() >= safe ? '(safe)' : '(wait)'}`]] }),
+      scene: () => ({ kind: 'deploy', safe, push, groups }),
+      bot: () => ({ tap: game.gap() >= safe + 0.3 }),
+    };
+    return game;
+  },
+};
+
+/* ------------------------------------------------------------------ */
+/* SpaDeX: India's first docking (16 January 2025)                     */
+/* ------------------------------------------------------------------ */
+const LDOCK = {
+  id: 'spadex',
+  title: 'SpaDeX docking',
+  mission: 'SpaDeX',
+  agency: 'ISRO',
+  year: 2025,
+  date: '2025-01-16',
+  button: 'BRAKE',
+  control: 'hold',
+  goal: 'Dock gently with the other satellite: touch at under 5 cm per second.',
+  guide: ['In space nothing slows you down. You will keep drifting forever!', 'Hold BRAKE to slow down, but don’t stop before you touch.'],
+  fact: 'On 16 January 2025 ISRO’s two SpaDeX satellites docked in orbit, making India the fourth country to dock spacecraft in space.',
+  create() {
+    const brake = 0.004, rate = 6; // m/s² from the small thrusters; time runs 6× faster
+    let x = 18, v = -0.24, t = 0, stopped = false, fuel = 1;
+    const game = {
+      kind: 'dock',
+      status: 'play',
+      stars: 0,
+      reason: '',
+      result: [],
+      burning: false,
+      get x() {
+        return x;
+      },
+      get v() {
+        return v;
+      },
+      update(dt, input) {
+        if (game.status !== 'play') return;
+        const n = Math.ceil((dt * rate) / 0.01), h = (dt * rate) / n;
+        game.burning = !!input.hold && v < 0 && fuel > 0;
+        for (let i = 0; i < n; i++) {
+          // Newton's first law: velocity only changes while the thrusters fire
+          if (game.burning) {
+            v = Math.min(0, v + brake * h);
+            fuel = Math.max(0, fuel - h / 200);
+          }
+          x += v * h;
+          t += h;
+          if (x <= 0) {
+            const sp = -v;
+            if (sp > 0.05) {
+              game.status = 'lost';
+              game.reason = `Bump! You touched at ${(sp * 100).toFixed(1)} cm/s. Docking needs under 5 cm/s. Brake earlier.`;
+            } else {
+              game.status = 'won';
+              game.stars = sp <= 0.015 ? 3 : sp <= 0.03 ? 2 : 1;
+              game.result = ['Docked! India is the fourth country to dock in space.', `Contact speed: ${(sp * 100).toFixed(1)} cm/s`];
+            }
+            return;
+          }
+          if (v >= 0 && !stopped) stopped = true;
+        }
+        if (stopped) {
+          game.status = 'lost';
+          game.reason = `You stopped ${x.toFixed(1)} m short. Nothing pushes you again in space! Brake a little less.`;
+        }
+      },
+      hud: () => ({ fuel, info: [['Distance', `${x.toFixed(2)} m`], ['Speed', `${(Math.abs(v) * 100).toFixed(1)} cm/s`]], alert: x < 3 && -v > 0.05 ? 'Too fast!' : null }),
+      scene: () => ({ kind: 'dock' }),
+      bot() {
+        const stop = (v * v) / (2 * brake);
+        return { hold: -v > 0.012 && stop + 0.15 > x };
+      },
+    };
+    return game;
+  },
+};
+
 export const CHAPTERS = [
-  { id: 'moon', title: 'To the Moon', levels: ['raise', 'moonshot', 'catchmoon', 'vikram', 'hop', 'home13'] },
-  { id: 'mars', title: 'Mars & beyond', levels: ['escape', 'window', 'marscapture', 'terror', 'slingshot'] },
+  { id: 'moon', title: 'Earth & Moon', levels: ['earthrise', 'eagle', 'home13', 'rohini', 'mip', 'sats104', 'raise', 'moonshot', 'catchmoon', 'vikram', 'hop', 'spadex'] },
+  { id: 'mars', title: 'Planets & beyond', levels: ['slingshot', 'cassini', 'window', 'escape', 'marscapture', 'pluto', 'juno', 'terror'] },
 ];
-export const LEVELS = [L1, L2, L3, L4, LHOP, L13, LESC, L5, L6, L7, L8];
+/** Levels in timeline order: real mission dates, 1969 → 2023. */
+export const LEVELS = [LEARTH, LA11, L13, L8, LSLV, LCAS, LMIP, L5, LESC, L6, LPLUTO, LJUNO, L104, L7, L1, L2, L3, L4, LHOP, LDOCK].sort((a, b) => a.date.localeCompare(b.date));
 export const levelById = (id) => LEVELS.find((l) => l.id === id);

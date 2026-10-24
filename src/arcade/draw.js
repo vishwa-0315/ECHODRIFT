@@ -2,7 +2,7 @@
 import { drawBody, starField } from '../ui/render.js';
 import { heatFlux } from '../core/edl.js';
 
-const LABEL = { earth: 'Earth', moon: 'Moon', mars: 'Mars', sun: 'Sun', jupiter: 'Jupiter', saturn: 'Saturn' };
+const LABEL = { earth: 'Earth', moon: 'Moon', mars: 'Mars', sun: 'Sun', jupiter: 'Jupiter', saturn: 'Saturn', pluto: 'Pluto' };
 
 export function createRenderer() {
   const stars = starField(420, 5);
@@ -155,6 +155,14 @@ export function createRenderer() {
     }
     const ox = W / 2 + jx, oy = (view.top + 22 + view.bottom) / 2 + jy;
     layer(ctx, game, skin, sc, cam.x, cam.y, cam.s, ox, oy, view, dt, true);
+    if (sc.earthArrow != null) {
+      // Earth is 384,000 km away, far off screen in this direction
+      const ax = Math.cos(sc.earthArrow), ay = -Math.sin(sc.earthArrow);
+      const ex = W / 2 + ax * Math.min(W, view.bottom - view.top) * 0.42, ey = (view.top + view.bottom) / 2 + ay * (view.bottom - view.top) * 0.42;
+      drawBody(ctx, 'earth', ex, ey, 9, Math.PI, { minR: 9, dpr: view.dpr });
+      label(ctx, 'to Earth (384,000 km)', ex, ey - 16, '#c9d4e6', true);
+    }
+    if (sc.windowView) windowView(ctx, W, view, sc.windowView.elev);
     if (inset && game.status === 'play') {
       // close-up window: the ship skimming the planet, while the main view stays wide
       const r = Math.min(74, W * 0.19);
@@ -232,16 +240,16 @@ export function createRenderer() {
     for (const r of sc.rings || []) {
       const b = w.bodyAt(r.body);
       const rr = Math.max(16, r.r * scl);
-      ctx.strokeStyle = 'rgba(82,210,115,0.9)';
-      ctx.fillStyle = 'rgba(82,210,115,0.08)';
-      ctx.lineWidth = 2;
-      ctx.setLineDash([8, 6]);
+      ctx.strokeStyle = r.thin ? 'rgba(120,180,255,0.5)' : 'rgba(82,210,115,0.9)';
+      ctx.fillStyle = r.thin ? 'rgba(120,180,255,0.06)' : 'rgba(82,210,115,0.08)';
+      ctx.lineWidth = r.thin ? 1.5 : 2;
+      ctx.setLineDash(r.thin ? [3, 4] : [8, 6]);
       ctx.beginPath();
       ctx.arc(X(b.x), Y(b.y), rr, 0, Math.PI * 2);
       ctx.fill();
       ctx.stroke();
       ctx.setLineDash([]);
-      if (main) label(ctx, r.label, X(b.x), Y(b.y) - rr - 6, '#52d273', true);
+      if (main && r.label) label(ctx, r.label, X(b.x), Y(b.y) - rr - 6, '#52d273', true);
     }
     if (game.trail.length > 1) {
       ctx.strokeStyle = 'rgba(255,153,51,0.55)';
@@ -252,7 +260,7 @@ export function createRenderer() {
       ctx.stroke();
     }
     const pr = game.pred;
-    if (pr && pr.path.length > 3 && game.status === 'play') {
+    if (pr && pr.path.length > 3 && game.status === 'play' && !sc.noPred) {
       ctx.strokeStyle = 'rgba(223,232,255,0.85)';
       ctx.lineWidth = 2;
       ctx.setLineDash([2, 6]);
@@ -262,9 +270,15 @@ export function createRenderer() {
       ctx.stroke();
       ctx.setLineDash([]);
       if (pr.hit && main) {
-        ctx.fillStyle = '#ff5c5c';
-        ctx.font = '800 16px Inter, system-ui, sans-serif';
-        ctx.fillText('✕', X(pr.hit.x) - 5, Y(pr.hit.y) + 5);
+        const hx = X(pr.hit.x), hy = Y(pr.hit.y);
+        ctx.strokeStyle = '#ff5c5c';
+        ctx.lineWidth = 3;
+        ctx.beginPath();
+        ctx.moveTo(hx - 6, hy - 6);
+        ctx.lineTo(hx + 6, hy + 6);
+        ctx.moveTo(hx + 6, hy - 6);
+        ctx.lineTo(hx - 6, hy + 6);
+        ctx.stroke();
       }
     }
     const minR = sc.minR || {};
@@ -287,6 +301,30 @@ export function createRenderer() {
       const b = w.bodyAt(n);
       drawB(n, b.x, b.y);
     }
+    for (const mk of sc.marks || []) {
+      const mx = X(mk.x), my = Y(mk.y);
+      if (mk.kind === 'target') {
+        ctx.strokeStyle = '#52d273';
+        ctx.lineWidth = 3;
+        ctx.beginPath();
+        ctx.arc(mx, my, 9, 0, Math.PI * 2);
+        ctx.stroke();
+        ctx.beginPath();
+        ctx.arc(mx, my, 3, 0, Math.PI * 2);
+        ctx.fillStyle = '#52d273';
+        ctx.fill();
+        if (main && mk.label) label(ctx, mk.label, mx, my + 24, '#52d273', true);
+      } else {
+        ctx.strokeStyle = '#ff5c5c';
+        ctx.lineWidth = 3;
+        ctx.beginPath();
+        ctx.moveTo(mx - 7, my - 7);
+        ctx.lineTo(mx + 7, my + 7);
+        ctx.moveTo(mx + 7, my - 7);
+        ctx.lineTo(mx - 7, my + 7);
+        ctx.stroke();
+      }
+    }
     if (!sc.shipHidden) {
       const v = w.rel(sc.central);
       let ang = Math.atan2(-v.vy, v.vx);
@@ -299,6 +337,133 @@ export function createRenderer() {
       rocket(ctx, sx, sy, ang, skin, game.burning, main ? 12 : 9);
       if (game.status === 'lost' && w.status === 'hit') boom(ctx, sx, sy);
     } else if (main) drawParts(ctx, dt);
+  }
+
+  /** Apollo 8's window: the grey lunar horizon, and Earth rising above it by `elev` degrees. */
+  function windowView(ctx, W, view, elev) {
+    const w = Math.min(170, W * 0.42), h2 = w * 0.62;
+    const x0 = W - w - 10, y0 = view.bottom - h2 - 16;
+    ctx.save();
+    ctx.beginPath();
+    ctx.roundRect ? ctx.roundRect(x0, y0, w, h2, 14) : ctx.rect(x0, y0, w, h2);
+    ctx.clip();
+    ctx.fillStyle = '#000';
+    ctx.fillRect(x0, y0, w, h2);
+    const horizonY = y0 + h2 * 0.72;
+    const pxPerDeg = h2 / 16;
+    const ey = horizonY - elev * pxPerDeg;
+    drawBody(ctx, 'earth', x0 + w * 0.55, ey, 11, -Math.PI / 2, { minR: 11 });
+    const g = ctx.createLinearGradient(0, horizonY, 0, y0 + h2);
+    g.addColorStop(0, '#8a8a8a');
+    g.addColorStop(1, '#3a3a3a');
+    ctx.fillStyle = g;
+    ctx.beginPath();
+    ctx.moveTo(x0, horizonY + 6);
+    ctx.quadraticCurveTo(x0 + w / 2, horizonY - 6, x0 + w, horizonY + 6);
+    ctx.lineTo(x0 + w, y0 + h2);
+    ctx.lineTo(x0, y0 + h2);
+    ctx.fill();
+    ctx.restore();
+    ctx.strokeStyle = '#c9d4e6';
+    ctx.lineWidth = 3;
+    ctx.beginPath();
+    ctx.roundRect ? ctx.roundRect(x0, y0, w, h2, 14) : ctx.rect(x0, y0, w, h2);
+    ctx.stroke();
+    label(ctx, 'WINDOW VIEW', x0 + w / 2, y0 - 6, '#c9d4e6', true);
+  }
+
+  /* ---------------- PSLV-C37: satellites drifting away from the stage ---------------- */
+  function deploy(ctx, W, H, game, skin, view, dt) {
+    const sc = game.scene();
+    ctx.fillStyle = '#04060b';
+    ctx.fillRect(0, 0, W, H);
+    stars(ctx, W, H);
+    // Earth's curve far below
+    drawBody(ctx, 'earth', W / 2, view.bottom + W * 0.35, W * 0.7, -Math.PI / 2, { dpr: 1 });
+    const cx = W / 2, cy = (view.top + view.bottom) / 2 - 10;
+    const ppm = Math.min(W, view.bottom - view.top) / 70;
+    // the PS4 upper stage
+    ctx.fillStyle = '#d9dde4';
+    ctx.fillRect(cx - 14, cy - 34, 28, 68);
+    ctx.fillStyle = skin.trim;
+    ctx.fillRect(cx - 14, cy - 34, 28, 8);
+    ctx.fillStyle = '#9aa3b2';
+    ctx.beginPath();
+    ctx.moveTo(cx - 10, cy + 34);
+    ctx.lineTo(cx + 10, cy + 34);
+    ctx.lineTo(cx + 16, cy + 46);
+    ctx.lineTo(cx - 16, cy + 46);
+    ctx.fill();
+    for (const st of game.sats) {
+      const d = (game.t - st.t0) * sc.push;
+      const x = cx + Math.cos(st.dir) * (18 + d * ppm), y = cy + Math.sin(st.dir) * (18 + d * ppm);
+      ctx.fillStyle = '#e8c15a';
+      ctx.fillRect(x - 5, y - 4, 10, 8);
+      ctx.fillStyle = '#2f49b8';
+      ctx.fillRect(x - 13, y - 2, 7, 4);
+      ctx.fillRect(x + 6, y - 2, 7, 4);
+    }
+    // safe-gap ring around the stage for the last released group
+    const gap = game.gap();
+    const r = 18 + Math.min(sc.safe, gap === Infinity ? sc.safe : gap) * ppm;
+    ctx.strokeStyle = gap >= sc.safe ? 'rgba(82,210,115,0.9)' : 'rgba(255,204,77,0.9)';
+    ctx.setLineDash([6, 6]);
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.arc(cx, cy, 18 + sc.safe * ppm, 0, Math.PI * 2);
+    ctx.stroke();
+    ctx.setLineDash([]);
+    void r;
+    label(ctx, gap >= sc.safe ? 'Safe to release!' : 'Wait for the gap…', cx, cy - 18 - sc.safe * ppm - 8, gap >= sc.safe ? '#52d273' : '#ffcc4d', true);
+    void dt;
+  }
+
+  /* ---------------- SpaDeX: chaser closing in on the target ---------------- */
+  function dock(ctx, W, H, game, skin, view, dt) {
+    ctx.fillStyle = '#04060b';
+    ctx.fillRect(0, 0, W, H);
+    stars(ctx, W, H);
+    drawBody(ctx, 'earth', W / 2, view.bottom + W * 0.4, W * 0.7, -Math.PI / 2, { dpr: 1 });
+    const cy = (view.top + view.bottom) / 2;
+    const span = Math.max(3, Math.min(20, game.x * 1.3 + 1));
+    const ppm = (W - 140) / span;
+    const tx = 60; // target's docking port
+    const sat = (x, flip, col) => {
+      ctx.save();
+      ctx.translate(x, cy);
+      if (flip) ctx.scale(-1, 1);
+      ctx.fillStyle = col;
+      ctx.fillRect(-36, -16, 36, 32);
+      ctx.fillStyle = '#2f49b8';
+      ctx.fillRect(-30, -46, 24, 26);
+      ctx.fillRect(-30, 20, 24, 26);
+      ctx.fillStyle = '#c9d4e6';
+      ctx.fillRect(0, -6, 8, 12);
+      ctx.restore();
+    };
+    sat(tx, false, '#e8c15a');
+    const cxp = tx + 16 + game.x * ppm;
+    if (game.burning) {
+      const fl = 14 + Math.random() * 6;
+      ctx.fillStyle = skin.flame;
+      ctx.beginPath();
+      ctx.moveTo(cxp - 2, cy - 4);
+      ctx.lineTo(cxp - 2 - fl, cy);
+      ctx.lineTo(cxp - 2, cy + 4);
+      ctx.fill();
+    }
+    sat(cxp, true, '#d9dde4');
+    ctx.strokeStyle = 'rgba(141,156,181,0.4)';
+    ctx.setLineDash([3, 5]);
+    ctx.beginPath();
+    ctx.moveTo(tx + 8, cy + 60);
+    ctx.lineTo(cxp - 8, cy + 60);
+    ctx.stroke();
+    ctx.setLineDash([]);
+    label(ctx, `${game.x.toFixed(2)} m`, (tx + cxp) / 2, cy + 76, '#c9d4e6', true);
+    label(ctx, 'Target', tx - 18, cy - 54, '#e8c15a', true);
+    label(ctx, 'Chaser (you)', cxp + 18, cy - 54, '#ffffff', true);
+    void dt;
   }
 
   /** Text with a dark halo so it stays readable over planets and lines. */
@@ -518,6 +683,8 @@ export function createRenderer() {
       }
       if (game.kind === 'orbit') orbital(ctx, W, H, game, skin, view, dt);
       else if (game.kind === 'lander') lander(ctx, W, H, game, skin, view, dt);
+      else if (game.kind === 'deploy') deploy(ctx, W, H, game, skin, view, dt);
+      else if (game.kind === 'dock') dock(ctx, W, H, game, skin, view, dt);
       else if (game.kind === 'edl') {
         if (game.phase === 'land') lander(ctx, W, H, game.land, skin, view, dt);
         else edl(ctx, W, H, game, skin, view, dt);

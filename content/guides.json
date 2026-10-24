@@ -1,0 +1,115 @@
+{
+  "controls": {
+    "orbital": [
+      { "title": "Read the screen", "text": "The solid orange line is where you have been. The dotted line is where you WILL go if you do nothing: it uses exactly the same physics as the flight. The numbers at the top show your fuel (Δv left), height and the far and near points of your orbit." },
+      { "title": "Control time", "text": "Press Play to let time run. Use « and » to slow down or speed up (up to ×10,000,000). The game pauses on its own before an important moment, such as reaching the Moon or Mars." },
+      { "title": "Plan a burn", "text": "Press + Burn. Set WHEN (tap Next periapsis to burn at your closest point, where burns work best), DIRECTION (Prograde speeds you up, Retrograde slows you down, Radial points away from or towards the planet) and SIZE in m/s. The dotted line updates instantly, so adjust until it goes where you want." },
+      { "title": "Fly the burn", "text": "Press Play. When the burn arrives, time slows down and the engine fires for real: heavy spacecraft with small engines take many minutes. The fuel used follows the rocket equation." },
+      { "title": "Ask for help", "text": "Press Mission Assist at any time. It calculates a burn that works from where you are now and shows it on the dotted line before you commit." },
+      { "title": "Look around", "text": "Use the Earth / Moon / Ship buttons to change what the view follows, + and − to zoom, and ↺ to restart the mission." }
+    ],
+    "lander": [
+      { "title": "Read the screen", "text": "Top left shows your height, speed down and sideways, tilt, fuel and seconds of hover fuel left. The goal is to touch down slowly, upright, on flat ground." },
+      { "title": "Thrust", "text": "Drag the Thrust slider up to push against gravity. Real engines can't throttle below a minimum, so very small settings jump to that minimum." },
+      { "title": "Tilt", "text": "Hold Tilt left or Tilt right to lean the lander. Thrust then pushes you sideways as well as up. Press Level to stand upright before landing." },
+      { "title": "Pick a spot", "text": "Tap the ground to choose a landing spot. Hazard map shows boulders and slopes. Assist can fly to your chosen spot using the same physics." }
+    ],
+    "edl": [
+      { "title": "Read the screen", "text": "The capsule enters Mars's air at 125 km and about 19,500 km/h. The panel shows Mach number, air pressure on the parachute (Pa), heating and distance to the target." },
+      { "title": "Steer with lift", "text": "Drag the lift slider. Lift up flies farther, lift down drops sooner. Guided entry steers automatically towards the target." },
+      { "title": "Open the parachute", "text": "Press Deploy parachute only when the light says OPEN: between about Mach 2.2 and 1.1, and below about 850 Pa. Too early tears it; too late and it can't slow you in time." },
+      { "title": "Land", "text": "At about 2 km the backshell separates and the powered descent starts. Then the sky crane lowers the rover." }
+    ]
+  },
+  "missions": {
+    "chandrayaan3": {
+      "kind": "orbital",
+      "summary": "Raise the orbit step by step, leave for the Moon, then brake to be captured, just like ISRO did in July–August 2023.",
+      "steps": [
+        { "title": "1. First orbit raise", "text": "Pause, press + Burn, tap Next periapsis, choose Prograde and set about 360–370 m/s. The far point (apogee) grows from 36,500 km to about 70,000 km. Press Play." },
+        { "title": "2. Second orbit raise", "text": "At the next perigee add another prograde burn of about 190 m/s. The apogee passes 100,000 km and the first stage is complete." },
+        { "title": "3. Trans-lunar injection", "text": "At a later perigee (around 30 July 2023 in the game) burn prograde about 175–180 m/s. Check the dotted line: it must reach the Moon, with a closest approach of a few hundred km. The real burn was on 1 August." },
+        { "title": "4. Coast to the Moon", "text": "Let time run. The game pauses about 3 hours before closest approach to the Moon." },
+        { "title": "5. Lunar orbit insertion", "text": "Plan a Retrograde burn at the next periapsis, relative to the Moon. Increase the size until the far point is below 20,000 km (about 5,000 km is safest, because Earth's pull stretches high orbits). Capture by 6 August earns an extra star." },
+        { "title": "6. Bonus: circularise", "text": "Brake again at the low points until the far point is under 200 km, keeping the near point above 90 km. ISRO did this in several small steps." }
+      ],
+      "tips": ["Burn near perigee: the same fuel buys much more height there (the Oberth effect).", "If a step goes wrong, Mission Assist recalculates from where you are."]
+    },
+    "apollo13": {
+      "kind": "orbital",
+      "summary": "An oxygen tank has exploded. Put the crew on a path that enters Earth's air at a safe angle, between −5.3° and −7.4°.",
+      "steps": [
+        { "title": "1. Check the entry angle", "text": "Look at the predicted entry angle at the top. At the start the path is not safe." },
+        { "title": "2. Small correction burn", "text": "Plan a burn of only a few m/s (about 3–7 m/s), prograde or retrograde, within the first hours. Watch the entry angle as you change the size, and stop when it is near −6.5°." },
+        { "title": "3. Swing around the Moon", "text": "Let time run. The Moon's gravity turns the spacecraft back towards Earth (a free return)." },
+        { "title": "4. Bonus: the PC+2 burn", "text": "About 2 hours after passing closest to the Moon, a 262 m/s burn brings the crew home sooner, like the real crew did. Adjust its direction so the entry angle stays in the safe window." },
+        { "title": "5. Re-entry", "text": "Coast to Earth. An entry angle close to −6.5° earns the most stars." }
+      ],
+      "tips": ["Too shallow and the capsule skips off the air; too steep and it overheats."]
+    },
+    "voyager2": {
+      "kind": "orbital",
+      "summary": "A tiny course correction decides where you pass Jupiter, and Jupiter's gravity then flings you to Saturn.",
+      "steps": [
+        { "title": "1. Look at the prediction", "text": "The dotted line shows your path past Jupiter and on to Saturn, with the predicted closest distance to Saturn." },
+        { "title": "2. Make a tiny burn", "text": "Plan a burn about a day after the start. You will need less than 1 m/s: use the 0.1 size buttons and try different directions until the Saturn approach is under 1,000,000 km." },
+        { "title": "3. Watch the slingshot", "text": "Speed up time. Passing behind Jupiter, Voyager 2 gains speed from Jupiter's orbital motion." },
+        { "title": "4. Reach Saturn", "text": "Keep coasting until Saturn. Using less fuel earns more stars." }
+      ],
+      "tips": ["Small changes near the start become huge changes years later: that's why mission planners are so careful."]
+    },
+    "mangalyaan": {
+      "kind": "orbital",
+      "summary": "Choose a launch window, correct your course, then make the big braking burn at Mars, with Mangalyaan's small fuel tank.",
+      "steps": [
+        { "title": "1. Choose your launch window", "text": "On the chart, tap a green square (enough fuel). The white circle is ISRO's real choice, around 1 December 2013. Press Launch." },
+        { "title": "2. Trajectory correction", "text": "Two days in, a small burn (a few m/s) moves your closest approach to Mars to 300–800 km. Mission Assist finds it quickly." },
+        { "title": "3. Cruise for about 300 days", "text": "Speed up time. The game pauses 2 days before Mars." },
+        { "title": "4. Mars orbit insertion", "text": "Plan a Retrograde burn at the next periapsis, relative to Mars: about 1,100 m/s, firing for about 30 minutes. The far point must be under 100,000 km. The real burn on 24 September 2014 gave a 422 × 76,994 km orbit." }
+      ],
+      "tips": ["Keep at least 30–60 kg of fuel for 2 or 3 stars."]
+    },
+    "aditya": {
+      "kind": "orbital",
+      "summary": "Stay near the L1 point for 178 days. L1 is like balancing on a hilltop: without small pushes you drift away.",
+      "steps": [
+        { "title": "1. Understand the view", "text": "This view turns with Earth around the Sun. The dashed box is the allowed zone; the dotted curve is the reference halo-like orbit." },
+        { "title": "2. Station-keeping every few weeks", "text": "The game pauses about every 4 weeks. Plan a small correction (usually 5–30 m/s) that brings the dotted prediction back onto the reference orbit. Directions here are Away from Sun, Ahead, Sunward and Behind." },
+        { "title": "3. Hold for 178 days", "text": "Repeat until the hold time is complete. Using less than 150 m/s in total earns 2 stars, less than 90 m/s earns 3." }
+      ],
+      "tips": ["Correct early: a small drift grows fast at L1."]
+    },
+    "apollo11": {
+      "kind": "lander",
+      "summary": "Fly the Eagle past the boulder field and land gently in the flat zone, before the fuel runs out.",
+      "steps": [
+        { "title": "1. Keep flying forward", "text": "You start 150 m up, moving sideways at 13 m/s. Keep enough thrust to sink slowly (2–4 m/s) while you look for flat ground." },
+        { "title": "2. Avoid the boulders", "text": "Use Hazard map to see the boulder field. The safe zone is ahead, between 300 m and 520 m." },
+        { "title": "3. Stop sideways motion", "text": "Tilt back to slow down over the landing spot, then press Level." },
+        { "title": "4. Touch down", "text": "Come down slower than 3 m/s, with less than 1.2 m/s sideways. Watch the hover-fuel seconds: the real Eagle landed with less than a minute left." }
+      ],
+      "tips": ["Tap a spot and turn on Assist to watch it fly the same physics."]
+    },
+    "vikram": {
+      "kind": "lander",
+      "summary": "Land Vikram near the Moon's south pole on safe, flat ground.",
+      "steps": [
+        { "title": "1. Slow the fall", "text": "You start 800 m up, falling at 12 m/s. Add thrust early: the engines can only just beat the Moon's gravity." },
+        { "title": "2. Choose a safe spot", "text": "Use Hazard map and tap a flat patch without boulders." },
+        { "title": "3. Land gently", "text": "Below 3 m/s down and 0.5 m/s sideways, upright. ISRO's real Vikram landed on 23 August 2023." }
+      ],
+      "tips": ["Fuel is limited: don't hover for long."]
+    },
+    "perseverance": {
+      "kind": "edl",
+      "summary": "Seven minutes of terror: steer through the air, open the parachute in its window, then land with the sky crane.",
+      "steps": [
+        { "title": "1. Entry", "text": "Keep lift up at first to fly farther. Turn on Guided entry to steer automatically to the Jezero crater target." },
+        { "title": "2. Parachute", "text": "Wait for the light to say OPEN (about Mach 2.2 to 1.1), then press Deploy parachute. The heat shield drops 20 s later." },
+        { "title": "3. Powered descent", "text": "After the backshell separates, use thrust to slow down and steer to the green target zone." },
+        { "title": "4. Sky crane", "text": "Touch down slower than 1 m/s and nearly upright. The real rover landed on 18 February 2021." }
+      ],
+      "tips": ["Mars's air is very thin: the parachute alone can't land you."]
+    }
+  }
+}

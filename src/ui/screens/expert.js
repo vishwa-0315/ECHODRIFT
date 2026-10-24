@@ -67,7 +67,7 @@ export function expertScreen(app) {
       h('div.row', h('span.chip', 'Discovery lab')),
       h('div.t', l.title),
       h('div.d', l.desc),
-      h('div.foot', h('span.small.muted', l.who), app.save.labs[l.id] ? h('span.ok.small', '✓ Done') : h('span.small.muted', 'Open')),
+      h('div.foot', h('span.small.muted', l.who), app.save.labs[l.id] ? h('span.ok.small', 'Done') : h('span.small.muted', 'Open')),
     );
   const el = h(
     'div.screen',
@@ -76,15 +76,15 @@ export function expertScreen(app) {
       sky,
       h('div.inner', h('div.row', h('button.btn.icon.sm', { 'aria-label': 'Back', onclick: () => app.go('home') }, '←'), h('div.label', 'Expert mode')), h('h1', 'Full missions'), h('p', { style: { maxWidth: '40ch' } }, 'Plan every burn yourself, on the real dates, with the real spacecraft. For experienced pilots.'), clock),
     ),
-    vyomNote('These are the full missions, on their real dates. You plan every burn yourself. Stuck? Press ✦ Mission Assist and I’ll plan it for you!', 'happy'),
-    h('div.row.wrap', h('button.btn.primary', { onclick: () => app.go('explorer') }, '🪐 Solar System now'), h('button.btn', { onclick: () => app.go('about') }, 'How the physics works')),
+    vyomNote('These are the full missions, on their real dates. You plan every burn yourself. Stuck? Press Mission Assist and I’ll plan it for you!', 'happy'),
+    h('div.row.wrap', h('button.btn.primary', { onclick: () => app.go('explorer') }, 'Solar System now'), h('button.btn', { onclick: () => app.go('about') }, 'How the physics works')),
     h('div.section', h('h3', 'ISRO missions'), h('span.small.muted', 'India’s journey to the Moon, Mars and the Sun')),
     h('div.cards', isro.map(card)),
     h('div.section', h('h3', 'NASA history'), h('span.small.muted', 'Missions that changed exploration')),
     h('div.cards', other.map(card)),
     h('div.section', h('h3', 'Discovery labs'), h('span.small.muted', 'Real data, real formulas')),
     h('div.cards', LABS.map(labCard)),
-    h('p.small.muted', { style: { marginTop: '18px' } }, 'Stuck? ✦ Mission Assist can plan any burn for you. Every mission shows its real history and sources, and states every simplification.'),
+    h('p.small.muted', { style: { marginTop: '18px' } }, 'Stuck? Mission Assist can plan any burn for you. Every mission shows its real history and sources, and states every simplification.'),
   );
   return {
     el,
