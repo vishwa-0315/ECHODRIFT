@@ -9,6 +9,7 @@ import { progress, CERTS, rankFor } from '../../game/progress.js';
 import { LEVELS } from '../../arcade/levels.js';
 import { vyomSVG, vyomNote } from '../guide.js';
 import { sfx } from '../audio.js';
+import { certCode, readCertCode } from '../../game/integrity.js';
 
 const FOOTER = 'Launch Window was selected for the State-Level Youth Astronomy & Space Science Congress (YASSC 2026), organised by the Tamilnadu Astronomy & Science Society (TASS).';
 
@@ -20,7 +21,13 @@ export function profileForm(app, onSaved) {
     const inp = h('input.pf-input', { type: 'text', value: pf[key] || '', placeholder: ph, maxlength: 60, autocomplete: 'off', 'data-testid': 'pf-' + key, 'aria-label': label });
     return { key, inp, el: h('label.pf-field', h('span.pf-label', label + (required ? ' *' : '')), inp) };
   };
+  // once a certificate has been issued in a name, that name can't be changed (no certificates for someone else)
+  const locked = CERTS.some((c) => prog.certEarned(c.id)) && !!pf.name;
   const F = [field('name', 'Your name', 'As it should appear on the certificate', true), field('school', 'School or college', 'e.g. K. Ramakrishnan College of Technology'), field('grade', 'Class or year', 'e.g. Class 8, or III BE (ECE)'), field('city', 'City or district', 'e.g. Tiruchirappalli')];
+  if (locked) {
+    F[0].inp.readOnly = true;
+    F[0].el.appendChild(h('span.small.muted', 'Locked: a certificate has already been issued in this name.'));
+  }
   const err = h('div.pf-err', { role: 'alert' });
   const form = h(
     'form.pf-form',
@@ -28,6 +35,11 @@ export function profileForm(app, onSaved) {
       onsubmit: (e) => {
         e.preventDefault();
         const vals = Object.fromEntries(F.map((f) => [f.key, f.inp.value.replace(/\s+/g, ' ').trim()]));
+        if (locked) vals.name = pf.name;
+        if (/[<>{}\[\]\\]|https?:/i.test(Object.values(vals).join(' '))) {
+          err.textContent = 'Please use only letters, numbers and simple punctuation.';
+          return;
+        }
         if (vals.name.length < 2) {
           err.textContent = 'Please type your name (at least 2 letters).';
           F[0].inp.focus();
@@ -40,7 +52,6 @@ export function profileForm(app, onSaved) {
     },
     F.map((f) => f.el),
     err,
-    h('p.small.muted', 'Saved only on this device, and printed on your certificates. Nothing is sent anywhere.'),
     h('button.btn.primary.block', { type: 'submit', 'data-testid': 'pf-save' }, 'Save profile'),
   );
   return form;
@@ -64,6 +75,17 @@ export async function drawCertificate(canvas, cert, info) {
   ctx.strokeStyle = cert.color;
   ctx.lineWidth = 5;
   ctx.strokeRect(56, 56, W - 112, H - 112);
+  // security watermark: the name and verify code repeated faintly across the paper,
+  // so an edited name or number stands out
+  ctx.save();
+  ctx.translate(W / 2, H / 2);
+  ctx.rotate(-0.42);
+  ctx.font = '600 22px Inter, system-ui, sans-serif';
+  ctx.fillStyle = 'rgba(11,26,51,0.035)';
+  ctx.textAlign = 'center';
+  const mark = `LAUNCH WINDOW · ${info.name.toUpperCase()} · ${info.id} · `;
+  for (let y = -H; y < H; y += 54) ctx.fillText(mark.repeat(4), (y / 54) % 2 ? 60 : -60, y);
+  ctx.restore();
   // faint orbit rings in the corners
   ctx.strokeStyle = 'rgba(11,26,51,0.07)';
   ctx.lineWidth = 3;
@@ -142,8 +164,8 @@ export async function drawCertificate(canvas, cert, info) {
   ctx.fillText(`Awarded on ${info.date}`, W - 300, 912);
   ctx.font = '400 18px Inter, system-ui, sans-serif';
   ctx.fillStyle = '#5b6b85';
-  ctx.fillText(`Certificate no. ${info.id}`, W - 300, 944);
-  ctx.fillText('Launch Window game', W - 300, 970);
+  ctx.fillText(`Verify code: ${info.id}`, W - 300, 944);
+  ctx.fillText('Check it in Launch Window → Certificates → Verify', W - 300, 970);
   // the fixed footer line about the game's YASSC 2026 selection
   ctx.textAlign = 'center';
   ctx.fillStyle = '#3b4a63';
@@ -163,22 +185,22 @@ export async function drawCertificate(canvas, cert, info) {
 function certInfo(app, cert) {
   const prog = progress(app);
   const pf = prog.profile();
-  const total = prog.total();
+  // only stars backed by recorded flights count
+  const total = prog.verifiedStars();
   const when = new Date(prog.certEarned(cert.id) || Date.now());
-  let hs = 0;
-  for (const c of `${pf.name}|${cert.id}|${when.getTime()}`) hs = (hs * 33 + c.charCodeAt(0)) >>> 0;
+  const levels = prog.levelsDone();
   return {
     name: pf.name,
     school: pf.school,
     grade: pf.grade,
     city: pf.city,
-    levels: prog.levelsDone(),
+    levels,
     stars: total,
     rank: rankFor(total).name,
     quiz: prog.data.quizRight || 0,
     cards: prog.cardCount(),
     date: when.toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' }),
-    id: `LW-${cert.id.slice(0, 2).toUpperCase()}-${hs.toString(36).toUpperCase().slice(0, 6)}`,
+    id: certCode({ name: pf.name, tier: cert.id, stars: total, levels, when: when.getTime() }),
   };
 }
 
@@ -220,12 +242,36 @@ export function certsScreen(app) {
     drawCertificate(canvas, cert, certInfo(app, cert));
   }
 
+  /** Check a certificate: name + verify code → the facts it was issued for. */
+  function verifyPanel() {
+    const nm = h('input.pf-input', { type: 'text', placeholder: 'Name on the certificate', 'aria-label': 'Name on the certificate', 'data-testid': 'vf-name', maxlength: 60 });
+    const cd = h('input.pf-input', { type: 'text', placeholder: 'Verify code, e.g. 02WDX-IUY0B', 'aria-label': 'Verify code', 'data-testid': 'vf-code', maxlength: 14, autocapitalize: 'characters' });
+    const out = h('div.vf-out', { role: 'status', 'aria-live': 'polite' });
+    const check = () => {
+      const r = readCertCode(nm.value, cd.value);
+      clear(out);
+      if (!r) return put(out, h('div.vf-bad', 'Not valid. The name or code does not match a Launch Window certificate. Check the spelling, or the certificate may have been edited.'));
+      const c = CERTS.find((x) => x.id === r.tier);
+      put(out, h('div.vf-ok', h('b', 'Valid certificate. '), `${c.tier} · ${c.title}, issued to ${nm.value.trim()} on ${r.date.toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' })}: ${r.levels} missions, ${r.stars} stars. These must match what is printed on the certificate.`));
+    };
+    return h('details.vf', h('summary', 'Verify a certificate'), h('div.pf-form', nm, cd, h('button.btn.block', { 'data-testid': 'vf-check', onclick: check }, 'Check'), out));
+  }
+
   function render() {
     clear(body);
     const pf = prog.profile();
-    const done = prog.levelsDone(), stars = prog.total();
+    const done = prog.levelsDone(), stars = prog.verifiedStars();
+    if (prog.tampered()) {
+      put(
+        body,
+        vyomNote('Your saved progress was changed outside the game, so I can’t issue certificates for it. Start fresh and fly the missions yourself!', 'sad'),
+        h('button.btn.primary.block', { 'data-testid': 'reset', onclick: () => (prog.resetProgress(), sfx.tap(), app.go('home')) }, 'Reset progress and start again'),
+        verifyPanel(),
+      );
+      return;
+    }
     if (!pf.name) {
-      put(body, vyomNote('Tell me a little about you, so I can put your name on your certificates!', 'happy'), profileForm(app, () => render()));
+      put(body, vyomNote('Tell me a little about you, so I can put your name on your certificates!', 'happy'), profileForm(app, () => render()), verifyPanel());
       return;
     }
     put(
@@ -251,6 +297,7 @@ export function certsScreen(app) {
           );
         }),
       ),
+      verifyPanel(),
       h('p.small.muted', FOOTER),
     );
   }

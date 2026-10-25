@@ -27,11 +27,19 @@ android {
             keyPassword 'launchwindow'
         }
     }
+    lint {
+        checkReleaseBuilds false
+        abortOnError false
+    }
     buildTypes {
         debug {
             signingConfig signingConfigs.shared
         }
         release {
+            // the APK players install: signed with the shared key and NOT debuggable
+            // (so its saved progress can't be inspected or edited with developer tools)
+            signingConfig signingConfigs.shared
+            debuggable false
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }

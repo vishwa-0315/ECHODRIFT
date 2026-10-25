@@ -1,6 +1,7 @@
 /** App shell: navigation, progress save, settings, modals, toasts, audio. */
 import { h, clear, put } from './dom.js';
 import { vyomSVG, setVoice } from './guide.js';
+import { checkSeal, sealOf } from '../game/integrity.js';
 
 export const VERSION = '1.0.0';
 const KEY = 'launchwindow.save.v1';
@@ -26,6 +27,9 @@ export function createApp(root, content, screens) {
   }
   save = { missions: {}, labs: {}, settings: { sound: true, music: true, reduceMotion: false, textSize: 1 }, ...(save || {}) };
   save.settings = { sound: true, music: true, reduceMotion: false, textSize: 1, ...save.settings };
+  // integrity: a sealed save whose seal is missing or wrong was changed outside the game
+  if (save.arcade && save.sealed && !save.arcade.seal) save.arcade.tampered = true;
+  checkSeal(save);
   let current = null;
   let actx = null;
 
@@ -37,6 +41,10 @@ export function createApp(root, content, screens) {
       return save.settings;
     },
     persist() {
+      if (save.arcade) {
+        save.arcade.seal = sealOf(save);
+        save.sealed = true;
+      }
       try {
         store.setItem(KEY, JSON.stringify(save));
       } catch {

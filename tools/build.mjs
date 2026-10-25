@@ -22,7 +22,7 @@ const head = `<title>Launch Window</title>
 <link rel="icon" href="${icon}">
 <style>${fonts}\n${css}</style>`;
 const bodyHtml = `<div id="app"></div>\n<noscript>Launch Window needs JavaScript.</noscript>\n<script>${js}</script>`;
-const full = `<!doctype html>\n<html lang="en">\n<head>\n<meta charset="utf-8">\n<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">\n${head}\n</head>\n<body>\n${bodyHtml}\n</body>\n</html>\n`;
+const full = `<!doctype html>\n<html lang="en">\n<head>\n<meta charset="utf-8">\n<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">\n<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src 'self' data: blob:; connect-src https://api.github.com; font-src data:; media-src data: blob:; base-uri 'none'; form-action 'none'; object-src 'none'">\n<meta name="referrer" content="no-referrer">\n${head}\n</head>\n<body>\n${bodyHtml}\n</body>\n</html>\n`;
 mkdirSync(root + 'dist', { recursive: true });
 mkdirSync(root + 'www', { recursive: true });
 writeFileSync(root + 'dist/index.html', full);

@@ -44,10 +44,10 @@ jobs:
         working-directory: android
         run: |
           chmod +x gradlew
-          ./gradlew assembleDebug --no-daemon
+          ./gradlew assembleRelease --no-daemon
 
       - name: Rename APK
-        run: cp android/app/build/outputs/apk/debug/app-debug.apk LaunchWindow-build${{ github.run_number }}.apk
+        run: cp android/app/build/outputs/apk/release/app-release.apk LaunchWindow-build${{ github.run_number }}.apk
 
       - name: Upload APK (download from this run's page)
         uses: actions/upload-artifact@v4
@@ -68,7 +68,7 @@ jobs:
           body: |
             **Install on Android:** download `LaunchWindow-build${{ github.run_number }}.apk` on your phone, open it, and allow "Install unknown apps" when asked. Android 7.0 or newer.
             **Play in a browser:** https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/ (or download `launch-window.html`, which works offline).
-            This is a debug-signed build, fine for testing and judging; use a signed release AAB for Google Play.
+            Release build (not debuggable), signed with the game's shared key so every new version installs as an update.
 
       - name: Prepare web version
         run: |

@@ -506,3 +506,7 @@ a { color: var(--cyan); }
 .cert-modal { width: min(980px, 100%); }
 .cert-canvas { display: block; width: 100%; height: auto; border-radius: 8px; box-shadow: 0 6px 24px #0008; }
 .cert-unlock { text-align: left; color: inherit; cursor: pointer; width: 100%; }
+.vf { border: 1px solid var(--line); border-radius: 14px; padding: 8px 12px; margin: 6px 0 12px; background: var(--panel2); }
+.vf > summary { cursor: pointer; font-weight: 700; }
+.vf-ok { color: var(--good); line-height: 1.45; }
+.vf-bad { color: var(--bad); line-height: 1.45; }

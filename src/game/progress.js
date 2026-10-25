@@ -71,7 +71,15 @@ export function progress(app) {
       const i = LEVELS.findIndex((l) => l.id === id);
       return i <= 0 || p.stars(id) > 0 || p.stars(LEVELS[i - 1].id) > 0;
     },
-    levelsDone: () => LEVELS.filter((l) => p.stars(l.id) > 0).length,
+    levelsDone: () => LEVELS.filter((l) => p.stars(l.id) > 0 && (s.proof || {})[l.id]?.n > 0).length,
+    /** Stars backed by a recorded flight (stars without a flight record don't count for certificates). */
+    verifiedStars: () => LEVELS.reduce((a, l) => a + Math.min(p.stars(l.id), (s.proof || {})[l.id]?.s || 0), 0),
+    tampered: () => !!s.tampered,
+    /** Wipe quick-play progress (used after the save was changed outside the game). */
+    resetProgress() {
+      app.save.arcade = { stars: {}, tries: {}, badges: {}, quizRight: 0, quizSeen: [], skin: 'classic' };
+      app.persist();
+    },
     certEarned: (id) => (s.certs || {})[id] || 0,
     profile: () => (app.save.profile ||= { name: '', school: '', grade: '', city: '' }),
     setProfile(pf) {
@@ -107,6 +115,10 @@ export function progress(app) {
     finish(id, stars, extra = {}) {
       const before = p.total();
       const prevBest = p.stars(id);
+      // a record of real flights (demo flights by Vyom never reach here)
+      const pr = ((s.proof ||= {})[id] ||= { s: 0, n: 0 });
+      pr.s = Math.max(pr.s, stars);
+      pr.n++;
       s.stars[id] = Math.max(prevBest, stars);
       s.streak = (s.streak || 0) + 1;
       // today's mission and the daily streak
@@ -128,8 +140,8 @@ export function progress(app) {
       const newSkins = SKINS.filter((k) => !k.quiz && k.need > before && k.need <= after);
       app.persist();
       // certificates: remember the date each one was first earned
-      const done = LEVELS.filter((l) => p.stars(l.id) > 0).length;
-      const newCerts = CERTS.filter((c) => !(s.certs ||= {})[c.id] && done >= c.levels && after >= c.stars);
+      const done = p.levelsDone();
+      const newCerts = s.tampered ? [] : CERTS.filter((c) => !(s.certs ||= {})[c.id] && done >= c.levels && p.verifiedStars() >= c.stars);
       for (const c of newCerts) s.certs[c.id] = Date.now();
       const rankUp = rankFor(after).need > rankFor(before).need ? rankFor(after) : null;
       return { newBadges: p.award(earn), newSkins, improved: prevBest > 0 && stars > prevBest, firstWin: prevBest === 0, streak: s.streak, daily, rankUp, newCerts };
