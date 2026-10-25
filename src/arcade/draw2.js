@@ -86,7 +86,7 @@ function astro(ctx, W, H, game, skin, view) {
     ctx.setLineDash([]);
   }
   // where you would stop if you pushed back now
-  if (!game.locked && Math.abs(game.omega) > 0.02 * D) {
+  if (!game.locked && Math.abs(game.omega) > 0.02 * D && view.aids !== false) {
     const sx = cx + ((game.stopAt - th) / D) * ppd;
     if (sx > 0 && sx < W) {
       ctx.strokeStyle = '#ffcc4d';

@@ -240,7 +240,7 @@ export const LDODGE = {
           const dv = gg.w.dvUsed;
           if (Math.abs(gapAtMeet) < 1000) return gg.lose(`Only ${Math.round(Math.abs(gapAtMeet))} m apart: far too close! Burn a little longer, half an orbit before the pole.`);
           if (gapAtMeet > 15e3) return gg.lose(`Safe, but you moved ${fmtKm(gapAtMeet)} away and wasted fuel the orbiter needs for science. Use a shorter burn.`);
-          gg.win(dv <= 0.45 ? 3 : dv <= 0.8 ? 2 : 1, ['Safe pass over the north pole!', `Gap: ${(gapAtMeet / 1000).toFixed(2)} km`, `Burn: ${(dv * 100).toFixed(0)} cm/s`]);
+          gg.win(dv <= 0.38 ? 3 : dv <= 0.6 ? 2 : 1, ['Safe pass over the north pole!', `Gap: ${(gapAtMeet / 1000).toFixed(2)} km`, `Burn: ${(dv * 100).toFixed(0)} cm/s`]);
         }
       },
       onHit: (gg) => gg.lose('Crashed into the Moon!'),
@@ -561,7 +561,7 @@ export const LROVER = {
           for (const [cx, cy, r] of craters) if (Math.hypot(x - cx, y - cy) < r) return g.lose('Pragyan rolled into a crater! Steer around it, giving it plenty of room.');
           for (const [cx, cy, r] of rocks) if (Math.hypot(x - cx, y - cy) < r + 0.25) return g.lose('Bumped into a rock. Pragyan’s wheels can only climb small stones.');
           if (Math.hypot(x - goal[0], y - goal[1]) < 0.6) {
-            return g.win(dist < 15.6 ? 3 : dist < 17.5 ? 2 : 1, ['Reached the science spot!', `Distance driven: ${dist.toFixed(1)} m (the straight line is 14 m)`]);
+            return g.win(dist < 15.2 ? 3 : dist < 17 ? 2 : 1, ['Reached the science spot!', `Distance driven: ${dist.toFixed(1)} m (the straight line is 14 m)`]);
           }
           if (Math.abs(x) > 9 || y < -3 || y > 18) return g.lose('Too far from the lander: its radio could lose Pragyan. Stay near the path.');
         }

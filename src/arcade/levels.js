@@ -206,7 +206,7 @@ const L2 = {
         const r = Math.hypot(g.w.y[0], g.w.y[1]);
         if (d < zone) {
           const dv = g.w.dvUsed;
-          return g.win(dv <= 230 ? 3 : dv <= 290 ? 2 : 1, ['You reached the Moon!', `Fuel used: ${Math.round(dv)} m/s of Δv`]);
+          return g.win(dv <= 205 ? 3 : dv <= 250 ? 2 : 1, ['You reached the Moon!', `Fuel used: ${Math.round(dv)} m/s of Δv`]);
         }
         if (r > 200000e3) wentHigh = true;
         const o = g.w.orbitAbout('earth');
@@ -309,7 +309,7 @@ const L3 = {
       isp: 315,
       apoMax: 20000e3,
       periMin: 15e3,
-      starsBy: (g, apo) => (apo <= 6000e3 ? 3 : apo <= 12000e3 ? 2 : 1),
+      starsBy: (g, apo) => (apo <= 5500e3 ? 3 : apo <= 10000e3 ? 2 : 1),
       info2: (o) => ['Orbit', o.energy < 0 ? 'Caught!' : 'Flying past'],
     }),
 };
@@ -400,7 +400,7 @@ const L4 = {
       speed: 1.6,
       holdThrottle: 1,
       limits: { vz: 3, vx: 1, tilt: 15 },
-      stars: (v) => (v <= 1 ? 3 : v <= 2 ? 2 : 1),
+      stars: (v) => (v <= 0.8 ? 3 : v <= 1.6 ? 2 : 1),
       surface: 'moon',
     }),
 };
@@ -474,7 +474,7 @@ const L5 = {
         if (gg.w.t - launchT > tTransfer * 1.02) {
           const deg = ((launchPhase - ideal) * 180) / Math.PI;
           if (best > 15e9) return gg.lose(`Missed Mars by ${fmtKm(best)}. You launched with Mars ${((launchPhase * 180) / Math.PI).toFixed(0)}° ahead; ${deg > 0 ? 'wait a little longer' : 'launch a bit sooner'} next time.`);
-          return gg.win(best < 3e9 ? 3 : best < 7e9 ? 2 : 1, [`Arrived ${fmtKm(best)} from Mars`, `Launch angle: ${((launchPhase * 180) / Math.PI).toFixed(1)}° (best ≈ ${((ideal * 180) / Math.PI).toFixed(0)}°)`]);
+          return gg.win(best < 1e9 ? 3 : best < 4e9 ? 2 : 1, [`Arrived ${fmtKm(best)} from Mars`, `Launch angle: ${((launchPhase * 180) / Math.PI).toFixed(1)}° (best ≈ ${((ideal * 180) / Math.PI).toFixed(0)}°)`]);
         }
       },
       onHit: (gg) => gg.lose('Flew into the Sun!'),
@@ -518,7 +518,7 @@ const L6 = {
       isp: 315,
       apoMax: 80000e3,
       periMin: 150e3,
-      starsBy: (g) => (g.w.dvUsed <= 750 ? 3 : g.w.dvUsed <= 950 ? 2 : 1),
+      starsBy: (g) => (g.w.dvUsed <= 700 ? 3 : g.w.dvUsed <= 850 ? 2 : 1),
       botApo: 0.85,
       info2: (o) => ['Far point', o.energy < 0 ? fmtKm(o.apo - 3389.5e3) : 'not caught yet'],
     }),
@@ -735,7 +735,7 @@ const L8 = {
         const s = gg.w.rel('saturn');
         const d = Math.hypot(s.x, s.y);
         // inside the zone: judge at the closest pass (when the distance starts growing again)
-        if (best < zone && d > best) return gg.win(best < 0.06 * AU ? 3 : best < 0.13 * AU ? 2 : 1, ['Saturn reached!', `Closest pass: ${(best / AU).toFixed(3)} AU (${fmtKm(best)})`]);
+        if (best < zone && d > best) return gg.win(best < 0.035 * AU ? 3 : best < 0.08 * AU ? 2 : 1, ['Saturn reached!', `Closest pass: ${(best / AU).toFixed(3)} AU (${fmtKm(best)})`]);
         best = Math.min(best, d);
         const r = Math.hypot(gg.w.y[0], gg.w.y[1]);
         if (gg.w.t - launchT > tS * 1.25 || r > aS * 1.6) return gg.lose(`Missed Saturn by ${(best / AU).toFixed(2)} AU. Change your aim a little and try again.`);
@@ -893,7 +893,7 @@ const L13 = {
         if (ang < lo) return g.lose(`Entry at ${ang.toFixed(1)}°: too steep! The capsule would get too hot. Brake less next time.`);
         if (ang > hi) return g.lose(`Entry at ${ang.toFixed(1)}°: too shallow, the capsule skips off the air. Brake a little more.`);
         const err = Math.abs(ang + 6.5);
-        g.win(err < 0.35 ? 3 : err < 0.8 ? 2 : 1, ['Splashdown! The crew is home safe.', `Entry angle ${ang.toFixed(2)}° (perfect is about −6.5°)`, `Burn used: ${g.w.dvUsed.toFixed(1)} m/s`]);
+        g.win(err < 0.2 ? 3 : err < 0.6 ? 2 : 1, ['Splashdown! The crew is home safe.', `Entry angle ${ang.toFixed(2)}° (perfect is about −6.5°)`, `Burn used: ${g.w.dvUsed.toFixed(1)} m/s`]);
       },
       info(g) {
         const h2 = g.pred?.hit;
@@ -992,7 +992,7 @@ const LA11 = {
       speed: 1.0,
       holdThrottle: 0.6,
       limits: { vz: 3, vx: 1.2, tilt: 12 },
-      stars: (v) => (v <= 1 ? 3 : v <= 2 ? 2 : 1),
+      stars: (v) => (v <= 0.8 ? 3 : v <= 1.6 ? 2 : 1),
       surface: 'moon',
     }),
 };
@@ -1068,7 +1068,7 @@ const LMIP = {
       onHit(gg) {
         const d = surfDist(gg.w.y[0], gg.w.y[1]);
         if (d > 700e3) return gg.lose(`Impact ${fmtKm(d)} from the south pole. Watch the red cross and drop when it is on the target.`);
-        gg.win(d < 120e3 ? 3 : d < 300e3 ? 2 : 1, ['Impact! The probe reached the Moon’s south pole region.', `Distance from target: ${fmtKm(d)}`]);
+        gg.win(d < 50e3 ? 3 : d < 150e3 ? 2 : 1, ['Impact! The probe reached the Moon’s south pole region.', `Distance from target: ${fmtKm(d)}`]);
       },
       info(gg) {
         if (dropped) return [['Height', fmtKm(Math.hypot(gg.w.y[0], gg.w.y[1]) - R)], ['Status', 'Falling…']];
@@ -1125,7 +1125,7 @@ const LPLUTO = {
         if (snapped) {
           const q = snapped / rp;
           if (q > 1.6) return gg.lose(`Too far away (${fmtKm(snapped - R)} from Pluto): the photo is just a dot. Wait until you are closest!`);
-          return gg.win(q < 1.06 ? 3 : q < 1.25 ? 2 : 1, ['Photo taken!', `Distance: ${fmtKm(snapped - R)} (closest possible: 12,500 km)`]);
+          return gg.win(q < 1.03 ? 3 : q < 1.12 ? 2 : 1, ['Photo taken!', `Distance: ${fmtKm(snapped - R)} (closest possible: 12,500 km)`]);
         }
         if (d > best * 2 && d > rp * 3) gg.lose('You flew past without taking the photo! Tap SNAP as you pass closest.');
       },
@@ -1172,7 +1172,7 @@ const LJUNO = {
       isp: 318,
       apoMax: 8.3e9,
       periMin: 1000e3,
-      starsBy: (g) => (g.w.dvUsed <= 650 ? 3 : g.w.dvUsed <= 820 ? 2 : 1),
+      starsBy: (g) => (g.w.dvUsed <= 645 ? 3 : g.w.dvUsed <= 760 ? 2 : 1),
       botApo: 0.85,
       info2: (o) => ['Far point', o.energy < 0 ? fmtKm(o.apo - 71492e3) : 'not caught yet'],
     }),
@@ -1228,7 +1228,7 @@ const LEARTH = {
         if (snapped != null) {
           if (snapped < 0) return gg.lose('Too early: Earth was still hidden behind the Moon. Wait for it to peek over the horizon!');
           if (snapped > 12) return gg.lose(`Too late: Earth was already ${snapped.toFixed(0)}° up. Snap it right as it rises!`);
-          return gg.win(snapped < 3 ? 3 : snapped < 6 ? 2 : 1, ['Earthrise!', `Earth was ${snapped.toFixed(1)}° above the Moon’s horizon`]);
+          return gg.win(snapped < 1.5 ? 3 : snapped < 4 ? 2 : 1, ['Earthrise!', `Earth was ${snapped.toFixed(1)}° above the Moon’s horizon`]);
         }
         if (e > 14) gg.lose('You missed the moment! Tap SNAP as soon as Earth peeks over the horizon.');
       },
@@ -1323,7 +1323,7 @@ const LCAS = {
       isp: 308,
       apoMax: 9.5e9,
       periMin: 5000e3,
-      starsBy: (g) => (g.w.dvUsed <= 700 ? 3 : g.w.dvUsed <= 880 ? 2 : 1),
+      starsBy: (g) => (g.w.dvUsed <= 660 ? 3 : g.w.dvUsed <= 760 ? 2 : 1),
       botApo: 0.85,
       info2: (o) => ['Far point', o.energy < 0 ? fmtKm(o.apo - 60268e3) : 'not caught yet'],
     }),
@@ -1379,7 +1379,7 @@ const L104 = {
         if (sats.length >= groups) {
           const total = t / 60;
           game.status = 'won';
-          game.stars = total < 2.2 ? 3 : total < 3 ? 2 : 1;
+          game.stars = total < 1.8 ? 3 : total < 2.5 ? 2 : 1;
           game.result = ['All 104 satellites released safely!', `Time taken: ${total.toFixed(1)} minutes (the real release took about 11 minutes)`];
           return;
         }

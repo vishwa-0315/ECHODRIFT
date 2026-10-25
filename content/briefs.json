@@ -13,8 +13,8 @@
     ],
     "stars": [
       "Snap within 12° of the horizon",
-      "Within 6°",
-      "Within 3°"
+      "Within 4°",
+      "Within 1.5°"
     ],
     "history": "On 24 December 1968, on Apollo 8’s fourth orbit, Bill Anders saw Earth rise over the Moon and grabbed a colour film camera. His photo, Earthrise, became one of the most famous pictures ever taken.",
     "measure": [
@@ -36,8 +36,8 @@
     ],
     "stars": [
       "Land under 3 m/s",
-      "Under 2 m/s",
-      "Under 1 m/s"
+      "Under 1.6 m/s",
+      "Under 0.8 m/s"
     ],
     "history": "On 20 July 1969 Neil Armstrong took manual control to fly past a boulder field. Eagle touched down with only about 25 seconds of fuel left before the abort limit.",
     "measure": [
@@ -59,8 +59,8 @@
     ],
     "stars": [
       "Enter inside the safe window",
-      "Within 0.8° of −6.5°",
-      "Within 0.35° of −6.5°"
+      "Within 0.6° of −6.5°",
+      "Within 0.2° of −6.5°"
     ],
     "history": "After an oxygen tank exploded in April 1970, the crew used the lunar module’s engine to swing around the Moon and come home. Small burns kept them inside the narrow entry window, and they splashed down safely on 17 April.",
     "measure": [
@@ -82,8 +82,8 @@
     ],
     "stars": [
       "Reach Saturn’s zone",
-      "Pass within 0.13 AU",
-      "Pass within 0.06 AU"
+      "Pass within 0.08 AU",
+      "Pass within 0.035 AU"
     ],
     "history": "Voyager 2 swung past Jupiter on 9 July 1979. Jupiter’s gravity bent its path and added speed, sending it on to Saturn in 1981 and later to Uranus and Neptune.",
     "measure": [
@@ -128,8 +128,8 @@
     ],
     "stars": [
       "Get caught by Saturn",
-      "Using under 880 m/s of Δv",
-      "Using under 700 m/s"
+      "Using under 760 m/s of Δv",
+      "Using under 660 m/s"
     ],
     "history": "On 1 July 2004 Cassini flew through a gap in Saturn’s rings and fired its main engine for 96 minutes. It became the first spacecraft to orbit Saturn.",
     "measure": [
@@ -151,8 +151,8 @@
     ],
     "stars": [
       "Impact within 700 km",
-      "Within 300 km",
-      "Within 120 km"
+      "Within 150 km",
+      "Within 50 km"
     ],
     "history": "On 14 November 2008 the Moon Impact Probe left Chandrayaan-1 and fell for about 25 minutes, hitting near Shackleton crater. Its instruments sniffed the thin gas around the Moon on the way down.",
     "measure": [
@@ -174,8 +174,8 @@
     ],
     "stars": [
       "Arrive within 15 million km",
-      "Within 7 million km",
-      "Within 3 million km"
+      "Within 4 million km",
+      "Within 1 million km"
     ],
     "history": "Mangalyaan launched on 5 November 2013. PSLV could not send it straight to Mars, so it raised its orbit six times and left Earth on 1 December, right inside the window.",
     "measure": [
@@ -220,8 +220,8 @@
     ],
     "stars": [
       "Get caught by Mars",
-      "Using under 950 m/s of Δv",
-      "Using under 750 m/s"
+      "Using under 850 m/s of Δv",
+      "Using under 700 m/s"
     ],
     "history": "On 24 September 2014 Mangalyaan braked for about 23 minutes behind Mars. India became the first country to reach Mars orbit on its first attempt.",
     "measure": [
@@ -243,8 +243,8 @@
     ],
     "stars": [
       "Snap within 1.6× the closest distance",
-      "Within 1.25×",
-      "Within 1.06×"
+      "Within 1.12×",
+      "Within 1.03×"
     ],
     "history": "New Horizons flew past Pluto on 14 July 2015. The flyby was programmed in advance, and the photos took months to send home across 5 billion km.",
     "measure": [
@@ -266,8 +266,8 @@
     ],
     "stars": [
       "Get caught by Jupiter",
-      "Using under 820 m/s of Δv",
-      "Using under 650 m/s"
+      "Using under 760 m/s of Δv",
+      "Using under 645 m/s"
     ],
     "history": "On 4 July 2016 Juno fired its main engine for 35 minutes and became the second spacecraft ever to orbit Jupiter.",
     "measure": [
@@ -289,8 +289,8 @@
     ],
     "stars": [
       "Release all safely in 8 minutes",
-      "In under 3 minutes",
-      "In under 2.2 minutes"
+      "In under 2.5 minutes",
+      "In under 1.8 minutes"
     ],
     "history": "On 15 February 2017 PSLV-C37 released 104 satellites in about 11 minutes, each in a planned direction so none would ever collide. It was a world record at the time.",
     "measure": [
@@ -358,8 +358,8 @@
     ],
     "stars": [
       "Reach the Moon zone",
-      "Using under 290 m/s of Δv",
-      "Using under 230 m/s"
+      "Using under 250 m/s of Δv",
+      "Using under 205 m/s"
     ],
     "history": "On 1 August 2023 Chandrayaan-3 made its trans-lunar injection burn at perigee and left Earth orbit for the Moon.",
     "measure": [
@@ -381,8 +381,8 @@
     ],
     "stars": [
       "Get caught by the Moon",
-      "Far point under 12,000 km",
-      "Far point under 6,000 km"
+      "Far point under 10,000 km",
+      "Far point under 5,500 km"
     ],
     "history": "On 5 August 2023 Chandrayaan-3 braked for about 30 minutes and was captured into a lunar orbit, then lowered it step by step to about 100 km.",
     "measure": [
@@ -404,8 +404,8 @@
     ],
     "stars": [
       "Land under 3 m/s",
-      "Under 2 m/s",
-      "Under 1 m/s"
+      "Under 1.6 m/s",
+      "Under 0.8 m/s"
     ],
     "history": "On 23 August 2023 Vikram landed near the Moon’s south pole. India became the first country to land there and the fourth to soft-land on the Moon.",
     "measure": [
@@ -495,14 +495,14 @@
         "Crab Nebula, 62° away"
       ],
       [
-        "Locked on",
-        "within 0.5°, turning under 0.08°/s"
+        "Star tracker locks",
+        "within 2.5°, turning under 0.4°/s"
       ]
     ],
     "stars": [
-      "Lock on within 0.5°",
-      "Within 0.25°",
-      "Within 0.12°"
+      "Lock on to the Crab Nebula",
+      "Swing past at most once, within 110 s",
+      "No overshoot, within 70 s"
     ],
     "history": "AstroSat launched on 28 September 2015 on PSLV-C30. It is India’s first multi-wavelength space observatory, studying stars, galaxies and black holes in ultraviolet, visible and X-ray light at the same time.",
     "measure": [
@@ -528,8 +528,8 @@
     ],
     "stars": [
       "Pass more than 1 km apart",
-      "Using under 80 cm/s",
-      "Using under 45 cm/s"
+      "Using under 60 cm/s",
+      "Using under 38 cm/s"
     ],
     "history": "ISRO predicted that Chandrayaan-2’s orbiter and NASA’s LRO would pass within about 3 km of each other over the Moon’s north pole on 20 October 2021, with less than 100 m between their orbits. A small burn on 18 October moved the orbiter safely out of the way.",
     "measure": [
@@ -625,8 +625,8 @@
     ],
     "stars": [
       "Reach the science spot",
-      "Driving under 17.5 m",
-      "Driving under 15.6 m"
+      "Driving under 17 m",
+      "Driving under 15.2 m"
     ],
     "history": "On 27 August 2023 Pragyan’s cameras spotted a 4 m wide crater 3 m ahead. ISRO commanded it to back up and take a new path. Pragyan drove about 100 m on the Moon before the lunar night.",
     "measure": [

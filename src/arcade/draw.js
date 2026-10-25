@@ -466,7 +466,7 @@ export function createRenderer() {
     ctx.setLineDash([]);
     label(ctx, `${game.x.toFixed(2)} m`, (tx + cxp) / 2, cy + 76, '#c9d4e6', true);
     // where you would stop if you braked from now on
-    if (game.stopX && game.status === 'play' && game.v < -0.003) {
+    if (game.stopX && game.status === 'play' && game.v < -0.003 && view.aids !== false) {
       const sxp = tx + 16 + Math.max(-1, game.stopX()) * ppm;
       const late = game.stopX() < 0.05;
       ctx.strokeStyle = late ? 'rgba(255,92,92,0.9)' : 'rgba(255,204,77,0.8)';
@@ -552,7 +552,7 @@ export function createRenderer() {
     ctx.stroke();
     // where you would stop if you held the engine from now on: below the ground = brake now!
     const sa = game.stopAlt?.();
-    if (sa != null && game.status === 'play') {
+    if (sa != null && game.status === 'play' && view.aids !== false) {
       const yS = groundY - Math.max(-8, sa) * ppm;
       const danger = sa < 2;
       ctx.strokeStyle = danger ? 'rgba(255,92,92,0.9)' : 'rgba(255,204,77,0.75)';

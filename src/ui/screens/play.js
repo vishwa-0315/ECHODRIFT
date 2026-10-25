@@ -50,7 +50,8 @@ export function playScreen(app, { id, demo = false }) {
     coach.t += dt;
     if (coach.hideAt && coach.t > coach.hideAt) ((coach.hideAt = 0), coachEl.classList.remove('show'));
     // only help players who are learning this level (first tries, or after a miss)
-    const learning = (prog.data.tries[id] || 0) + (prog.stars(id) ? 0 : 1) >= 1 && prog.stars(id) < 3;
+    // Vyom only steps in after two failed tries, and never once you have won the level
+    const learning = (prog.data.tries[id] || 0) >= 2 && !prog.stars(id);
     if (!coach.on || !learning || coach.t < 2.5) return;
     const b = game.bot() || {};
     const wantA = !!(b.hold || b.tap), wantB = !!(b.holdB || b.tapB);
@@ -190,7 +191,7 @@ export function playScreen(app, { id, demo = false }) {
     const r = fitCanvas(canvas);
     const top = el.querySelector('.play-hud')?.getBoundingClientRect().bottom ?? 120;
     const bottom = el.querySelector('.play-bottom')?.getBoundingClientRect().top ?? r.h - 120;
-    renderer.draw(r.ctx, r.w, r.h, game, skin, { top, bottom, dpr: r.dpr, camMode });
+    renderer.draw(r.ctx, r.w, r.h, game, skin, { top, bottom, dpr: r.dpr, camMode, aids: !prog.stars(id) || demoMode });
     hud();
   }
 
