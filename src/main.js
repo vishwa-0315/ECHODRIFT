@@ -16,10 +16,11 @@ import { expertScreen } from './ui/screens/expert.js';
 import { playScreen } from './ui/screens/play.js';
 import { hangarScreen } from './ui/screens/hangar.js';
 import { sandboxScreen } from './ui/screens/sandbox.js';
+import { certsScreen } from './ui/screens/certs.js';
 import { quizGameScreen } from './ui/screens/quizgame.js';
 import { setAudio, unlockAudio } from './ui/audio.js';
 
-const screens = { home: homeScreen, expert: expertScreen, play: playScreen, hangar: hangarScreen, sandbox: sandboxScreen, quizgame: quizGameScreen, briefing: briefingScreen, orbital: orbitalScreen, porkchop: porkchopScreen, lander: landerScreen, edl: edlScreen, lab: labScreen, explorer: explorerScreen, about: aboutScreen };
+const screens = { home: homeScreen, expert: expertScreen, play: playScreen, hangar: hangarScreen, sandbox: sandboxScreen, certs: certsScreen, quizgame: quizGameScreen, briefing: briefingScreen, orbital: orbitalScreen, porkchop: porkchopScreen, lander: landerScreen, edl: edlScreen, lab: labScreen, explorer: explorerScreen, about: aboutScreen };
 
 async function boot() {
   const root = document.getElementById('app');

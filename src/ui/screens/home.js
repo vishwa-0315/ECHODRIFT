@@ -11,6 +11,7 @@ import { setAudio, setMood, startMusic, sfx, unlockAudio } from '../audio.js';
 import { briefFor } from '../debrief.js';
 
 import { BODY } from '../levelIcons.js';
+import { profileForm } from './certs.js';
 const LOCK = '<svg width="14" height="16" viewBox="0 0 14 16" aria-hidden="true"><rect x="1" y="7" width="12" height="8" rx="2" fill="currentColor"/><path d="M4 7V5a3 3 0 0 1 6 0v2" stroke="currentColor" stroke-width="2" fill="none"/></svg>';
 
 export function homeScreen(app, params = {}) {
@@ -228,6 +229,7 @@ export function homeScreen(app, params = {}) {
     timeline,
     h(
       'div.home-more',
+      h('button.btn', { onclick: () => app.go('certs'), 'data-testid': 'certs' }, prog.profile().name ? `Certificates · ${prog.profile().name.split(' ')[0]}` : 'Profile & certificates'),
       h('button.btn', { onclick: () => app.go('hangar'), 'data-testid': 'hangar' }, `Badges & rockets (${Object.keys(prog.data.badges).length})`),
       h('button.btn', { onclick: () => app.go('explorer') }, 'Solar System now'),
       h('button.btn', { onclick: () => app.go('expert'), 'data-testid': 'expert' }, 'Expert missions & labs'),
@@ -257,6 +259,14 @@ export function homeScreen(app, params = {}) {
             ? [`Welcome back! Next up: ${next.title}.`]
             : ['Every level done! Can you get 3 stars on all of them?'];
       setTimeout(() => g.say([...lines, 'Tap me any time for a space fact!'], 'happy'), 250);
+      // ask once for the player's details (used on certificates), after a first win
+      if (!prog.profile().name && !app.settings.askedProfile && total > 0) {
+        app.setSetting('askedProfile', true);
+        setTimeout(() => {
+          const ov = h('div.overlay', { role: 'dialog', 'aria-modal': 'true' }, h('div.modal', h('h2', 'Your pilot profile'), h('p.muted', 'Vyom will print these on the certificates you unlock.'), profileForm(app, () => (ov.remove(), app.go('home'))), h('button.btn.ghost.block', { style: { marginTop: '8px' }, onclick: () => ov.remove(), 'data-testid': 'pf-later' }, 'Later')));
+          el.appendChild(ov);
+        }, 900);
+      }
     },
     destroy: () => clearInterval(raf),
   };

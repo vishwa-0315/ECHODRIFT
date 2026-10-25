@@ -317,7 +317,7 @@ export function playScreen(app, { id, demo = false }) {
     );
   }
 
-  function showWin({ newBadges, newSkins, improved, firstWin, streak, daily, rankUp }) {
+  function showWin({ newBadges, newSkins, improved, firstWin, streak, daily, rankUp, newCerts = [] }) {
     const praise = rankUp
       ? `Promoted! You are now a ${rankUp.name}.`
       : daily
@@ -339,6 +339,7 @@ export function playScreen(app, { id, demo = false }) {
       praise ? h('div.praise', praise) : null,
       h('ul.result-lines', game.result.map((r) => h('li', r))),
       badgeChips(newBadges, newSkins),
+      newCerts.length ? h('div.unlocks', newCerts.map((c) => h('button.unlock.cert-unlock', { onclick: () => app.go('certs'), 'data-testid': 'cert-new' }, h('span.medal', { style: { background: c.color } }, '★'), h('div', h('b', `New certificate: ${c.tier} · ${c.title}`), h('div.small.muted', 'Tap to see it with your name on it'))))) : null,
       debrief(),
       h(
         'div.row.wrap.result-btns',

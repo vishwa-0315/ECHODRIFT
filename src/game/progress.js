@@ -41,6 +41,13 @@ export const RANKS = [
   { need: 65, name: 'Flight Director' },
   { need: 80, name: 'Mission Commander' },
 ];
+/** Certificates, unlocked by levels completed and stars (see certs.js for the design). */
+export const CERTS = [
+  { id: 'bronze', tier: 'Bronze', title: 'Space Explorer', levels: 10, stars: 0, color: '#b87333' },
+  { id: 'silver', tier: 'Silver', title: 'Mission Pilot', levels: 20, stars: 45, color: '#9aa4b2' },
+  { id: 'gold', tier: 'Gold', title: 'Mission Commander', levels: 30, stars: 75, color: '#d4a017' },
+  { id: 'platinum', tier: 'Platinum', title: 'Space Legend', levels: 30, stars: 90, color: '#4cc9f0' },
+];
 export const rankFor = (stars) => RANKS.filter((r) => stars >= r.need).pop();
 export const nextRank = (stars) => RANKS.find((r) => r.need > stars) || null;
 
@@ -63,6 +70,13 @@ export function progress(app) {
       if (ALL_LEVELS_OPEN) return true;
       const i = LEVELS.findIndex((l) => l.id === id);
       return i <= 0 || p.stars(id) > 0 || p.stars(LEVELS[i - 1].id) > 0;
+    },
+    levelsDone: () => LEVELS.filter((l) => p.stars(l.id) > 0).length,
+    certEarned: (id) => (s.certs || {})[id] || 0,
+    profile: () => (app.save.profile ||= { name: '', school: '', grade: '', city: '' }),
+    setProfile(pf) {
+      app.save.profile = { ...p.profile(), ...pf };
+      app.persist();
     },
     dailyDoneToday: () => s.dailyDone === dayKey(),
     dailyStreak: () => {
@@ -113,8 +127,12 @@ export function progress(app) {
       if (LEVELS.every((l) => p.stars(l.id) === 3)) earn.push('allstars');
       const newSkins = SKINS.filter((k) => !k.quiz && k.need > before && k.need <= after);
       app.persist();
+      // certificates: remember the date each one was first earned
+      const done = LEVELS.filter((l) => p.stars(l.id) > 0).length;
+      const newCerts = CERTS.filter((c) => !(s.certs ||= {})[c.id] && done >= c.levels && after >= c.stars);
+      for (const c of newCerts) s.certs[c.id] = Date.now();
       const rankUp = rankFor(after).need > rankFor(before).need ? rankFor(after) : null;
-      return { newBadges: p.award(earn), newSkins, improved: prevBest > 0 && stars > prevBest, firstWin: prevBest === 0, streak: s.streak, daily, rankUp };
+      return { newBadges: p.award(earn), newSkins, improved: prevBest > 0 && stars > prevBest, firstWin: prevBest === 0, streak: s.streak, daily, rankUp, newCerts };
     },
     /** Finished a Quiz to Orbit game with `stars` (0 = did not reach orbit). */
     quizGame(stars) {
