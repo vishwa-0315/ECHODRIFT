@@ -7,3 +7,4 @@ android/.gradle/
 android/local.properties
 *.keystore
 www/
+!android/app/launchwindow-test.keystore

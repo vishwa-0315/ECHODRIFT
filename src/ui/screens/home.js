@@ -234,7 +234,7 @@ export function homeScreen(app, params = {}) {
       h('button.btn.ghost', { onclick: () => app.go('about') }, 'How the physics works'),
       h('button.btn', { onclick: () => checkForUpdates(app), 'data-testid': 'updates' }, 'Check for updates'),
     ),
-    h('p.small.muted', { style: { marginTop: '14px' } }, `Version: build ${BUILD || 'test'}. `, 'For all ages. Every level uses real gravity, real engines and real mission data. Stuck? Vyom can show you how.'),
+    h('p.small.muted', { style: { marginTop: '14px' } }, `Version 1.0.${BUILD || 0} (build ${BUILD || 'test'}). `, 'For all ages. Every level uses real gravity, real engines and real mission data. Stuck? Vyom can show you how.'),
   );
 
   return {

@@ -7,8 +7,9 @@ android {
         applicationId "org.launchwindow.game"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 1
-        versionName "1.0"
+        // version follows the GitHub Actions build number, so every new APK installs as an update
+        versionCode (System.getenv("GITHUB_RUN_NUMBER") ?: "1").toInteger()
+        versionName "1.0.${System.getenv("GITHUB_RUN_NUMBER") ?: "0"}"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         aaptOptions {
              // Files and dirs to omit from the packaged assets dir, modified to accommodate modern web apps.
@@ -16,7 +17,20 @@ android {
             ignoreAssetsPattern = '!.svn:!.git:!.ds_store:!*.scc:.*:!CVS:!thumbs.db:!picasa.ini:!*~'
         }
     }
+    // One fixed test key for every build: Android only accepts an update signed with the same key.
+    // (Testing and judging only. A Play Store release needs a private key kept out of the repo.)
+    signingConfigs {
+        shared {
+            storeFile file('launchwindow-test.keystore')
+            storePassword 'launchwindow'
+            keyAlias 'launchwindow'
+            keyPassword 'launchwindow'
+        }
+    }
     buildTypes {
+        debug {
+            signingConfig signingConfigs.shared
+        }
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
