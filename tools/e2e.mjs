@@ -53,7 +53,7 @@ if (!ONLY || ONLY === 'quick') {
   await page.click('[data-testid=quiz-1]');
   await page.click('[data-testid=quiz-next]');
   await page.waitForSelector('[data-testid=main-btn]');
-  const ids = ['earthrise', 'eagle', 'home13', 'slingshot', 'rohini', 'cassini', 'mip', 'window', 'escape', 'marscapture', 'pluto', 'juno', 'sats104', 'terror', 'raise', 'moonshot', 'catchmoon', 'vikram', 'hop', 'spadex'];
+  const ids = ['earthrise', 'eagle', 'home13', 'slingshot', 'rohini', 'cassini', 'sre1', 'mip', 'window', 'escape', 'marscapture', 'pluto', 'astrosat', 'juno', 'sats104', 'terror', 'dodge', 'navic', 'lvm3', 'raise', 'moonshot', 'catchmoon', 'hazard', 'vikram', 'pragyan', 'hop', 'aditya', 'insat', 'pushpak', 'spadex'];
   for (const id of ids.slice(1)) {
     await page.evaluate((id) => window.__LW.go('play', { id, demo: true }), id);
     await page.waitForSelector('.result-card', { timeout: 120000 });
@@ -76,6 +76,27 @@ if (!ONLY || ONLY === 'quick') {
   await page.evaluate(() => window.__LW.go('hangar'));
   await wait(300);
   await shot('hangar');
+  result['history-cards'] = await page.evaluate(() => document.querySelectorAll('.hcard.got').length);
+  log('history cards unlocked', result['history-cards']);
+  // home: filters and a mission card
+  await page.evaluate(() => window.__LW.go('home'));
+  await page.waitForSelector('[data-testid=filter-isro]');
+  await page.click('[data-testid=filter-isro]');
+  result['filter-isro'] = await page.textContent('.filter-count');
+  await page.click('[data-testid=filter-all]');
+  await page.click('[data-testid=info-raise]');
+  await page.waitForSelector('.mission-card');
+  await shot('mission-card');
+  log('filter', result['filter-isro']);
+  // orbit sandbox: launch at escape speed and check the readout says escaping
+  await page.evaluate(() => window.__LW.go('sandbox'));
+  await page.waitForSelector('[data-testid=sb-launch]');
+  await page.$eval('[data-testid=sb-speed]', (e) => { e.value = 142; e.dispatchEvent(new Event('input')); });
+  await page.click('[data-testid=sb-launch]');
+  await wait(1500);
+  result['sandbox'] = await page.evaluate(() => [...document.querySelectorAll('.sb-stats .chip-stat')].map((c) => c.innerText.replace(/\n/, ': ')).join(' | '));
+  await shot('sandbox');
+  log('sandbox', result['sandbox']);
   await page.evaluate(() => window.__LW.go('home'));
   await page.waitForSelector('[data-testid=expert]');
 }

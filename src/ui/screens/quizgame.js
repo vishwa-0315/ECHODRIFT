@@ -6,6 +6,7 @@
  */
 import { h, clear, put, fitCanvas } from '../dom.js';
 import { progress } from '../../game/progress.js';
+import { levelById } from '../../arcade/levels.js';
 import { createRenderer } from '../../arcade/draw.js';
 import { drawBody, starField } from '../render.js';
 import { vyomSVG } from '../guide.js';
@@ -27,7 +28,10 @@ export function quizGameScreen(app) {
   const skin = prog.skin();
   const r = createRenderer();
   const stars = starField(380, 21);
-  const deck = shuffle(quizBank.map((q, i) => ({ ...q, i })));
+  // questions you have not seen come first; a full round is completed before any repeat
+  if (prog.data.quizSeen.length >= quizBank.length) prog.data.quizSeen = [];
+  const all = quizBank.map((q, i) => ({ ...q, i }));
+  const deck = [...shuffle(all.filter((q) => !prog.data.quizSeen.includes(q.i))), ...shuffle(all.filter((q) => prog.data.quizSeen.includes(q.i)))];
   let qi = -1, speed = 0, wrong = 0, right = 0, lane = 1, laneX = 1, gateT = 0, gateDur = 9, cur = null, opts = [], state = 'intro', raf = 0, last = 0, flash = 0, scroll = 0;
 
   const canvas = h('canvas.play-canvas', { 'aria-hidden': 'true' });
@@ -64,7 +68,17 @@ export function quizGameScreen(app) {
     const wrongs = shuffle(cur.options.map((o, k) => k).filter((k) => k !== cur.answer)).slice(0, 2);
     opts = shuffle([cur.answer, ...wrongs]);
     clear(qCard);
-    put(qCard, h('div.qg-num', `Question ${qi + 1}`), h('div.qg-text', cur.q));
+    const lv = levelById(cur.level);
+    const hintTxt = h('div.qg-hint');
+    const hintBtn = h('button.btn.sm.ghost.hint-btn', { 'data-testid': 'qg-hint', disabled: prog.hintsLeft() <= 0, onclick: (e) => {
+      e.stopPropagation();
+      if (state !== 'gates' || !prog.useHint()) return;
+      sfx.tap();
+      hintTxt.textContent = 'Hint: ' + (cur.hint || 'Think it through!');
+      hintBtn.disabled = true;
+      hintBtn.textContent = `Hint used (${prog.hintsLeft()} left)`;
+    } }, `Hint (${prog.hintsLeft()} of 3)`);
+    put(qCard, h('div.qg-num', `Question ${qi + 1}` + (lv ? ` · ${lv.mission}` : ''), hintBtn), h('div.qg-text', cur.q), hintTxt);
     clear(gates);
     opts.forEach((k, li) => gates.appendChild(h('button.qg-gate', { 'data-testid': 'gate-' + li, 'data-right': k === cur.answer ? '1' : '0', onpointerdown: () => steer(li), onclick: () => steer(li) }, cur.options[k])));
     lane = -1;
@@ -87,7 +101,9 @@ export function quizGameScreen(app) {
       g.classList.toggle('right', opts[j] === cur.answer);
       g.classList.toggle('wrong', j === lane && !ok);
     });
-    const badges = prog.quiz(ok, cur.i);
+    const badges = prog.quiz(ok, cur.i, cur.level, true);
+    if (prog.newCard) setTimeout(() => app.toast(`History card unlocked: ${levelById(prog.newCard)?.title}`, 2600, 'happy'), 400);
+    for (const k of prog.newSkins || []) setTimeout(() => app.toast(`New rocket colour: ${k.name}`, 2600, 'happy'), 900);
     if (ok) {
       right++;
       speed += BURN;

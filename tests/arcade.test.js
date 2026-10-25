@@ -34,16 +34,21 @@ test('restricted three-body: Moon moves on its real orbit (27.3-day sidereal per
 for (const L of LEVELS) {
   test(`level "${L.title}" can be won with the real physics`, () => {
     const g = L.create();
-    let t = 0, prevTap = false;
+    // the NavIC map is laid out by the renderer; use plain degrees here
+    if (L.tapCanvas) g.map = { toXY: (lat, lon) => [lon, lat], toGeo: (x, y) => [y, x] };
+    let t = 0, prevTap = false, prevTapB = false;
     while (g.status === 'play' && t < 300) {
       const b = g.bot();
+      // a tap is one press: it needs a release before the next one
       const tap = !!b.tap && !prevTap;
+      const tapB = !!b.tapB && !prevTapB;
       prevTap = !!b.tap;
-      g.update(1 / 60, { hold: !!b.hold, tap, aim: b.aim ?? 0 });
+      prevTapB = !!b.tapB;
+      g.update(1 / 60, { hold: !!b.hold, tap, holdB: !!b.holdB, tapB, aim: b.aim ?? 0, point: b.point || null });
       t += 1 / 60;
     }
     assert.equal(g.status, 'won', g.reason);
-    assert.ok(g.stars >= 1 && g.stars <= 3);
+    assert.equal(g.stars, 3, `a good pilot earns 3 stars (got ${g.stars}: ${g.result.join(' | ')})`);
     assert.ok(t < 70, `level should be short (took ${t.toFixed(0)} s)`);
   });
 }

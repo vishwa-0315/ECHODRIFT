@@ -17,6 +17,7 @@ import { createWorld, bodyState } from './physics.js';
 import { MU, RADIUS, AU, DAY, G0 } from '../core/constants.js';
 import { Lander } from '../core/lander.js';
 import { EntrySim } from '../core/edl.js';
+import { NEW_LEVELS } from './levels2.js';
 
 const BODY_NAME = { moon: 'the Moon', mars: 'Mars', jupiter: 'Jupiter', earth: 'Earth', pluto: 'Pluto' };
 const km = (m) => m / 1000;
@@ -35,12 +36,12 @@ function conicState(mu, rp, e, nu, rot = 0) {
 }
 
 /** Clock: simulated seconds per real second, ∝ local orbital period (slow near planets). */
-const orbitClock = (mu, k) => (r) => (2 * Math.PI * Math.sqrt(r ** 3 / mu)) / k;
+export const orbitClock = (mu, k) => (r) => (2 * Math.PI * Math.sqrt(r ** 3 / mu)) / k;
 
 /* ------------------------------------------------------------------ */
 /* Shared orbital game                                                 */
 /* ------------------------------------------------------------------ */
-function orbitalGame(cfg) {
+export function orbitalGame(cfg) {
   const w = createWorld(cfg.world);
   const g = {
     kind: 'orbit',
@@ -58,7 +59,7 @@ function orbitalGame(cfg) {
       if (g.status !== 'play') return;
       g.realT += dt;
       cfg.beforeStep?.(g, input);
-      const wantBurn = !!input.hold && w.fuel > 0 && !g.noEngine;
+      const wantBurn = (cfg.alwaysBurn || !!input.hold) && w.fuel > 0 && !g.noEngine;
       g.burning = wantBurn;
       w.burn = wantBurn ? { dir: cfg.dir, ref: cfg.ref ?? null } : null;
       const r = cfg.clockR(g);
@@ -86,6 +87,8 @@ function orbitalGame(cfg) {
       w.burn = null;
     },
     hud: () => ({ fuel: cfg.noFuel ? null : w.fuel / w.fuel0, info: cfg.info(g), alert: cfg.alert?.(g) }),
+    /** read-only sample for the debrief graph: [sim time s, height m, speed m/s] */
+    telemetry: () => [w.t, Math.hypot(w.y[0], w.y[1]) - (cfg.world.central.R || 0), Math.hypot(w.y[2], w.y[3])],
     scene: () => cfg.scene(g),
     bot: () => cfg.bot(g),
   };
@@ -352,6 +355,7 @@ function landerLevel({ g, engine, mass, dry, z0, vz0, speed = 1, holdThrottle, i
       alert: l.altitude < 60 && l.vz < -limits.vz * 1.5 ? 'Too fast! Brake!' : l.fuel <= 0 ? 'Out of fuel!' : null,
     }),
     scene: () => ({ kind: 'lander', surface, z0, crane }),
+    telemetry: () => [l.t, Math.max(0, l.altitude), Math.abs(l.vz)],
     bot() {
       // brake when the engine's real stopping distance (with margin) reaches the ground
       const aNet = (engine.thrust * (typeof holdThrottle === 'function' ? holdThrottle(l) : holdThrottle)) / l.mass - g;
@@ -628,6 +632,7 @@ const L7 = {
         };
       },
       scene: () => (phase === 'land' ? land.scene() : { kind: 'edl', phase }),
+      telemetry: () => (phase === 'land' ? [e.t + land.l.t, Math.max(0, land.l.altitude), Math.abs(land.l.vz)] : [e.t, Math.max(0, e.alt), e.s.v]),
       get land() {
         return land;
       },
@@ -805,6 +810,7 @@ const LHOP = {
       },
       hud: () => ({ fuel: l.fuel / (mass - dry), info: [['Height', `${Math.round(Math.max(0, l.altitude) * 100)} cm`], ['Best', `${Math.round(peak * 100)} cm / 40 cm`]] }),
       scene: () => ({ kind: 'lander', surface: 'moon', z0: 4, span: 4 }),
+      telemetry: () => [l.t, Math.max(0, l.altitude), Math.abs(l.vz)],
       bot() {
         if (!lifted || (l.vz > 0 && peak < 0.3)) return { hold: peak < 0.3 };
         // coming down: brake late and gently
@@ -887,7 +893,7 @@ const L13 = {
         const ok = ang != null && ang >= lo && ang <= hi;
         return [['Entry angle', ang == null ? 'missing Earth!' : `${ang.toFixed(2)}° ${ok ? '(safe)' : ang > hi ? '(too shallow)' : '(too steep)'}`], ['Safe window', '−5.3° to −7.4°']];
       },
-      scene: (g) => ({ central: 'earth', bodies: ['moon'], rings: [], focus: [[0, 0], [g.w.y[0], g.w.y[1]], [r0 * 0.9, 0], [-r0 * 0.9, 0], [0, r0 * 0.9], [0, -r0 * 0.9]] }),
+      scene: (g) => ({ central: 'earth', bodies: ['moon'], rings: [], minR: { earth: 8, moon: 5 }, focus: [[0, 0], [g.w.y[0], g.w.y[1]], [r0 * 0.9, 0], [-r0 * 0.9, 0], [0, r0 * 0.9], [0, -r0 * 0.9]] }),
       bot(g) {
         const h2 = g.pred?.hit;
         const ang = h2 && h2.body === 'earth' ? (Math.asin((h2.x * h2.vx + h2.y * h2.vy) / (Math.hypot(h2.x, h2.y) * Math.hypot(h2.vx, h2.vy))) * 180) / Math.PI : 0;
@@ -1120,7 +1126,7 @@ const LPLUTO = {
         const d = Math.hypot(gg.w.y[0], gg.w.y[1]);
         return [['Distance', fmtKm(d - R)], ['Speed', `${(Math.hypot(gg.w.y[2], gg.w.y[3]) / 1000).toFixed(2)} km/s`]];
       },
-      scene: (gg) => ({ central: 'pluto', bodies: [], rings: [], focus: [[0, 0], [gg.w.y[0], gg.w.y[1]], [rp * 2.2, 0], [-rp * 2.2, 0]], minR: { pluto: 10 } }),
+      scene: (gg) => ({ central: 'pluto', bodies: [], rings: [], focus: [[0, 0], [gg.w.y[0], gg.w.y[1]], [rp * 1.8, 0], [-rp * 1.8, 0]], minR: { pluto: 20 } }),
       bot(gg) {
         const o = gg.w.orbitAbout('pluto');
         return { tap: !snapped && o.radialV >= 0 };
@@ -1223,7 +1229,7 @@ const LEARTH = {
         const e = elev(gg.w.y[0], gg.w.y[1]);
         return [['Earth above horizon', e < 0 ? 'not yet' : `${e.toFixed(1)}°`], ['Best photo', '0°–3°']];
       },
-      scene: (gg) => ({ central: 'moon', bodies: [], rings: [], noPred: true, windowView: { elev: elev(gg.w.y[0], gg.w.y[1]) }, earthArrow: eDir, focus: [[R * 1.35, 0], [-R * 1.35, 0], [0, R * 1.35], [0, -R * 1.35]] }),
+      scene: (gg) => ({ central: 'moon', bodies: [], rings: [], noPred: true, keepWide: true, windowView: { elev: elev(gg.w.y[0], gg.w.y[1]) }, earthArrow: eDir, focus: [[R * 1.35, 0], [-R * 1.35, 0], [0, R * 1.35], [0, -R * 1.35]] }),
       bot(gg) {
         return { tap: snapped == null && elev(gg.w.y[0], gg.w.y[1]) > 0.8 };
       },
@@ -1376,6 +1382,7 @@ const L104 = {
       },
       hud: () => ({ fuel: null, info: [['Released', `${Math.min(104, sats.length * 8)} / 104`], ['Gap', game.gap() === Infinity ? 'clear' : `${game.gap().toFixed(1)} m ${game.gap() >= safe ? '(safe)' : '(wait)'}`]] }),
       scene: () => ({ kind: 'deploy', safe, push, groups }),
+      telemetry: () => [t, Math.min(12, game.gap() === Infinity ? 12 : game.gap()), sats.length * 8],
       bot: () => ({ tap: game.gap() >= safe + 0.3 }),
     };
     return game;
@@ -1444,8 +1451,9 @@ const LDOCK = {
           game.reason = `You stopped ${x.toFixed(1)} m short. Nothing pushes you again in space! Brake a little less.`;
         }
       },
-      hud: () => ({ fuel, info: [['Distance', `${x.toFixed(2)} m`], ['Speed', `${(Math.abs(v) * 100).toFixed(1)} cm/s`]], alert: x < 3 && -v > 0.05 ? 'Too fast!' : null }),
+      hud: () => ({ fuel, info: [['Distance', `${Math.max(0, x).toFixed(2)} m`], ['Speed', `${(Math.abs(v) * 100).toFixed(1)} cm/s`]], alert: x < 3 && -v > 0.05 ? 'Too fast!' : null }),
       scene: () => ({ kind: 'dock' }),
+      telemetry: () => [t, Math.max(0, x), Math.abs(v)],
       bot() {
         const stop = (v * v) / (2 * brake);
         return { hold: -v > 0.012 && stop + 0.15 > x };
@@ -1456,9 +1464,9 @@ const LDOCK = {
 };
 
 export const CHAPTERS = [
-  { id: 'moon', title: 'Earth & Moon', levels: ['earthrise', 'eagle', 'home13', 'rohini', 'mip', 'sats104', 'raise', 'moonshot', 'catchmoon', 'vikram', 'hop', 'spadex'] },
-  { id: 'mars', title: 'Planets & beyond', levels: ['slingshot', 'cassini', 'window', 'escape', 'marscapture', 'pluto', 'juno', 'terror'] },
+  { id: 'moon', title: 'Earth & Moon', levels: ['earthrise', 'eagle', 'home13', 'rohini', 'mip', 'sats104', 'raise', 'moonshot', 'catchmoon', 'vikram', 'hop', 'spadex', 'sre1', 'dodge', 'navic', 'lvm3', 'hazard', 'pragyan', 'insat', 'pushpak'] },
+  { id: 'mars', title: 'Planets & beyond', levels: ['slingshot', 'cassini', 'window', 'escape', 'marscapture', 'pluto', 'juno', 'terror', 'astrosat', 'aditya'] },
 ];
 /** Levels in timeline order: real mission dates, 1969 → 2023. */
-export const LEVELS = [LEARTH, LA11, L13, L8, LSLV, LCAS, LMIP, L5, LESC, L6, LPLUTO, LJUNO, L104, L7, L1, L2, L3, L4, LHOP, LDOCK].sort((a, b) => a.date.localeCompare(b.date));
+export const LEVELS = [LEARTH, LA11, L13, L8, LSLV, LCAS, LMIP, L5, LESC, L6, LPLUTO, LJUNO, L104, L7, L1, L2, L3, NEW_LEVELS.find((l) => l.id === 'hazard'), L4, LHOP, LDOCK, ...NEW_LEVELS.filter((l) => l.id !== 'hazard')].sort((a, b) => a.date.localeCompare(b.date));
 export const levelById = (id) => LEVELS.find((l) => l.id === id);

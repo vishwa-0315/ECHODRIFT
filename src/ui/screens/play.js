@@ -3,9 +3,12 @@ import { h, clear, put, fitCanvas } from '../dom.js';
 import { levelById, LEVELS } from '../../arcade/levels.js';
 import { createRenderer } from '../../arcade/draw.js';
 import { progress } from '../../game/progress.js';
-import { guide, vyomSVG } from '../guide.js';
+import { guide, vyomSVG, speak } from '../guide.js';
 import { sfx, boostOn, boostOff, setMood, unlockAudio } from '../audio.js';
 import quiz from '../../../content/quiz.json';
+import { BODY } from '../levelIcons.js';
+import { drawBody, starField } from '../render.js';
+import { flightRecorder, flightGraph, starTargets, coachTip, briefFor } from '../debrief.js';
 
 const CHEERS = ['Brilliant flying!', 'Wow, just like the real mission!', 'You are a natural!', 'Mission control is cheering!'];
 const OOPS = ['Oops! Space is tricky.', 'Close one! Let’s try again.', 'Even real missions need practice.'];
@@ -16,9 +19,10 @@ export function playScreen(app, { id, demo = false }) {
   const skin = prog.skin();
   const ri = LEVELS.indexOf(L);
   let game = L.create();
+  const rec = flightRecorder();
   const renderer = createRenderer();
   let running = false, raf = 0, last = 0, ended = false;
-  let hold = false, tapQueued = false, aim = 0;
+  let hold = false, tapQueued = false, aim = L.aimMin ?? 0, holdB = false, tapB = false, point = null;
   let demoMode = demo;
 
   const canvas = h('canvas.play-canvas', { 'aria-label': `${L.title}: game view` });
@@ -28,11 +32,49 @@ export function playScreen(app, { id, demo = false }) {
   const fuel = h('div.fuel', h('span.fuel-label', 'Fuel'), h('div.fuel-bar', fuelFill));
   const light = h('div.chute-light', { style: { display: 'none' } });
   const alertEl = h('div.play-alert');
+  /* ---------- Vyom's live coaching: compares what you do with what a good pilot would do ---------- */
+  const coachEl = h('div.coach-tip', { role: 'status', 'aria-live': 'polite' });
+  const coach = { on: app.settings.coach !== false && !L.tapCanvas, wrongA: 0, wrongB: 0, wrongAim: 0, last: -99, t: 0, hideAt: 0 };
+  const labelA = () => game.button || (L.buttons ? L.buttons[0] : L.button);
+  const labelB = () => (L.buttons ? L.buttons[1] : '');
+  function coachSay(text) {
+    coachEl.innerHTML = '';
+    const face = h('span.toast-vyom', { innerHTML: vyomSVG('wow', 34) });
+    put(coachEl, face, h('span', text));
+    coachEl.classList.add('show');
+    coach.last = coach.t;
+    coach.hideAt = coach.t + 2.6;
+    speak(text);
+  }
+  function coachTick(dt, input) {
+    coach.t += dt;
+    if (coach.hideAt && coach.t > coach.hideAt) ((coach.hideAt = 0), coachEl.classList.remove('show'));
+    // only help players who are learning this level (first tries, or after a miss)
+    const learning = (prog.data.tries[id] || 0) + (prog.stars(id) ? 0 : 1) >= 1 && prog.stars(id) < 3;
+    if (!coach.on || !learning || coach.t < 2.5) return;
+    const b = game.bot() || {};
+    const wantA = !!(b.hold || b.tap), wantB = !!(b.holdB || b.tapB);
+    const holdy = L.control === 'hold' || L.buttons;
+    coach.wrongA = wantA && !input.hold ? coach.wrongA + dt : !wantA && input.hold && holdy ? coach.wrongA - dt : 0;
+    coach.wrongB = wantB && !input.holdB ? coach.wrongB + dt : !wantB && input.holdB ? coach.wrongB - dt : 0;
+    coach.wrongAim = L.control === 'aim+tap' && b.aim != null && Math.abs(b.aim - input.aim) > 0.18 ? coach.wrongAim + dt * Math.sign(b.aim - input.aim) : 0;
+    if (coach.t - coach.last < 5) return;
+    if (coach.wrongA > 1.2) coachSay(L.control === 'tap' || L.control === 'aim+tap' ? `Now! Tap ${labelA()}!` : `Now! Hold ${labelA()}!`);
+    else if (coach.wrongA < -1.5) coachSay(`Let go of ${labelA()} now.`);
+    else if (coach.wrongB > 1.2) coachSay(L.buttons ? `Try ${labelB()} now!` : '');
+    else if (coach.wrongB < -1.5) coachSay(`Let go of ${labelB()} now.`);
+    else if (coach.wrongAim > 2) coachSay(`Slide ${L.aimLabel || 'AIM'} further right.`);
+    else if (coach.wrongAim < -2) coachSay(`Slide ${L.aimLabel || 'AIM'} back a little to the left.`);
+  }
   const demoBanner = h('div.demo-banner', { style: { display: demoMode ? '' : 'none' } }, 'Vyom is flying. Watch the button!');
-  const mainBtn = h('button.big-btn', { 'data-testid': 'main-btn' }, h('span.big-label', L.button));
-  const aimInput = h('input', { type: 'range', min: -1, max: 1, step: 0.005, value: 0, 'aria-label': 'Aim', 'data-testid': 'aim' });
+  const mainBtn = h('button.big-btn', { 'data-testid': 'main-btn' }, h('span.big-label', L.buttons ? L.buttons[0] : L.button));
+  // levels with two controls (e.g. TILT and STAGE, or LEFT and RIGHT)
+  const btnB = L.buttons ? h('button.big-btn.btn-b', { 'data-testid': 'btn-b' }, h('span.big-label', L.buttons[1])) : null;
+  const btnRow = btnB ? h('div.dual-btns', mainBtn, btnB) : mainBtn;
+  if (L.tapCanvas) mainBtn.style.display = 'none'; // you tap the picture itself
+  const aimInput = h('input', { type: 'range', min: L.aimMin ?? -1, max: 1, step: 0.005, value: L.aimMin ?? 0, 'aria-label': L.aimLabel || 'Aim', 'data-testid': 'aim' });
   const nudge = (d) => () => ((aimInput.value = Math.max(-1, Math.min(1, +aimInput.value + d))), (aim = +aimInput.value), sfx.tap());
-  const aimRow = h('div.aim-row', { style: { display: L.control === 'aim+tap' ? '' : 'none' } }, h('button.btn.icon.sm', { onclick: nudge(-0.01), 'aria-label': 'Aim left a little' }, '−'), aimInput, h('button.btn.icon.sm', { onclick: nudge(0.01), 'aria-label': 'Aim right a little' }, '+'));
+  const aimRow = h('div.aim-row', { style: { display: L.control === 'aim+tap' ? '' : 'none' } }, L.aimLabel ? h('span.aim-label', L.aimLabel) : null, h('button.btn.icon.sm', { onclick: nudge(-0.01), 'aria-label': 'Aim left a little' }, '−'), aimInput, h('button.btn.icon.sm', { onclick: nudge(0.01), 'aria-label': 'Aim right a little' }, '+'));
   aimInput.addEventListener('input', () => (aim = +aimInput.value));
 
   const CAMS = [['auto', 'Auto'], ['wide', 'Wide'], ['follow', 'Follow']];
@@ -52,7 +94,8 @@ export function playScreen(app, { id, demo = false }) {
     h('div.play-top', h('button.btn.icon.sm.ghost', { 'aria-label': 'Back to levels', onclick: () => leave() }, '←'), h('div.play-title', h('div.lvl', `Level ${ri + 1} · ${L.mission}`), h('div.t' + (L.title.length > 17 ? '.long' : ''), L.title)), camBtn),
     h('div.play-hud', info, fuel, light, demoBanner),
     alertEl,
-    h('div.play-bottom', g.el, aimRow, mainBtn),
+    coachEl,
+    h('div.play-bottom', g.el, aimRow, btnRow),
   );
 
   /* ---------- input ---------- */
@@ -74,6 +117,38 @@ export function playScreen(app, { id, demo = false }) {
     hold = false;
     mainBtn.classList.remove('pressed');
   };
+  if (btnB) {
+    const downB = (e) => {
+      e.preventDefault();
+      unlockAudio();
+      if (!running && !demoMode && !ended) {
+        g.hide();
+        start();
+        return;
+      }
+      if (demoMode || ended) return;
+      holdB = true;
+      tapB = true;
+      btnB.classList.add('pressed');
+      app.vibrate(12);
+    };
+    const upB = () => ((holdB = false), btnB.classList.remove('pressed'));
+    btnB.addEventListener('pointerdown', downB);
+    for (const ev of ['pointerup', 'pointercancel', 'pointerleave']) btnB.addEventListener(ev, upB);
+  }
+  // levels where you tap the picture itself (e.g. NavIC: tap where the circles meet)
+  canvas.addEventListener('pointerdown', (e) => {
+    if (!L.tapCanvas || ended) return;
+    unlockAudio();
+    if (!running && !demoMode) {
+      g.hide();
+      start();
+      return;
+    }
+    if (demoMode) return;
+    const r = canvas.getBoundingClientRect();
+    point = { x: e.clientX - r.left, y: e.clientY - r.top };
+  });
   mainBtn.addEventListener('pointerdown', down);
   mainBtn.addEventListener('pointerup', up);
   mainBtn.addEventListener('pointercancel', up);
@@ -92,16 +167,21 @@ export function playScreen(app, { id, demo = false }) {
     const dt = Math.min(0.05, (now - (last || now)) / 1000);
     last = now;
     if (running && !ended && !document.hidden) {
-      let input = { hold, tap: tapQueued, aim };
+      let input = { hold, tap: tapQueued, aim, holdB, tapB, point };
       if (demoMode) {
         const b = game.bot();
-        input = { hold: !!b.hold, tap: !!b.tap, aim: b.aim ?? 0 };
+        input = { hold: !!b.hold, tap: !!b.tap, aim: b.aim ?? 0, holdB: !!b.holdB, tapB: !!b.tapB, point: b.point || null };
         mainBtn.classList.toggle('pressed', !!b.hold || !!b.tap);
+        btnB?.classList.toggle('pressed', !!b.holdB || !!b.tapB);
         if (b.aim != null) aimInput.value = b.aim;
       }
       tapQueued = false;
+      tapB = false;
+      point = null;
       const wasPhase = game.phase;
+      if (!demoMode) coachTick(dt, input);
       game.update(dt, input);
+      rec.add(game.telemetry?.());
       if (game.phase === 'chute' && wasPhase === 'entry') sfx.chute();
       if (game.burning) boostOn();
       else boostOff();
@@ -131,17 +211,42 @@ export function playScreen(app, { id, demo = false }) {
     alertEl.textContent = hd.alert || '';
     alertEl.style.display = hd.alert ? '' : 'none';
     // the Perseverance level switches from PARACHUTE (tap) to ENGINE (hold)
-    const label = game.button || L.button;
+    const label = game.button || (L.buttons ? L.buttons[0] : L.button);
     const lab = mainBtn.querySelector('.big-label');
     if (lab.textContent !== label) lab.textContent = label;
     mainBtn.disabled = game.phase === 'chute';
   }
 
   /* ---------- start / end ---------- */
-  function start() {
-    running = true;
-    last = 0;
+  let counting = false;
+  function start(now = false) {
+    if (running || counting) return;
     setMood('play');
+    if (now || demoMode || document.body.classList.contains('reduce-motion')) {
+      running = true;
+      last = 0;
+      return;
+    }
+    // a quick 3-2-1 countdown before every flight
+    counting = true;
+    const cd = h('div.countdown', { 'aria-live': 'assertive' });
+    el.appendChild(cd);
+    const steps = ['3', '2', '1', 'GO!'];
+    steps.forEach((t, i) =>
+      setTimeout(() => {
+        cd.textContent = t;
+        cd.classList.remove('pop');
+        void cd.offsetWidth;
+        cd.classList.add('pop');
+        i < 3 ? sfx.star(0) : sfx.star(2);
+        if (i === 3) {
+          running = true;
+          counting = false;
+          last = 0;
+          setTimeout(() => cd.remove(), 450);
+        }
+      }, i * 420),
+    );
   }
   function intro() {
     if (demoMode) {
@@ -161,7 +266,10 @@ export function playScreen(app, { id, demo = false }) {
   async function end() {
     if (ended) return;
     ended = true;
+    coachEl.classList.remove('show');
+    rec.last(game.telemetry?.());
     hold = false;
+    holdB = false;
     boostOff();
     mainBtn.classList.remove('pressed');
     if (game.status === 'won') {
@@ -209,15 +317,29 @@ export function playScreen(app, { id, demo = false }) {
     );
   }
 
-  function showWin({ newBadges, newSkins }) {
+  function showWin({ newBadges, newSkins, improved, firstWin, streak, daily, rankUp }) {
+    const praise = rankUp
+      ? `Promoted! You are now a ${rankUp.name}.`
+      : daily
+        ? `Today’s mission complete! Daily streak: ${daily} day${daily > 1 ? 's' : ''}.`
+        : improved
+          ? `New personal best: ${game.stars} stars!`
+          : streak >= 3
+            ? `${streak} wins in a row! You are on fire.`
+            : firstWin
+              ? 'First time flying this mission. Well done!'
+              : null;
+    if (rankUp) setTimeout(() => sfx.unlock(), 1200);
+    if (praise) setTimeout(() => speak(praise), 900);
     confetti(el);
     if (newBadges.length || newSkins.length) setTimeout(() => sfx.unlock(), 1600);
     const next = LEVELS[ri + 1];
     const ov = overlay([
       h('div.result-head', h('div.vyom-big', { innerHTML: vyomSVG('happy', 84) }), h('div', h('h2.ok', CHEERS[Math.floor(Math.random() * CHEERS.length)]), starRow(game.stars))),
+      praise ? h('div.praise', praise) : null,
       h('ul.result-lines', game.result.map((r) => h('li', r))),
-      h('div.fact', h('b', 'Real mission: '), L.fact),
       badgeChips(newBadges, newSkins),
+      debrief(),
       h(
         'div.row.wrap.result-btns',
         h('button.btn', { onclick: () => replay(), 'data-testid': 'replay' }, '↺ Replay'),
@@ -226,11 +348,26 @@ export function playScreen(app, { id, demo = false }) {
     ]);
   }
 
+  /** Flight debrief: graph, star targets, and what the real mission did. */
+  function debrief() {
+    const b = briefFor(id);
+    const graph = flightGraph(id, rec.points);
+    if (!b && !graph) return h('div.fact', h('b', 'Real mission: '), L.fact);
+    return h(
+      'details.debrief',
+      { open: true },
+      h('summary', 'Flight debrief'),
+      graph,
+      b ? h('div.debrief-sec', h('div.small.muted', game.status === 'won' ? 'Star targets' : 'What to aim for'), starTargets(id, game.status === 'won' ? game.stars : 0)) : null,
+      h('div.fact', h('b', 'What really happened: '), b?.history || L.fact),
+    );
+  }
+
   function quizCard(next) {
-    const pool = quiz.map((q, i) => ({ ...q, i })).filter((q) => q.level === id);
-    const unseen = pool.filter((q) => !prog.data.quizSeen.includes(q.i));
-    const q = (unseen.length ? unseen : pool)[Math.floor(Math.random() * (unseen.length || pool.length))];
-    const goNext = () => (next ? app.go('play', { id: next.id }) : app.go('home', { finished: true }));
+    const all = quiz.map((q, i) => ({ ...q, i }));
+    // this mission's questions first, then general ones, never one you have already seen
+    const q = prog.pickQuestion(all.filter((x) => x.level === id), all.length) || prog.pickQuestion(all.filter((x) => x.level === 'general'), all.length) || prog.pickQuestion(all, all.length);
+    const goNext = () => (next ? flyTo(next) : app.go('home', { finished: true }));
     if (!q) return goNext();
     const opts = h('div.quiz-opts');
     const after = h('div.quiz-after');
@@ -249,8 +386,9 @@ export function playScreen(app, { id, demo = false }) {
                 b.classList.toggle('right', j === q.answer);
                 b.classList.toggle('wrong', j === k && !right);
               });
-              const badges = prog.quiz(right, q.i);
-              put(after, h('p', h('b', right ? 'Correct! ' : 'Not quite. '), q.explain), badgeChips(badges), h('div.row', h('div.spacer'), h('button.btn.primary', { onclick: () => (ov.remove(), goNext()), 'data-testid': 'quiz-next' }, next ? `Next: ${next.title} ▸` : 'Back to levels ▸')));
+              const badges = prog.quiz(right, q.i, q.level);
+              const card = prog.newCard ? h('div.unlock', h('span.medal.card', '★'), h('div', h('b', `History card unlocked: ${L.mission}`), h('div.small.muted', 'Read it in Badges & rockets'))) : null;
+              put(after, h('p', h('b', right ? 'Correct! ' : 'Not quite. '), q.explain), card, badgeChips(badges, prog.newSkins || []), h('div.row', h('div.spacer'), h('button.btn.primary', { onclick: () => (ov.remove(), goNext()), 'data-testid': 'quiz-next' }, next ? `Next: ${next.title} ▸` : 'Back to levels ▸')));
             },
           },
           o,
@@ -261,10 +399,13 @@ export function playScreen(app, { id, demo = false }) {
   }
 
   function showLose(badges) {
+    setTimeout(() => speak(coachTip(id, game.reason) || game.reason), 500);
     const tries = prog.data.tries[id] || 0;
     overlay([
       h('div.result-head', h('div.vyom-big', { innerHTML: vyomSVG('sad', 84) }), h('div', h('h2.no', OOPS[Math.floor(Math.random() * OOPS.length)]), h('p', game.reason))),
+      coachTip(id, game.reason) ? h('div.coach', h('b', 'Vyom explains: '), coachTip(id, game.reason)) : null,
       badgeChips(badges),
+      debrief(),
       tries >= 2 ? h('p.small.muted', 'Stuck? Let Vyom show you how, then try again.') : null,
       h(
         'div.row.wrap.result-btns',
@@ -280,6 +421,85 @@ export function playScreen(app, { id, demo = false }) {
       h('div.result-head', h('div.vyom-big', { innerHTML: vyomSVG('happy', 84) }), h('div', h('h2', 'Your turn!'), h('p', game.status === 'won' ? 'See how I timed the button? Now you try.' : 'Hmm, even I missed that time. Try it yourself!'))),
       h('div.row.wrap.result-btns', h('button.btn', { onclick: () => app.go('home') }, 'Levels'), h('button.btn.primary.grow', { onclick: () => app.go('play', { id }), 'data-testid': 'retry' }, 'Let me fly ▸')),
     ]);
+  }
+
+  /** Celebration hop: a rocket flies from this mission to the next one on the timeline. */
+  function flyTo(next) {
+    const go = () => app.go('play', { id: next.id });
+    if (document.body.classList.contains('reduce-motion')) return go();
+    const c = h('canvas.fly-canvas', { 'aria-label': `Flying on to level ${ri + 2}: ${next.title}` });
+    const ov = h('div.fly-ov', { onclick: () => finish() }, c, h('div.fly-skip.small', 'Tap to skip'));
+    el.appendChild(ov);
+    const sky = starField(260, 9);
+    let t0 = 0, raf2 = 0, done = false;
+    const DUR = 2.2;
+    sfx.unlock();
+    boostOn();
+    function finish() {
+      if (done) return;
+      done = true;
+      cancelAnimationFrame(raf2);
+      boostOff();
+      go();
+    }
+    const nodes = [
+      { L, n: ri + 1 },
+      { L: next, n: ri + 2 },
+    ];
+    function frame2(now) {
+      if (!t0) t0 = now;
+      const t = Math.min(1, (now - t0) / 1000 / DUR);
+      const { w, h: H, ctx } = fitCanvas(c);
+      ctx.fillStyle = '#04060b';
+      ctx.fillRect(0, 0, w, H);
+      sky(ctx, w, H);
+      const A = [w * 0.22, H * 0.72], B = [w * 0.78, H * 0.3], C = [w * 0.2, H * 0.18];
+      const P = (u) => [(1 - u) ** 2 * A[0] + 2 * (1 - u) * u * C[0] + u * u * B[0], (1 - u) ** 2 * A[1] + 2 * (1 - u) * u * C[1] + u * u * B[1]];
+      // dotted route
+      ctx.setLineDash([3, 7]);
+      ctx.strokeStyle = 'rgba(223,232,255,0.55)';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      for (let i = 0; i <= 60; i++) {
+        const [x, y] = P(i / 60);
+        i ? ctx.lineTo(x, y) : ctx.moveTo(x, y);
+      }
+      ctx.stroke();
+      ctx.setLineDash([]);
+      // the two missions
+      nodes.forEach(({ L: Lv, n }, k) => {
+        const [x, y] = k ? B : A;
+        drawBody(ctx, BODY[Lv.id] || 'earth', x, y, 26, -2.3, { minR: 26 });
+        ctx.textAlign = 'center';
+        ctx.fillStyle = k ? '#ff9933' : '#8d9cb5';
+        ctx.font = '700 12px Inter, system-ui, sans-serif';
+        ctx.fillText(`LEVEL ${n} · ${Lv.year}`, x, y + 46);
+        ctx.fillStyle = '#e7eef8';
+        ctx.font = '800 15px Inter, system-ui, sans-serif';
+        ctx.fillText(Lv.title, x, y + 64);
+        ctx.textAlign = 'left';
+      });
+      // the rocket, easing in and out, with a flame trail
+      const u = t < 0.5 ? 2 * t * t : 1 - (-2 * t + 2) ** 2 / 2;
+      const [x, y] = P(u), [x2, y2] = P(Math.min(1, u + 0.01));
+      ctx.strokeStyle = 'rgba(255,153,51,0.6)';
+      ctx.lineWidth = 3;
+      ctx.beginPath();
+      for (let i = 0; i <= 30; i++) {
+        const [tx, ty] = P(Math.max(0, u - 0.25 + (0.25 * i) / 30));
+        i ? ctx.lineTo(tx, ty) : ctx.moveTo(tx, ty);
+      }
+      ctx.stroke();
+      renderer.rocket(ctx, x, y, Math.atan2(y2 - y, x2 - x), skin, true, 18);
+      ctx.textAlign = 'center';
+      ctx.fillStyle = '#ffcc4d';
+      ctx.font = '800 18px Inter, system-ui, sans-serif';
+      ctx.fillText('Next mission!', w / 2, H * 0.9);
+      ctx.textAlign = 'left';
+      if (t >= 1) return setTimeout(finish, 350);
+      raf2 = requestAnimationFrame(frame2);
+    }
+    raf2 = requestAnimationFrame(frame2);
   }
 
   function replay() {
@@ -308,7 +528,7 @@ export function playScreen(app, { id, demo = false }) {
     get game() {
       return game;
     },
-    startNow: () => (g.hide(), start()),
+    startNow: () => (g.hide(), start(true)),
   };
 }
 

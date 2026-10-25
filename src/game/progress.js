@@ -15,6 +15,7 @@ export const SKINS = [
   { id: 'neptune', name: 'Deep Neptune', need: 36, body: '#9fb7ff', trim: '#2f49b8', flame: '#8fb0ff' },
   { id: 'quizwhiz', name: 'Quiz whiz', need: 0, quiz: 1, body: '#e2ccff', trim: '#8b5cf6', flame: '#c4b5fd' },
   { id: 'aurora', name: 'Aurora', need: 0, quiz: 3, body: '#c8ffe8', trim: '#10b981', trim2: '#8b5cf6', flame: '#6ee7b7' },
+  { id: 'heritage', name: 'Heritage', need: 0, cards: 10, body: '#f5e6c8', trim: '#8b5a2b', trim2: '#ff9933', flame: '#ffc56b' },
 ];
 
 export const BADGES = [
@@ -27,7 +28,30 @@ export const BADGES = [
   { id: 'tryagain', icon: '', name: 'Never give up', desc: 'Try one level 5 times' },
   { id: 'quizorbit', icon: '', name: 'Quiz to Orbit', desc: 'Reach orbit in the quiz game with no wrong answers' },
   { id: 'allstars', icon: '', name: 'Mission legend', desc: 'Get 3 stars on every level' },
+  { id: 'historian', icon: '', name: 'Mission historian', desc: 'Unlock all 30 mission history cards' },
 ];
+
+/** Pilot ranks, earned with stars (30 levels × 3 = 90 stars). */
+export const RANKS = [
+  { need: 0, name: 'Space Cadet' },
+  { need: 8, name: 'Trainee Pilot' },
+  { need: 20, name: 'Pilot' },
+  { need: 35, name: 'Flight Engineer' },
+  { need: 50, name: 'Mission Specialist' },
+  { need: 65, name: 'Flight Director' },
+  { need: 80, name: 'Mission Commander' },
+];
+export const rankFor = (stars) => RANKS.filter((r) => stars >= r.need).pop();
+export const nextRank = (stars) => RANKS.find((r) => r.need > stars) || null;
+
+/** Today's mission: one level a day, the same for everyone on that date. */
+const dayKey = (d = new Date()) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+export function dailyLevel(d = new Date()) {
+  const k = dayKey(d);
+  let hsh = 0;
+  for (const c of k) hsh = (hsh * 31 + c.charCodeAt(0)) >>> 0;
+  return LEVELS[hsh % LEVELS.length];
+}
 
 export function progress(app) {
   const s = (app.save.arcade ||= { stars: {}, tries: {}, badges: {}, quizRight: 0, quizSeen: [], skin: 'classic' });
@@ -40,11 +64,20 @@ export function progress(app) {
       const i = LEVELS.findIndex((l) => l.id === id);
       return i <= 0 || p.stars(id) > 0 || p.stars(LEVELS[i - 1].id) > 0;
     },
+    dailyDoneToday: () => s.dailyDone === dayKey(),
+    dailyStreak: () => {
+      const y = new Date();
+      y.setDate(y.getDate() - 1);
+      return s.dailyDone === dayKey() || s.dailyDone === dayKey(y) ? s.dailyStreak || 0 : 0;
+    },
     nextLevel() {
       return LEVELS.find((l) => !p.stars(l.id) && p.unlocked(l.id)) || null;
     },
     /** quiz: best Quiz to Orbit result needed (1 = reach orbit, 3 = three stars) */
-    skinOpen: (k) => p.total() >= k.need && (!k.quiz || (s.quizGameBest || 0) >= k.quiz),
+    skinOpen: (k) => p.total() >= k.need && (!k.quiz || (s.quizGameBest || 0) >= k.quiz) && (!k.cards || p.cardCount() >= k.cards),
+    /** Mission history cards: unlocked by answering that mission's quiz question right. */
+    card: (id) => !!(s.cards && s.cards[id]),
+    cardCount: () => Object.keys(s.cards || {}).length,
     skin: () => SKINS.find((k) => k.id === s.skin && p.skinOpen(k)) || SKINS[0],
     setSkin(id) {
       s.skin = id;
@@ -52,13 +85,26 @@ export function progress(app) {
     },
     tried(id) {
       s.tries[id] = (s.tries[id] || 0) + 1;
+      s.streak = 0;
       app.persist();
       return p.award(s.tries[id] >= 5 ? ['tryagain'] : []);
     },
     /** Record a finished level; returns { newBadges, newSkins, best } */
     finish(id, stars, extra = {}) {
       const before = p.total();
-      s.stars[id] = Math.max(p.stars(id), stars);
+      const prevBest = p.stars(id);
+      s.stars[id] = Math.max(prevBest, stars);
+      s.streak = (s.streak || 0) + 1;
+      // today's mission and the daily streak
+      let daily = null;
+      const today = dayKey();
+      if (dailyLevel().id === id && s.dailyDone !== today) {
+        const y = new Date();
+        y.setDate(y.getDate() - 1);
+        s.dailyStreak = s.dailyDone === dayKey(y) ? (s.dailyStreak || 0) + 1 : 1;
+        s.dailyDone = today;
+        daily = s.dailyStreak;
+      }
       const after = p.total();
       const earn = ['first'];
       if (stars === 3) earn.push('perfect');
@@ -67,7 +113,8 @@ export function progress(app) {
       if (LEVELS.every((l) => p.stars(l.id) === 3)) earn.push('allstars');
       const newSkins = SKINS.filter((k) => !k.quiz && k.need > before && k.need <= after);
       app.persist();
-      return { newBadges: p.award(earn), newSkins };
+      const rankUp = rankFor(after).need > rankFor(before).need ? rankFor(after) : null;
+      return { newBadges: p.award(earn), newSkins, improved: prevBest > 0 && stars > prevBest, firstWin: prevBest === 0, streak: s.streak, daily, rankUp };
     },
     /** Finished a Quiz to Orbit game with `stars` (0 = did not reach orbit). */
     quizGame(stars) {
@@ -78,11 +125,41 @@ export function progress(app) {
       const newSkins = SKINS.filter((k) => k.quiz && k.quiz > before && k.quiz <= s.quizGameBest);
       return { newSkins, newBadges: p.award(stars === 3 ? ['quizorbit'] : []) };
     },
-    quiz(right, qIndex) {
+    /** Quiz to Orbit hints: 3 to use over every 6 questions (the pool refills after each set of 6). */
+    hintsLeft: () => (s.hintBlock ||= { left: 3, n: 0 }).left,
+    useHint() {
+      const hb = (s.hintBlock ||= { left: 3, n: 0 });
+      if (hb.left <= 0) return false;
+      hb.left--;
+      app.persist();
+      return true;
+    },
+    /** Next question index from `pool` (array of {i}), never repeating one until all have been seen. */
+    pickQuestion(pool, total) {
+      if (s.quizSeen.length >= total) s.quizSeen = []; // every question seen: start a new round
+      const fresh = pool.filter((q) => !s.quizSeen.includes(q.i));
+      return fresh.length ? fresh[Math.floor(Math.random() * fresh.length)] : null;
+    },
+    /** level: the mission this question belongs to ('general' for none). Sets p.newCard / p.newSkins when something unlocks. */
+    quiz(right, qIndex, level, fromGame = false) {
       if (!s.quizSeen.includes(qIndex)) s.quizSeen.push(qIndex);
       if (right) s.quizRight++;
+      if (fromGame) {
+        const hb = (s.hintBlock ||= { left: 3, n: 0 });
+        if (++hb.n >= 6) ((hb.n = 0), (hb.left = 3));
+      }
+      p.newCard = null;
+      p.newSkins = [];
+      const earn = s.quizRight >= 10 ? ['quiz'] : [];
+      if (right && level && LEVELS.some((l) => l.id === level) && !p.card(level)) {
+        const before = p.cardCount();
+        (s.cards ||= {})[level] = Date.now();
+        p.newCard = level;
+        p.newSkins = SKINS.filter((k) => k.cards && k.cards > before && k.cards <= p.cardCount());
+        if (LEVELS.every((l) => p.card(l.id))) earn.push('historian');
+      }
       app.persist();
-      return p.award(s.quizRight >= 10 ? ['quiz'] : []);
+      return p.award(earn);
     },
     award(ids) {
       const fresh = ids.filter((id) => !s.badges[id]);

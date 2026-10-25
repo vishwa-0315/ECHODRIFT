@@ -14,7 +14,38 @@ const MOUTH = {
   wow: '<ellipse cx="50" cy="58" rx="3.2" ry="3.8" fill="#7ff3ff"/>',
 };
 
+const svgCache = new Map();
+/** Vyom's face as SVG markup (cached: the same face is drawn many times). */
 export function vyomSVG(mood = 'normal', size = 72) {
+  const key = mood + size;
+  if (!svgCache.has(key)) svgCache.set(key, buildSVG(mood, size));
+  return svgCache.get(key);
+}
+
+/* ---------- Vyom's voice (the browser's built-in speech, works offline) ---------- */
+let voiceOn = false;
+export function setVoice(on) {
+  voiceOn = !!on;
+  if (!voiceOn) window.speechSynthesis?.cancel();
+}
+export const voiceAvailable = () => typeof window !== 'undefined' && 'speechSynthesis' in window;
+export function speak(text) {
+  if (!voiceOn || !voiceAvailable() || !text) return;
+  try {
+    const ss = window.speechSynthesis;
+    ss.cancel();
+    const u = new SpeechSynthesisUtterance(text.replace(/[▸◀▶★☆]/g, ''));
+    const v = ss.getVoices().find((x) => /en[-_]IN/i.test(x.lang)) || ss.getVoices().find((x) => /^en/i.test(x.lang));
+    if (v) u.voice = v;
+    u.rate = 1.05;
+    u.pitch = 1.35;
+    ss.speak(u);
+  } catch {
+    /* speech is a bonus: ignore failures */
+  }
+}
+
+function buildSVG(mood, size) {
   return `<svg class="vyom" width="${size}" height="${size}" viewBox="0 0 100 100" aria-hidden="true">
   <line x1="50" y1="20" x2="50" y2="9" stroke="#c9d4e6" stroke-width="3"/>
   <circle class="vyom-tip" cx="50" cy="8" r="5" fill="#ff9933"/>
@@ -33,7 +64,7 @@ export function vyomSVG(mood = 'normal', size = 72) {
  * A guide bubble: Vyom + speech. lines = array of strings, shown one at a time
  * (tap to continue). Returns { el, say(lines, mood), hide() }.
  */
-export function guide({ compact = false } = {}) {
+export function guide({ compact = false, onTap = null, persist = false } = {}) {
   const face = h('div.vyom-face');
   const text = h('div.bubble-text');
   const next = h('div.bubble-next', '▸');
@@ -42,12 +73,20 @@ export function guide({ compact = false } = {}) {
   let queue = [], onDone = null;
   function show() {
     if (!queue.length) {
+      if (persist && el.classList.contains('show')) {
+        // Vyom stays on screen: tapping again asks for something new
+        onDone?.();
+        onDone = null;
+        onTap?.();
+        return;
+      }
       el.classList.remove('show');
       onDone?.();
       onDone = null;
       return;
     }
     text.textContent = queue.shift();
+    speak(text.textContent);
     next.style.visibility = queue.length ? 'visible' : 'hidden';
     el.classList.remove('pop');
     void el.offsetWidth;

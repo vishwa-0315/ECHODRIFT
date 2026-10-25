@@ -1,8 +1,9 @@
 /** Drawing for quick-play levels: realistic planets, plus flames, trails and particles. */
 import { drawBody, starField } from '../ui/render.js';
 import { heatFlux } from '../core/edl.js';
+import { DRAW2 } from './draw2.js';
 
-const LABEL = { earth: 'Earth', moon: 'Moon', mars: 'Mars', sun: 'Sun', jupiter: 'Jupiter', saturn: 'Saturn', pluto: 'Pluto' };
+const LABEL = { lro: 'LRO (NASA)', earth: 'Earth', moon: 'Moon', mars: 'Mars', sun: 'Sun', jupiter: 'Jupiter', saturn: 'Saturn', pluto: 'Pluto' };
 
 export function createRenderer() {
   const stars = starField(420, 5);
@@ -95,7 +96,8 @@ export function createRenderer() {
       if (!k) continue;
       const b = w.bodyAt(n);
       const d = Math.hypot(w.y[0] - b.x, w.y[1] - b.y);
-      if (d < k * R && (!best || d / (k * R) < best.q)) best = { name: n, x: b.x, y: b.y, R, d, q: d / (k * R) };
+      // Rf: size to keep in frame (Saturn's rings reach about 2.3 planet radii)
+      if (d < k * R && (!best || d / (k * R) < best.q)) best = { name: n, x: b.x, y: b.y, R, Rf: n === 'saturn' ? R * 2.3 : R, d, q: d / (k * R) };
     }
     return best;
   }
@@ -116,8 +118,10 @@ export function createRenderer() {
       const h2 = fallbackSpan / 2;
       return fitBox([[sx - h2, sy - h2], [sx + h2, sy + h2]], aw, ah);
     }
-    const span = Math.max(nb.d * 1.25, nb.R * 3.2);
-    const cx = nb.x + (sx - nb.x) * 0.5, cy = nb.y + (sy - nb.y) * 0.5;
+    const span = Math.max(nb.d * 1.3 + nb.Rf * 2.4, nb.Rf * 2.6, nb.R * 3.2);
+    // close in, keep the planet centred (the ship is near its edge anyway); farther out, frame both
+    const wgt = Math.max(0, Math.min(0.5, (nb.d / nb.R - 1.6) / 3));
+    const cx = nb.x + (sx - nb.x) * wgt, cy = nb.y + (sy - nb.y) * wgt;
     return fitBox([[cx - span / 2, cy - span / 2], [cx + span / 2, cy + span / 2]], aw, ah);
   }
   let shake = 0;
@@ -163,7 +167,7 @@ export function createRenderer() {
       label(ctx, 'to Earth (384,000 km)', ex, ey - 16, '#c9d4e6', true);
     }
     if (sc.windowView) windowView(ctx, W, view, sc.windowView.elev);
-    if (inset && game.status === 'play') {
+    if (inset && game.status === 'play' && !sc.noInset) {
       // close-up window: the ship skimming the planet, while the main view stays wide
       const r = Math.min(74, W * 0.19);
       // put the close-up in the corner farthest from anything important on screen
@@ -534,7 +538,40 @@ export function createRenderer() {
     ctx.stroke();
     // lander
     const x = W / 2, y = groundY - alt * ppm;
-    const size = sc.span ? Math.min(64, 4.2 * ppm * 0.35) : Math.max(30, Math.min(56, 4.2 * ppm));
+    const size = sc.span ? Math.min(64, 4.2 * ppm * 0.35) : Math.max(44, Math.min(72, 4.2 * ppm));
+    // height ruler on the left, so the empty sky still tells you how far down the ground is
+    if (!sc.span) {
+      const top = view.top + 20;
+      const step = [5, 10, 25, 50, 100, 200, 500].find((st) => st * ppm >= 34) || 1000;
+      ctx.font = '600 10px Inter, system-ui, sans-serif';
+      ctx.textAlign = 'left';
+      for (let m = step; groundY - m * ppm > top; m += step) {
+        const yy = groundY - m * ppm;
+        ctx.strokeStyle = 'rgba(201,212,230,0.35)';
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.moveTo(10, yy);
+        ctx.lineTo(22, yy);
+        ctx.stroke();
+        ctx.fillStyle = 'rgba(201,212,230,0.6)';
+        ctx.fillText(`${m} m`, 26, yy + 3);
+      }
+      ctx.strokeStyle = 'rgba(201,212,230,0.25)';
+      ctx.beginPath();
+      ctx.moveTo(10, groundY);
+      ctx.lineTo(10, top);
+      ctx.stroke();
+      // a marker that rides down the ruler with the lander
+      const ly = groundY - alt * ppm;
+      if (ly > top) {
+        ctx.fillStyle = '#ff9933';
+        ctx.beginPath();
+        ctx.moveTo(8, ly);
+        ctx.lineTo(0, ly - 5);
+        ctx.lineTo(0, ly + 5);
+        ctx.fill();
+      }
+    }
     ctx.fillStyle = 'rgba(0,0,0,0.35)';
     ctx.beginPath();
     ctx.ellipse(x, groundY + 2, size * (0.6 + 0.4 / (1 + alt / 20)), 4, 0, 0, Math.PI * 2);
@@ -685,6 +722,7 @@ export function createRenderer() {
       else if (game.kind === 'lander') lander(ctx, W, H, game, skin, view, dt);
       else if (game.kind === 'deploy') deploy(ctx, W, H, game, skin, view, dt);
       else if (game.kind === 'dock') dock(ctx, W, H, game, skin, view, dt);
+      else if (DRAW2[game.kind]) DRAW2[game.kind](ctx, W, H, game, skin, view, dt, { stars, emit, drawParts, boom });
       else if (game.kind === 'edl') {
         if (game.phase === 'land') lander(ctx, W, H, game.land, skin, view, dt);
         else edl(ctx, W, H, game, skin, view, dt);

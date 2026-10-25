@@ -10,7 +10,13 @@ Chandrayaan-3 · Vikram · Mangalyaan · Aditya-L1 · Apollo 11 · Apollo 13 · 
 > The earlier fictional prototype, *ECHO DRIFT*, lives on the [`echo-drift`](../../tree/echo-drift) branch.
 
 ## How it plays
-- **Quick play (for everyone):** 20 short levels on a mission timeline from 1968 to 2025 (Earthrise, Apollo 11 and 13, Voyager 2, SLV-3, Cassini, Chandrayaan-1, Mangalyaan, New Horizons, Juno, PSLV-C37, Perseverance, Chandrayaan-3, SpaDeX), one big button each, plus the coming missions (Gaganyaan, Chandrayaan-4, Artemis, Shukrayaan, Bharatiya Antariksh Station).
+- **Quick play (for everyone):** 30 short levels on a mission timeline from 1968 to 2025 (Earthrise, Apollo 11 and 13, Voyager 2, SLV-3, Cassini, SRE-1, Chandrayaan-1 and 2, Mangalyaan, New Horizons, AstroSat, Juno, PSLV-C37, Perseverance, NavIC, LVM3, Chandrayaan-3, Aditya-L1, INSAT-3DS, Pushpak RLV, SpaDeX), with one or two simple controls each, plus the coming missions (Gaganyaan, Chandrayaan-4, Artemis, Shukrayaan, Bharatiya Antariksh Station).
+- **Mission timeline:** filter by ISRO, NASA or "needs stars"; each era has its own look; tap the i on any level for its mission card (rocket, goal in numbers, what earns each star).
+- **Flight debrief:** after every flight, a graph of height and speed, the star targets, and what ISRO or NASA really did. When a flight fails, Vyom explains the physics behind the mistake.
+- **Mission history cards:** answer a mission's quiz question right to unlock its history card (collect 10 for the Heritage rocket, all 30 for the Mission historian badge).
+- **Orbit Sandbox:** choose Earth, the Moon, Mars or Jupiter, set height, speed, direction and engine, then fly with BOOST and BRAKE to discover orbital speed, escape speed and transfer orbits.
+- **Vyom, your guide:** explains every level, coaches you live while you fly ("Now! Hold BRAKE!"), explains the physics when a flight fails, celebrates personal bests, tells a space fact whenever you tap him, and can speak aloud (Voice on).
+- **Quiz:** 121 questions, at least 3 for every mission, each with a hint (3 hints for every 3 questions); no question repeats until you have seen them all.
 - **Quiz to Orbit:** a mini-game where right answers are engine burns: reach the real orbital speed of 7.8 km/s.
 - **Solar System explorer:** real planet positions on any date, the habitable zone, distances between any planets, full planet facts and their main moons.
 - **Smart camera:** zooms in on flybys and captures, with a close-up window and Auto / Wide / Follow modes.

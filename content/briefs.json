@@ -1,0 +1,711 @@
+{
+  "earthrise": {
+    "vehicle": "Saturn V · Apollo 8 command module",
+    "params": [
+      [
+        "Orbit",
+        "about 110 km above the Moon"
+      ],
+      [
+        "Moment",
+        "Earth peeks over the Moon’s horizon"
+      ]
+    ],
+    "stars": [
+      "Snap within 12° of the horizon",
+      "Within 6°",
+      "Within 3°"
+    ],
+    "history": "On 24 December 1968, on Apollo 8’s fourth orbit, Bill Anders saw Earth rise over the Moon and grabbed a colour film camera. His photo, Earthrise, became one of the most famous pictures ever taken.",
+    "measure": [
+      "Height above the Moon",
+      "Speed"
+    ]
+  },
+  "eagle": {
+    "vehicle": "Saturn V · Lunar Module Eagle",
+    "params": [
+      [
+        "Start",
+        "300 m up, falling at 9 m/s"
+      ],
+      [
+        "Safe touchdown",
+        "under 3 m/s"
+      ]
+    ],
+    "stars": [
+      "Land under 3 m/s",
+      "Under 2 m/s",
+      "Under 1 m/s"
+    ],
+    "history": "On 20 July 1969 Neil Armstrong took manual control to fly past a boulder field. Eagle touched down with only about 25 seconds of fuel left before the abort limit.",
+    "measure": [
+      "Height",
+      "Falling speed"
+    ]
+  },
+  "home13": {
+    "vehicle": "Saturn V · Apollo 13 (Odyssey and Aquarius)",
+    "params": [
+      [
+        "Safe entry window",
+        "−5.3° to −7.4°"
+      ],
+      [
+        "Perfect",
+        "about −6.5°"
+      ]
+    ],
+    "stars": [
+      "Enter inside the safe window",
+      "Within 0.8° of −6.5°",
+      "Within 0.35° of −6.5°"
+    ],
+    "history": "After an oxygen tank exploded in April 1970, the crew used the lunar module’s engine to swing around the Moon and come home. Small burns kept them inside the narrow entry window, and they splashed down safely on 17 April.",
+    "measure": [
+      "Height above Earth",
+      "Speed"
+    ]
+  },
+  "slingshot": {
+    "vehicle": "Titan IIIE-Centaur · Voyager 2",
+    "params": [
+      [
+        "Flyby",
+        "Jupiter, July 1979"
+      ],
+      [
+        "Goal",
+        "reach Saturn"
+      ]
+    ],
+    "stars": [
+      "Reach Saturn’s zone",
+      "Pass within 0.13 AU",
+      "Pass within 0.06 AU"
+    ],
+    "history": "Voyager 2 swung past Jupiter on 9 July 1979. Jupiter’s gravity bent its path and added speed, sending it on to Saturn in 1981 and later to Uranus and Neptune.",
+    "measure": [
+      "Distance from the Sun",
+      "Speed"
+    ]
+  },
+  "rohini": {
+    "vehicle": "SLV-3 · Rohini RS-1",
+    "params": [
+      [
+        "Orbital speed",
+        "about 7.8 km/s sideways"
+      ],
+      [
+        "Stay above",
+        "the air (150 km+)"
+      ]
+    ],
+    "stars": [
+      "Reach a stable orbit",
+      "Near and far points within 2,000 km",
+      "Within 700 km (nearly round)"
+    ],
+    "history": "On 18 July 1980 India’s SLV-3 rocket put the 35 kg Rohini satellite into orbit from Sriharikota. The project director was Dr A.P.J. Abdul Kalam.",
+    "measure": [
+      "Height",
+      "Speed"
+    ]
+  },
+  "cassini": {
+    "vehicle": "Titan IVB-Centaur · Cassini–Huygens",
+    "params": [
+      [
+        "Closest pass",
+        "about 20,000 km above Saturn"
+      ],
+      [
+        "Captured if",
+        "you stop flying away"
+      ]
+    ],
+    "stars": [
+      "Get caught by Saturn",
+      "Using under 880 m/s of Δv",
+      "Using under 700 m/s"
+    ],
+    "history": "On 1 July 2004 Cassini flew through a gap in Saturn’s rings and fired its main engine for 96 minutes. It became the first spacecraft to orbit Saturn.",
+    "measure": [
+      "Height above Saturn",
+      "Speed"
+    ]
+  },
+  "mip": {
+    "vehicle": "PSLV-C11 (PSLV-XL) · Chandrayaan-1",
+    "params": [
+      [
+        "Orbit",
+        "100 km above the Moon"
+      ],
+      [
+        "Target",
+        "Shackleton crater, south pole"
+      ]
+    ],
+    "stars": [
+      "Impact within 700 km",
+      "Within 300 km",
+      "Within 120 km"
+    ],
+    "history": "On 14 November 2008 the Moon Impact Probe left Chandrayaan-1 and fell for about 25 minutes, hitting near Shackleton crater. Its instruments sniffed the thin gas around the Moon on the way down.",
+    "measure": [
+      "Height above the Moon",
+      "Speed"
+    ]
+  },
+  "window": {
+    "vehicle": "PSLV-C25 (PSLV-XL) · Mangalyaan",
+    "params": [
+      [
+        "Mars should lead Earth by",
+        "about 44°"
+      ],
+      [
+        "Next window if missed",
+        "26 months later"
+      ]
+    ],
+    "stars": [
+      "Arrive within 15 million km",
+      "Within 7 million km",
+      "Within 3 million km"
+    ],
+    "history": "Mangalyaan launched on 5 November 2013. PSLV could not send it straight to Mars, so it raised its orbit six times and left Earth on 1 December, right inside the window.",
+    "measure": [
+      "Distance from the Sun",
+      "Speed"
+    ]
+  },
+  "escape": {
+    "vehicle": "PSLV-C25 (PSLV-XL) · Mangalyaan",
+    "params": [
+      [
+        "Leave Earth with",
+        "at least 2.6 km/s to spare"
+      ],
+      [
+        "Best place to burn",
+        "closest to Earth"
+      ]
+    ],
+    "stars": [
+      "Escape fast enough for Mars",
+      "Using under 720 m/s of Δv",
+      "Using under 600 m/s"
+    ],
+    "history": "On 1 December 2013 Mangalyaan fired its engine for about 22 minutes near perigee and left Earth on its way to Mars.",
+    "measure": [
+      "Height above Earth",
+      "Speed"
+    ]
+  },
+  "marscapture": {
+    "vehicle": "PSLV-C25 (PSLV-XL) · Mangalyaan",
+    "params": [
+      [
+        "Far point must be",
+        "under 80,000 km"
+      ],
+      [
+        "Near point must stay",
+        "above 150 km"
+      ]
+    ],
+    "stars": [
+      "Get caught by Mars",
+      "Using under 950 m/s of Δv",
+      "Using under 750 m/s"
+    ],
+    "history": "On 24 September 2014 Mangalyaan braked for about 23 minutes behind Mars. India became the first country to reach Mars orbit on its first attempt.",
+    "measure": [
+      "Height above Mars",
+      "Speed"
+    ]
+  },
+  "pluto": {
+    "vehicle": "Atlas V 551 · New Horizons",
+    "params": [
+      [
+        "Closest pass",
+        "about 12,500 km"
+      ],
+      [
+        "Flyby speed",
+        "about 14 km/s"
+      ]
+    ],
+    "stars": [
+      "Snap within 1.6× the closest distance",
+      "Within 1.25×",
+      "Within 1.06×"
+    ],
+    "history": "New Horizons flew past Pluto on 14 July 2015. The flyby was programmed in advance, and the photos took months to send home across 5 billion km.",
+    "measure": [
+      "Distance from Pluto",
+      "Speed"
+    ]
+  },
+  "juno": {
+    "vehicle": "Atlas V 551 · Juno",
+    "params": [
+      [
+        "Closest pass",
+        "about 4,200 km above the clouds"
+      ],
+      [
+        "Captured if",
+        "you stop flying away"
+      ]
+    ],
+    "stars": [
+      "Get caught by Jupiter",
+      "Using under 820 m/s of Δv",
+      "Using under 650 m/s"
+    ],
+    "history": "On 4 July 2016 Juno fired its main engine for 35 minutes and became the second spacecraft ever to orbit Jupiter.",
+    "measure": [
+      "Height above Jupiter",
+      "Speed"
+    ]
+  },
+  "sats104": {
+    "vehicle": "PSLV-C37 (PSLV-XL) · Cartosat-2D + 103 small satellites",
+    "params": [
+      [
+        "Safe gap",
+        "at least 4 m between groups"
+      ],
+      [
+        "Groups",
+        "13 releases of 8"
+      ]
+    ],
+    "stars": [
+      "Release all safely in 8 minutes",
+      "In under 3 minutes",
+      "In under 2.2 minutes"
+    ],
+    "history": "On 15 February 2017 PSLV-C37 released 104 satellites in about 11 minutes, each in a planned direction so none would ever collide. It was a world record at the time.",
+    "measure": [
+      "Time",
+      "Gap to the last group"
+    ]
+  },
+  "terror": {
+    "vehicle": "Atlas V 541 · Perseverance",
+    "params": [
+      [
+        "Parachute window",
+        "Mach 2.2 to 1.1"
+      ],
+      [
+        "Safe touchdown",
+        "under 2.5 m/s"
+      ]
+    ],
+    "stars": [
+      "Land safely",
+      "Touch down under 1.6 m/s",
+      "Under 0.9 m/s"
+    ],
+    "history": "On 18 February 2021 Perseverance entered Mars’s air at about 19,500 km/h. A supersonic parachute opened, the heat shield dropped away, and a rocket-powered sky crane lowered the rover into Jezero crater on cables.",
+    "measure": [
+      "Height",
+      "Speed"
+    ]
+  },
+  "raise": {
+    "vehicle": "LVM3-M4 · Chandrayaan-3",
+    "params": [
+      [
+        "Goal far point",
+        "70,000 km"
+      ],
+      [
+        "Start",
+        "170 × 36,500 km orbit"
+      ]
+    ],
+    "stars": [
+      "Reach the ring",
+      "Using under 460 m/s of Δv",
+      "Using under 360 m/s"
+    ],
+    "history": "After launch on 14 July 2023, Chandrayaan-3 raised its orbit five times, always burning near perigee where each push counts most.",
+    "measure": [
+      "Height above Earth",
+      "Speed"
+    ]
+  },
+  "moonshot": {
+    "vehicle": "LVM3-M4 · Chandrayaan-3",
+    "params": [
+      [
+        "Goal",
+        "within 40,000 km of the Moon"
+      ],
+      [
+        "Burn",
+        "near perigee"
+      ]
+    ],
+    "stars": [
+      "Reach the Moon zone",
+      "Using under 290 m/s of Δv",
+      "Using under 230 m/s"
+    ],
+    "history": "On 1 August 2023 Chandrayaan-3 made its trans-lunar injection burn at perigee and left Earth orbit for the Moon.",
+    "measure": [
+      "Height above Earth",
+      "Speed"
+    ]
+  },
+  "catchmoon": {
+    "vehicle": "LVM3-M4 · Chandrayaan-3",
+    "params": [
+      [
+        "Far point must be",
+        "under 20,000 km"
+      ],
+      [
+        "Near point must stay",
+        "above 50 km"
+      ]
+    ],
+    "stars": [
+      "Get caught by the Moon",
+      "Far point under 12,000 km",
+      "Far point under 6,000 km"
+    ],
+    "history": "On 5 August 2023 Chandrayaan-3 braked for about 30 minutes and was captured into a lunar orbit, then lowered it step by step to about 100 km.",
+    "measure": [
+      "Height above the Moon",
+      "Speed"
+    ]
+  },
+  "vikram": {
+    "vehicle": "LVM3-M4 · Vikram lander",
+    "params": [
+      [
+        "Start",
+        "800 m up, falling at 12 m/s"
+      ],
+      [
+        "Safe touchdown",
+        "under 3 m/s"
+      ]
+    ],
+    "stars": [
+      "Land under 3 m/s",
+      "Under 2 m/s",
+      "Under 1 m/s"
+    ],
+    "history": "On 23 August 2023 Vikram landed near the Moon’s south pole. India became the first country to land there and the fourth to soft-land on the Moon.",
+    "measure": [
+      "Height",
+      "Falling speed"
+    ]
+  },
+  "hop": {
+    "vehicle": "LVM3-M4 · Vikram lander",
+    "params": [
+      [
+        "Hop height",
+        "at least 40 cm"
+      ],
+      [
+        "Safe touchdown",
+        "under 2 m/s"
+      ]
+    ],
+    "stars": [
+      "Hop 40 cm and land",
+      "Touch down under 1 m/s",
+      "Under 0.5 m/s"
+    ],
+    "history": "On 3 September 2023 Vikram fired its engines, rose about 40 cm and landed 30–40 cm away: a test for future missions that must lift off from the Moon.",
+    "measure": [
+      "Height",
+      "Speed"
+    ]
+  },
+  "spadex": {
+    "vehicle": "PSLV-C60 · SpaDeX Chaser and Target",
+    "params": [
+      [
+        "Start",
+        "18 m apart, closing at 24 cm/s"
+      ],
+      [
+        "Safe contact",
+        "under 5 cm/s"
+      ]
+    ],
+    "stars": [
+      "Dock under 5 cm/s",
+      "Under 3 cm/s",
+      "Under 1.5 cm/s"
+    ],
+    "history": "On 16 January 2025 ISRO’s two SpaDeX satellites docked in orbit. India became the fourth country to dock spacecraft in space.",
+    "measure": [
+      "Distance",
+      "Closing speed"
+    ]
+  },
+  "sre1": {
+    "vehicle": "PSLV-C7 · Space Capsule Recovery Experiment (SRE-1)",
+    "params": [
+      [
+        "Orbit",
+        "about 637 km, polar"
+      ],
+      [
+        "Capsule mass",
+        "555 kg"
+      ],
+      [
+        "Target",
+        "Bay of Bengal"
+      ]
+    ],
+    "stars": [
+      "Splash down within 900 km",
+      "Within 250 km",
+      "Within 80 km"
+    ],
+    "history": "SRE-1 launched on 10 January 2007 and spent 12 days in orbit. On 22 January it fired its de-boost motor, hit the air at about 8 km/s and came down on parachutes in the Bay of Bengal, where it was recovered: India’s first spacecraft to return from orbit.",
+    "measure": [
+      "Height",
+      "Speed"
+    ],
+    "note": "The target is drawn where it will be when you arrive (Earth turns a little during the fall)."
+  },
+  "astrosat": {
+    "vehicle": "PSLV-C30 · AstroSat observatory",
+    "params": [
+      [
+        "Target",
+        "Crab Nebula, 62° away"
+      ],
+      [
+        "Locked on",
+        "within 0.5°, turning under 0.08°/s"
+      ]
+    ],
+    "stars": [
+      "Lock on within 0.5°",
+      "Within 0.25°",
+      "Within 0.12°"
+    ],
+    "history": "AstroSat launched on 28 September 2015 on PSLV-C30. It is India’s first multi-wavelength space observatory, studying stars, galaxies and black holes in ultraviolet, visible and X-ray light at the same time.",
+    "measure": [
+      "Off target",
+      "Turning speed"
+    ]
+  },
+  "dodge": {
+    "vehicle": "GSLV Mk III-M1 · Chandrayaan-2 orbiter",
+    "params": [
+      [
+        "Orbit",
+        "about 100 km above the Moon"
+      ],
+      [
+        "Predicted gap",
+        "under 100 m"
+      ],
+      [
+        "Safe gap",
+        "over 1 km"
+      ]
+    ],
+    "stars": [
+      "Pass more than 1 km apart",
+      "Using under 80 cm/s",
+      "Using under 45 cm/s"
+    ],
+    "history": "ISRO predicted that Chandrayaan-2’s orbiter and NASA’s LRO would pass within about 3 km of each other over the Moon’s north pole on 20 October 2021, with less than 100 m between their orbits. A small burn on 18 October moved the orbiter safely out of the way.",
+    "measure": [
+      "Height above the Moon",
+      "Speed"
+    ]
+  },
+  "navic": {
+    "vehicle": "GSLV-F12 · NVS-01 (NavIC)",
+    "params": [
+      [
+        "Satellites used",
+        "32.5°E, 83°E, 129.5°E"
+      ],
+      [
+        "Signal speed",
+        "300,000 km per second"
+      ]
+    ],
+    "stars": [
+      "Guess within 220 km",
+      "Within 130 km",
+      "Within 60 km"
+    ],
+    "history": "NavIC is India’s own satellite navigation system, like GPS. NVS-01, launched on 29 May 2023 on GSLV-F12, was the first of its second generation and carries an Indian-made atomic clock.",
+    "measure": [
+      "Guesses",
+      "Guesses left"
+    ]
+  },
+  "lvm3": {
+    "vehicle": "LVM3-M4 (S200, L110, C25 stages) · Chandrayaan-3",
+    "params": [
+      [
+        "Liftoff mass",
+        "about 640 tonnes"
+      ],
+      [
+        "Orbit speed",
+        "about 7.8 km/s sideways"
+      ],
+      [
+        "Goal",
+        "low point above 170 km"
+      ]
+    ],
+    "stars": [
+      "Reach orbit",
+      "With 2.5 t of cryogenic fuel left",
+      "With 5 t left"
+    ],
+    "history": "On 14 July 2023 LVM3-M4 lifted off from Sriharikota. Its two S200 boosters, the L110 core and the C25 cryogenic stage placed Chandrayaan-3 into a 170 × 36,500 km orbit about 16 minutes later.",
+    "measure": [
+      "Height",
+      "Speed"
+    ],
+    "note": "Air drag is left out to keep the level short."
+  },
+  "hazard": {
+    "vehicle": "LVM3-M4 · Vikram lander",
+    "params": [
+      [
+        "Start",
+        "150 m up, sinking at 1.6 m/s"
+      ],
+      [
+        "Safe touchdown",
+        "sideways under 0.5 m/s"
+      ]
+    ],
+    "stars": [
+      "Land on the safe spot",
+      "Sideways under 0.3 m/s, within 3.5 m",
+      "Sideways under 0.15 m/s, within 2 m"
+    ],
+    "history": "On 23 August 2023, at about 150 m above the Moon, Vikram paused to scan the ground with its hazard-detection cameras. The spot below was not safe, so it moved sideways to a safer place before touching down.",
+    "measure": [
+      "Height",
+      "Sideways speed"
+    ]
+  },
+  "pragyan": {
+    "vehicle": "LVM3-M4 · Pragyan rover",
+    "params": [
+      [
+        "Speed",
+        "about 1 cm per second"
+      ],
+      [
+        "Crater ahead",
+        "4 m wide, 3 m away"
+      ]
+    ],
+    "stars": [
+      "Reach the science spot",
+      "Driving under 17.5 m",
+      "Driving under 15.6 m"
+    ],
+    "history": "On 27 August 2023 Pragyan’s cameras spotted a 4 m wide crater 3 m ahead. ISRO commanded it to back up and take a new path. Pragyan drove about 100 m on the Moon before the lunar night.",
+    "measure": [
+      "Distance to the spot",
+      "Distance driven"
+    ]
+  },
+  "aditya": {
+    "vehicle": "PSLV-C57 · Aditya-L1",
+    "params": [
+      [
+        "Distance from Earth",
+        "about 1.5 million km"
+      ],
+      [
+        "One loop",
+        "about 178 days"
+      ]
+    ],
+    "stars": [
+      "Stay in the zone for one loop",
+      "Using under 8 m/s",
+      "Using under 3 m/s"
+    ],
+    "history": "Aditya-L1 launched on 2 September 2023 and entered its halo orbit around L1 on 6 January 2024. From there it watches the Sun without ever being blocked by Earth or the Moon.",
+    "measure": [
+      "Off the loop",
+      "Speed"
+    ],
+    "note": "Shown flat (in 2D); the real halo orbit also loops above and below."
+  },
+  "insat": {
+    "vehicle": "GSLV-F14 · INSAT-3DS",
+    "params": [
+      [
+        "Slot",
+        "82° East"
+      ],
+      [
+        "Height",
+        "35,786 km"
+      ],
+      [
+        "One orbit",
+        "23 h 56 min (one Earth turn)"
+      ]
+    ],
+    "stars": [
+      "Park over 82°E",
+      "Within 0.2° using under 5.5 m/s",
+      "Within 0.12° using under 3.6 m/s"
+    ],
+    "history": "INSAT-3DS launched on 17 February 2024 on GSLV-F14. From its slot at 82°E it watches India’s weather, cyclones and clouds day and night.",
+    "measure": [
+      "Off the slot",
+      "Drift"
+    ]
+  },
+  "pushpak": {
+    "vehicle": "Pushpak RLV-LEX-03 (dropped by a Chinook helicopter)",
+    "params": [
+      [
+        "Release",
+        "4.5 km up"
+      ],
+      [
+        "Safe touchdown",
+        "sinking under 3 m/s"
+      ]
+    ],
+    "stars": [
+      "Land on the runway",
+      "Sinking under 2.2 m/s",
+      "Under 1.2 m/s"
+    ],
+    "history": "On 23 June 2024 a Chinook helicopter released Pushpak 4.5 km up. It glided down on its own, landed at about 320 km/h on the runway at Chitradurga and stopped with a brake parachute and wheel brakes.",
+    "measure": [
+      "Height",
+      "Speed"
+    ]
+  }
+}

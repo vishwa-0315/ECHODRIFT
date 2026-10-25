@@ -4,6 +4,8 @@ import { progress, BADGES, SKINS } from '../../game/progress.js';
 import { createRenderer } from '../../arcade/draw.js';
 import { sfx } from '../audio.js';
 import { vyomNote } from '../guide.js';
+import { LEVELS } from '../../arcade/levels.js';
+import { briefFor } from '../debrief.js';
 
 export function hangarScreen(app) {
   const prog = progress(app);
@@ -27,7 +29,7 @@ export function hangarScreen(app) {
       },
       c,
       h('div.b', k.name),
-      h('div.small.muted', open ? (prog.data.skin === k.id ? 'Flying this one' : 'Tap to choose') : k.quiz ? `Locked: ${k.quiz === 3 ? 'Quiz to Orbit with 3 ★' : 'reach orbit in Quiz to Orbit'}` : `Locked: ${k.need} ★ needed`),
+      h('div.small.muted', open ? (prog.data.skin === k.id ? 'Flying this one' : 'Tap to choose') : k.cards ? `Locked: ${k.cards} history cards needed` : k.quiz ? `Locked: ${k.quiz === 3 ? 'Quiz to Orbit with 3 ★' : 'reach orbit in Quiz to Orbit'}` : `Locked: ${k.need} ★ needed`),
     );
   };
   const el = h(
@@ -45,6 +47,20 @@ export function hangarScreen(app) {
     ),
     h('div.section', h('h3', 'Rocket colours')),
     h('div.skin-grid', SKINS.map(skinCard)),
+    h('div.section', h('h3', 'Mission history cards'), h('span.small.muted', `${prog.cardCount()} of ${LEVELS.length} unlocked`)),
+    h('p.small.muted', 'Answer a mission’s quiz question right (after its level, or in Quiz to Orbit) to unlock its card.'),
+    h(
+      'div.card-grid',
+      LEVELS.map((L) => {
+        const got = prog.card(L.id);
+        return h(
+          'details.hcard' + (got ? '.got' : ''),
+          { 'data-testid': 'hcard-' + L.id },
+          h('summary', h('span.hc-year', String(L.year)), h('span.hc-name', L.title), h('span.small.muted', got ? L.mission : `${L.mission} · locked`)),
+          h('p.small', got ? briefFor(L.id)?.history || L.fact : 'Answer this mission’s quiz question right to read it.'),
+        );
+      }),
+    ),
   );
   return {
     el,

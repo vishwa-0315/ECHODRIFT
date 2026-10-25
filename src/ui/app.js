@@ -1,6 +1,6 @@
 /** App shell: navigation, progress save, settings, modals, toasts, audio. */
 import { h, clear, put } from './dom.js';
-import { vyomSVG } from './guide.js';
+import { vyomSVG, setVoice } from './guide.js';
 
 export const VERSION = '1.0.0';
 const KEY = 'launchwindow.save.v1';
@@ -51,6 +51,7 @@ export function createApp(root, content, screens) {
     applySettings() {
       document.documentElement.style.setProperty('--ts', save.settings.textSize);
       document.body.classList.toggle('reduce-motion', !!save.settings.reduceMotion);
+      setVoice(save.settings.voice === true);
     },
     record(missionId, stars, extra = {}) {
       const prev = save.missions[missionId] || { stars: 0 };

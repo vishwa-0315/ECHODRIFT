@@ -83,7 +83,19 @@ export function expertScreen(app) {
     h('div.section', h('h3', 'NASA history'), h('span.small.muted', 'Missions that changed exploration')),
     h('div.cards', other.map(card)),
     h('div.section', h('h3', 'Discovery labs'), h('span.small.muted', 'Real data, real formulas')),
-    h('div.cards', LABS.map(labCard)),
+    h(
+      'div.cards',
+      h(
+        'button.mcard.sandbox-card',
+        { 'data-testid': 'lab-sandbox', onclick: () => app.go('sandbox') },
+        h('div.yr', { 'aria-hidden': 'true' }, 'Free'),
+        h('div.row', h('span.chip', 'Sandbox')),
+        h('div.t', 'Orbit Sandbox'),
+        h('div.d', 'Choose a world, a height, a speed and an engine, then fly. Find orbital speed, escape speed and transfer orbits yourself.'),
+        h('div.foot', h('span.small.muted', 'Newton · Kepler · Oberth'), h('span.small.muted', 'Open')),
+      ),
+      LABS.map(labCard),
+    ),
     h('p.small.muted', { style: { marginTop: '18px' } }, 'Stuck? Mission Assist can plan any burn for you. Every mission shows its real history and sources, and states every simplification.'),
   );
   return {

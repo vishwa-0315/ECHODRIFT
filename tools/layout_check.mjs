@@ -13,7 +13,7 @@ const ALL_SIZES = [
   ['phone', 390, 844],
   ['tablet', 820, 1180],
 ];
-const ALL_IDS = ['earthrise', 'eagle', 'home13', 'slingshot', 'rohini', 'cassini', 'mip', 'window', 'escape', 'marscapture', 'pluto', 'juno', 'sats104', 'terror', 'raise', 'moonshot', 'catchmoon', 'vikram', 'hop', 'spadex'];
+const ALL_IDS = ['earthrise', 'eagle', 'home13', 'slingshot', 'rohini', 'cassini', 'sre1', 'mip', 'window', 'escape', 'marscapture', 'pluto', 'astrosat', 'juno', 'sats104', 'terror', 'dodge', 'navic', 'lvm3', 'raise', 'moonshot', 'catchmoon', 'hazard', 'vikram', 'pragyan', 'hop', 'aditya', 'insat', 'pushpak', 'spadex'];
 const SIZES = process.env.SIZES ? ALL_SIZES.filter((s) => process.env.SIZES.split(',').includes(s[0])) : ALL_SIZES;
 const IDS = process.env.IDS ? process.env.IDS.split(',') : ALL_IDS;
 const browser = await chromium.launch({ executablePath: '/opt/pw-browsers/chromium-1243/chrome-linux64/chrome' });

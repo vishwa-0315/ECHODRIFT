@@ -3,169 +3,183 @@
   "level": "raise",
   "q": "Where should you fire the engine to raise the far side of your orbit the most?",
   "options": [
-   "At the closest point to Earth",
-   "At the farthest point",
    "Halfway round",
-   "It makes no difference"
+   "At the farthest point",
+   "It makes no difference",
+   "At the closest point to Earth"
   ],
-  "answer": 0,
-  "explain": "You move fastest at the closest point (perigee), so the same push adds the most energy there. This is called the Oberth effect."
+  "answer": 3,
+  "explain": "You move fastest at the closest point (perigee), so the same push adds the most energy there. This is called the Oberth effect.",
+  "hint": "You move fastest there, so each push counts most."
  },
  {
   "level": "raise",
   "q": "Which rocket launched Chandrayaan-3?",
   "options": [
-   "PSLV",
-   "LVM3",
+   "Falcon 9",
    "GSLV Mk II",
-   "Falcon 9"
+   "PSLV",
+   "LVM3"
   ],
-  "answer": 1,
-  "explain": "ISRO's LVM3 rocket launched Chandrayaan-3 from Sriharikota on 14 July 2023."
+  "answer": 3,
+  "explain": "ISRO's LVM3 rocket launched Chandrayaan-3 from Sriharikota on 14 July 2023.",
+  "hint": "India's heaviest rocket, also called GSLV Mk III."
  },
  {
   "level": "moonshot",
   "q": "About how far away is the Moon?",
   "options": [
-   "38,000 km",
    "384,000 km",
+   "150 million km",
    "3.8 million km",
-   "150 million km"
+   "38,000 km"
   ],
-  "answer": 1,
-  "explain": "On average the Moon is about 384,400 km away. Light takes about 1.3 seconds to cross that gap."
+  "answer": 0,
+  "explain": "On average the Moon is about 384,400 km away. Light takes about 1.3 seconds to cross that gap.",
+  "hint": "Light takes just over one second to cover it."
  },
  {
   "level": "moonshot",
   "q": "How long did Chandrayaan-3 take from launch to lunar orbit?",
   "options": [
-   "About 3 days",
    "About 3 weeks",
    "About 3 months",
+   "About 3 days",
    "About a year"
   ],
-  "answer": 1,
-  "explain": "Launched on 14 July, it entered lunar orbit on 5 August 2023: 22 days. Raising the orbit step by step saves fuel. Apollo needed the giant Saturn V to get there in 3 days."
+  "answer": 0,
+  "explain": "Launched on 14 July, it entered lunar orbit on 5 August 2023: 22 days. Raising the orbit step by step saves fuel. Apollo needed the giant Saturn V to get there in 3 days.",
+  "hint": "Launched 14 July, captured by the Moon on 5 August."
  },
  {
   "level": "catchmoon",
   "q": "Why must a spacecraft brake to go into orbit around the Moon?",
   "options": [
-   "It arrives too fast for the Moon's gravity to hold it",
    "To avoid the Moon's air",
    "To save fuel",
-   "To turn around"
+   "To turn around",
+   "It arrives too fast for the Moon's gravity to hold it"
   ],
-  "answer": 0,
-  "explain": "Without braking you would swing past the Moon and fly away. Slowing down at the closest point lets the Moon's gravity capture you."
+  "answer": 3,
+  "explain": "Without braking you would swing past the Moon and fly away. Slowing down at the closest point lets the Moon's gravity capture you.",
+  "hint": "Think about speed: too fast to stay."
  },
  {
   "level": "catchmoon",
   "q": "How strong is gravity on the Moon compared with Earth?",
   "options": [
-   "About the same",
    "About half",
+   "Twice as strong",
    "About one-sixth",
-   "Twice as strong"
+   "About the same"
   ],
   "answer": 2,
-  "explain": "The Moon's surface gravity is 1.62 m/s², about one-sixth of Earth's 9.81 m/s²."
+  "explain": "The Moon's surface gravity is 1.62 m/s², about one-sixth of Earth's 9.81 m/s².",
+  "hint": "You could jump about six times higher there."
  },
  {
   "level": "vikram",
   "q": "Where on the Moon did Vikram land?",
   "options": [
-   "Near the south pole",
-   "Near the north pole",
    "On the far side's equator",
+   "Near the north pole",
+   "Near the south pole",
    "At the Apollo 11 site"
   ],
-  "answer": 0,
-  "explain": "Vikram landed near the lunar south pole on 23 August 2023, the first landing ever in that region."
+  "answer": 2,
+  "explain": "Vikram landed near the lunar south pole on 23 August 2023, the first landing ever in that region.",
+  "hint": "No country had landed there before."
  },
  {
   "level": "vikram",
   "q": "What name was given to Vikram's landing spot?",
   "options": [
-   "Tiranga Point",
    "Jawahar Point",
-   "Shiv Shakti Point",
-   "Vikram Point"
+   "Vikram Point",
+   "Tiranga Point",
+   "Shiv Shakti Point"
   ],
-  "answer": 2,
-  "explain": "It is called Shiv Shakti Point. Chandrayaan-2's impact site is Tiranga Point, and Chandrayaan-1's probe hit Jawahar Point."
+  "answer": 3,
+  "explain": "It is called Shiv Shakti Point. Chandrayaan-2's impact site is Tiranga Point, and Chandrayaan-1's probe hit Jawahar Point.",
+  "hint": "It is named after a pair of Hindu deities."
  },
  {
   "level": "vikram",
   "q": "Why can't a Moon lander use a parachute?",
   "options": [
    "Parachutes are too heavy",
-   "The Moon has no air",
    "It is too cold",
+   "The Moon has no air",
    "The Moon spins too fast"
   ],
-  "answer": 1,
-  "explain": "A parachute needs air to push against. The Moon has almost no atmosphere, so only rocket engines can slow you down."
+  "answer": 2,
+  "explain": "A parachute needs air to push against. The Moon has almost no atmosphere, so only rocket engines can slow you down.",
+  "hint": "Parachutes need something to push against."
  },
  {
   "level": "window",
   "q": "How often do Earth and Mars line up for a fuel-saving trip?",
   "options": [
-   "Every 6 months",
-   "Every year",
    "About every 26 months",
-   "Every 10 years"
+   "Every 10 years",
+   "Every 6 months",
+   "Every year"
   ],
-  "answer": 2,
-  "explain": "Earth laps Mars about every 780 days (26 months). That's when launch windows open."
+  "answer": 0,
+  "explain": "Earth laps Mars about every 780 days (26 months). That's when launch windows open.",
+  "hint": "A bit more than two years."
  },
  {
   "level": "window",
   "q": "How long did Mangalyaan take to fly from Earth to Mars?",
   "options": [
-   "About 3 weeks",
-   "About 300 days",
    "About 3 years",
-   "About 30 days"
+   "About 300 days",
+   "About 30 days",
+   "About 3 weeks"
   ],
   "answer": 1,
-  "explain": "It left Earth orbit on 1 December 2013 and reached Mars on 24 September 2014, almost 300 days later."
+  "explain": "It left Earth orbit on 1 December 2013 and reached Mars on 24 September 2014, almost 300 days later.",
+  "hint": "Launched November 2013, arrived September 2014."
  },
  {
   "level": "marscapture",
   "q": "Which country was the first to reach Mars orbit on its first try?",
   "options": [
-   "USA",
-   "Russia",
+   "China",
    "India",
-   "China"
+   "Russia",
+   "USA"
   ],
-  "answer": 2,
-  "explain": "India's Mangalyaan reached Mars orbit on 24 September 2014, on the country's first attempt."
+  "answer": 1,
+  "explain": "India's Mangalyaan reached Mars orbit on 24 September 2014, on the country's first attempt.",
+  "hint": "It is ISRO's own Mars mission."
  },
  {
   "level": "marscapture",
   "q": "Mangalyaan was famous for being…",
   "options": [
-   "The heaviest Mars probe",
+   "Powered by nuclear energy",
    "Very low cost",
-   "The first Mars lander",
-   "Powered by nuclear energy"
+   "The heaviest Mars probe",
+   "The first Mars lander"
   ],
   "answer": 1,
-  "explain": "The mission cost about ₹450 crore (roughly US$74 million), famously less than the budget of the film Gravity."
+  "explain": "The mission cost about ₹450 crore (roughly US$74 million), famously less than the budget of the film Gravity.",
+  "hint": "It cost less than many space films."
  },
  {
   "level": "terror",
   "q": "Why is a Mars landing called 'seven minutes of terror'?",
   "options": [
-   "The rover is scared",
-   "Radio signals take minutes to reach Earth, so it must land all by itself",
    "Mars has storms every 7 minutes",
-   "The engines only last 7 minutes"
+   "The engines only last 7 minutes",
+   "Radio signals take minutes to reach Earth, so it must land all by itself",
+   "The rover is scared"
   ],
-  "answer": 1,
-  "explain": "Entry, parachute and landing take about 7 minutes, but radio needs several minutes to reach Earth. By the time we hear it started, it's already over."
+  "answer": 2,
+  "explain": "Entry, parachute and landing take about 7 minutes, but radio needs several minutes to reach Earth. By the time we hear it started, it's already over.",
+  "hint": "Mars is so far that a radio message takes minutes each way."
  },
  {
   "level": "terror",
@@ -173,59 +187,64 @@
   "options": [
    "Airbags",
    "A sky crane on cables",
-   "Landing legs",
-   "Just the parachute"
+   "Just the parachute",
+   "Landing legs"
   ],
   "answer": 1,
-  "explain": "A rocket-powered sky crane hovered and lowered the rover on 6.4 m cables, then flew away."
+  "explain": "A rocket-powered sky crane hovered and lowered the rover on 6.4 m cables, then flew away.",
+  "hint": "It hung the rover on cables from a rocket-powered stage."
  },
  {
   "level": "terror",
   "q": "How thick is Mars' air compared with Earth's?",
   "options": [
+   "Ten times thicker",
    "About the same",
-   "About half",
    "About 1%",
-   "Ten times thicker"
+   "About half"
   ],
   "answer": 2,
-  "explain": "Surface pressure on Mars is about 0.6% to 1% of Earth's. Parachutes help, but they can't land you alone."
+  "explain": "Surface pressure on Mars is about 0.6% to 1% of Earth's. Parachutes help, but they can't land you alone.",
+  "hint": "Very, very thin: barely any air."
  },
  {
   "level": "slingshot",
   "q": "How does a gravity assist speed up a spacecraft?",
   "options": [
-   "The planet's magnetism pushes it",
    "It borrows a tiny bit of the planet's orbital motion",
+   "Sunlight pushes it",
    "Its engines fire near the planet",
-   "Sunlight pushes it"
+   "The planet's magnetism pushes it"
   ],
-  "answer": 1,
-  "explain": "Passing behind a moving planet, the craft gets pulled along and gains speed. The planet slows by an immeasurably tiny amount."
+  "answer": 0,
+  "explain": "Passing behind a moving planet, the craft gets pulled along and gains speed. The planet slows by an immeasurably tiny amount.",
+  "hint": "The planet is moving round the Sun, and the spacecraft rides along a little."
  },
  {
   "level": "slingshot",
   "q": "Which is the only spacecraft to have visited Uranus and Neptune?",
   "options": [
-   "Voyager 1",
    "Voyager 2",
-   "Cassini",
-   "New Horizons"
+   "New Horizons",
+   "Voyager 1",
+   "Cassini"
   ],
-  "answer": 1,
-  "explain": "Voyager 2 flew past Uranus in 1986 and Neptune in 1989, after Jupiter and Saturn."
+  "answer": 0,
+  "explain": "Voyager 2 flew past Uranus in 1986 and Neptune in 1989, after Jupiter and Saturn.",
+  "hint": "It flew past all four giant planets."
  },
  {
   "level": "slingshot",
   "q": "In which year was Voyager 2 launched?",
   "options": [
-   "1969",
-   "1977",
+   "2006",
    "1990",
-   "2006"
+   "1977",
+   "1969"
   ],
-  "answer": 1,
-  "explain": "Voyager 2 launched on 20 August 1977. It is still sending data from interstellar space."
+  "answer": 2,
+  "explain": "Voyager 2 launched on 20 August 1977. It is still sending data from interstellar space.",
+  "hint": "The same year as Voyager 1."
  },
  {
   "level": "hop",
@@ -237,115 +256,125 @@
    "It switched off for good"
   ],
   "answer": 1,
-  "explain": "Vikram fired its engines, rose about 40 cm and landed 30–40 cm away, showing it could lift off again from the Moon."
+  "explain": "Vikram fired its engines, rose about 40 cm and landed 30–40 cm away, showing it could lift off again from the Moon.",
+  "hint": "Lift off a little, land again a short way off."
  },
  {
   "level": "hop",
   "q": "Why was the hop important for future missions?",
   "options": [
    "To take selfies",
-   "Missions that bring Moon samples back must lift off from the Moon",
    "To escape a crater",
-   "To save fuel"
+   "To save fuel",
+   "Missions that bring Moon samples back must lift off from the Moon"
   ],
-  "answer": 1,
-  "explain": "Future sample-return and crewed missions must take off from the Moon. The hop proved the engines could restart there."
+  "answer": 3,
+  "explain": "Future sample-return and crewed missions must take off from the Moon. The hop proved the engines could restart there.",
+  "hint": "Future sample-return missions must leave the Moon again."
  },
  {
   "level": "home13",
   "q": "What went wrong on Apollo 13?",
   "options": [
    "It ran out of fuel",
-   "An oxygen tank exploded",
+   "The computer crashed",
    "It hit the Moon",
-   "The computer crashed"
+   "An oxygen tank exploded"
   ],
-  "answer": 1,
-  "explain": "An oxygen tank exploded on the way to the Moon. The landing was cancelled and the crew flew around the Moon and home."
+  "answer": 3,
+  "explain": "An oxygen tank exploded on the way to the Moon. The landing was cancelled and the crew flew around the Moon and home.",
+  "hint": "It happened on the way to the Moon, 'Houston, we've had a problem'."
  },
  {
   "level": "home13",
   "q": "What happens if a capsule enters the air too shallowly?",
   "options": [
-   "It lands softly",
    "It can skip off the atmosphere back into space",
+   "Nothing",
    "It burns up",
-   "Nothing"
+   "It lands softly"
   ],
-  "answer": 1,
-  "explain": "Too shallow and it bounces off the top of the atmosphere, like a stone skipping on water. Too steep and it overheats."
+  "answer": 0,
+  "explain": "Too shallow and it bounces off the top of the atmosphere, like a stone skipping on water. Too steep and it overheats.",
+  "hint": "Think of a stone skipping on water."
  },
  {
   "level": "home13",
   "q": "Which spacecraft did the Apollo 13 crew use as a lifeboat?",
   "options": [
-   "The Lunar Module Aquarius",
-   "Skylab",
    "The Saturn V rocket",
-   "Soyuz"
+   "Soyuz",
+   "The Lunar Module Aquarius",
+   "Skylab"
   ],
-  "answer": 0,
-  "explain": "The crew moved into the Lunar Module Aquarius and used its engine and supplies to get home."
+  "answer": 2,
+  "explain": "The crew moved into the Lunar Module Aquarius and used its engine and supplies to get home.",
+  "hint": "The crew moved into the craft meant for the landing."
  },
  {
   "level": "escape",
   "q": "How fast must something go to escape Earth's gravity from its surface?",
   "options": [
+   "112 km/s",
    "1.1 km/s",
    "11.2 km/s",
-   "112 km/s",
    "300,000 km/s"
   ],
-  "answer": 1,
-  "explain": "Escape speed at Earth's surface is about 11.2 km/s, roughly 40,000 km/h. Higher up it is a little less."
+  "answer": 2,
+  "explain": "Escape speed at Earth's surface is about 11.2 km/s, roughly 40,000 km/h. Higher up it is a little less.",
+  "hint": "More than 40,000 km/h."
  },
  {
   "level": "escape",
   "q": "Why did Mangalyaan circle Earth for almost a month before leaving?",
   "options": [
-   "To wait for good weather",
    "Its rocket was small, so it raised its orbit step by step",
-   "To take photos of Earth",
-   "To charge its batteries"
+   "To charge its batteries",
+   "To wait for good weather",
+   "To take photos of Earth"
   ],
-  "answer": 1,
-  "explain": "The PSLV rocket put it in an Earth orbit. Mangalyaan then fired its engine at perigee several times to build up speed before escaping."
+  "answer": 0,
+  "explain": "The PSLV rocket put it in an Earth orbit. Mangalyaan then fired its engine at perigee several times to build up speed before escaping.",
+  "hint": "Its rocket could not send it straight to Mars."
  },
  {
   "level": "general",
   "q": "Which planet is closest to the Sun?",
   "options": [
-   "Venus",
-   "Mercury",
+   "Earth",
    "Mars",
-   "Earth"
+   "Mercury",
+   "Venus"
   ],
-  "answer": 1,
-  "explain": "Mercury orbits closest to the Sun, at about 58 million km."
+  "answer": 2,
+  "explain": "Mercury orbits closest to the Sun, at about 58 million km.",
+  "hint": "It is also the smallest planet."
  },
  {
   "level": "general",
   "q": "Which is the largest planet?",
   "options": [
-   "Saturn",
    "Earth",
-   "Jupiter",
-   "Neptune"
+   "Neptune",
+   "Saturn",
+   "Jupiter"
   ],
-  "answer": 2,
-  "explain": "Jupiter is so big that more than 1,300 Earths could fit inside it."
+  "answer": 3,
+  "explain": "Jupiter is so big that more than 1,300 Earths could fit inside it.",
+  "hint": "It is a gas giant, more than 11 times wider than Earth."
  },
  {
   "level": "general",
   "q": "What is the Sun?",
   "options": [
-   "A planet",
+   "A comet",
    "A star",
-   "A moon",
-   "A comet"
+   "A planet",
+   "A moon"
   ],
   "answer": 1,
-  "explain": "The Sun is a star: a giant ball of hot gas powered by nuclear fusion."
+  "explain": "The Sun is a star: a giant ball of hot gas powered by nuclear fusion.",
+  "hint": "It is the closest one of its kind to us."
  },
  {
   "level": "general",
@@ -357,31 +386,34 @@
    "8 days"
   ],
   "answer": 1,
-  "explain": "Light takes about 8 minutes 20 seconds to travel the 150 million km from the Sun."
+  "explain": "Light takes about 8 minutes 20 seconds to travel the 150 million km from the Sun.",
+  "hint": "Light travels about 150 million km to get here."
  },
  {
   "level": "general",
   "q": "Who was the first human in space?",
   "options": [
-   "Neil Armstrong",
-   "Yuri Gagarin",
    "Rakesh Sharma",
-   "Valentina Tereshkova"
+   "Neil Armstrong",
+   "Valentina Tereshkova",
+   "Yuri Gagarin"
   ],
-  "answer": 1,
-  "explain": "Yuri Gagarin orbited Earth on 12 April 1961."
+  "answer": 3,
+  "explain": "Yuri Gagarin orbited Earth on 12 April 1961.",
+  "hint": "He flew Vostok 1 in 1961."
  },
  {
   "level": "general",
   "q": "Who was the first Indian in space?",
   "options": [
    "Kalpana Chawla",
-   "Rakesh Sharma",
+   "Vikram Sarabhai",
    "Sunita Williams",
-   "Vikram Sarabhai"
+   "Rakesh Sharma"
   ],
-  "answer": 1,
-  "explain": "Rakesh Sharma flew on a Soviet Soyuz in April 1984."
+  "answer": 3,
+  "explain": "Rakesh Sharma flew on a Soviet Soyuz in April 1984.",
+  "hint": "He flew on a Soviet spacecraft in 1984."
  },
  {
   "level": "general",
@@ -393,270 +425,1151 @@
    "Mercury"
   ],
   "answer": 2,
-  "explain": "Iron oxide (rust) in its dust makes Mars look red."
+  "explain": "Iron oxide (rust) in its dust makes Mars look red.",
+  "hint": "Rust (iron oxide) in its soil gives it its colour."
  },
  {
   "level": "general",
   "q": "How many planets are in our Solar System?",
   "options": [
-   "7",
    "8",
-   "9",
-   "10"
+   "10",
+   "7",
+   "9"
   ],
-  "answer": 1,
-  "explain": "There are eight planets. Pluto has been classed as a dwarf planet since 2006."
+  "answer": 0,
+  "explain": "There are eight planets. Pluto has been classed as a dwarf planet since 2006.",
+  "hint": "Pluto is no longer counted."
  },
  {
   "level": "general",
   "q": "What was India's first satellite?",
   "options": [
-   "Rohini",
    "Aryabhata",
    "INSAT-1A",
+   "Rohini",
    "Bhaskara"
   ],
-  "answer": 1,
-  "explain": "Aryabhata was launched on 19 April 1975 by a Soviet rocket."
+  "answer": 0,
+  "explain": "Aryabhata was launched on 19 April 1975 by a Soviet rocket.",
+  "hint": "Named after an ancient Indian astronomer and mathematician."
  },
  {
   "level": "general",
   "q": "Where is India's main rocket launch centre?",
   "options": [
-   "Thiruvananthapuram",
    "Sriharikota",
    "Bengaluru",
-   "Ahmedabad"
+   "Ahmedabad",
+   "Thiruvananthapuram"
   ],
-  "answer": 1,
-  "explain": "The Satish Dhawan Space Centre is at Sriharikota in Andhra Pradesh."
+  "answer": 0,
+  "explain": "The Satish Dhawan Space Centre is at Sriharikota in Andhra Pradesh.",
+  "hint": "It is on an island off the coast of Andhra Pradesh."
  },
  {
   "level": "general",
   "q": "Which is the hottest planet?",
   "options": [
-   "Mercury",
    "Venus",
+   "Mercury",
    "Mars",
    "Jupiter"
   ],
-  "answer": 1,
-  "explain": "Venus's thick carbon-dioxide air traps heat, making it hotter than Mercury."
+  "answer": 0,
+  "explain": "Venus's thick carbon-dioxide air traps heat, making it hotter than Mercury.",
+  "hint": "It is not the closest to the Sun: its thick clouds trap heat."
  },
  {
   "level": "general",
   "q": "What does a light-year measure?",
   "options": [
    "Time",
-   "Distance",
    "Brightness",
+   "Distance",
    "Speed"
   ],
-  "answer": 1,
-  "explain": "A light-year is the distance light travels in one year: about 9.5 trillion km."
+  "answer": 2,
+  "explain": "A light-year is the distance light travels in one year: about 9.5 trillion km.",
+  "hint": "It is the distance light travels in one year."
  },
  {
   "level": "general",
   "q": "What keeps the Moon in orbit around Earth?",
   "options": [
-   "Magnetism",
    "Gravity",
-   "Air",
-   "Sunlight"
+   "Magnetism",
+   "Sunlight",
+   "Air"
   ],
-  "answer": 1,
-  "explain": "Earth's gravity keeps pulling the Moon, so it keeps falling around us instead of flying off."
+  "answer": 0,
+  "explain": "Earth's gravity keeps pulling the Moon, so it keeps falling around us instead of flying off.",
+  "hint": "The same force that makes an apple fall."
  },
  {
   "level": "general",
   "q": "Who was the first person to walk on the Moon?",
   "options": [
-   "Buzz Aldrin",
+   "Michael Collins",
    "Neil Armstrong",
    "Yuri Gagarin",
-   "Michael Collins"
+   "Buzz Aldrin"
   ],
   "answer": 1,
-  "explain": "Neil Armstrong stepped onto the Moon on 20 July 1969 (21 July in UTC)."
+  "explain": "Neil Armstrong stepped onto the Moon on 20 July 1969 (21 July in UTC).",
+  "hint": "He was the commander of Apollo 11."
  },
  {
   "level": "general",
   "q": "Which is the largest moon in the Solar System?",
   "options": [
-   "Titan",
+   "Europa",
    "Our Moon",
-   "Ganymede",
-   "Europa"
+   "Titan",
+   "Ganymede"
   ],
-  "answer": 2,
-  "explain": "Jupiter's moon Ganymede is even bigger than the planet Mercury."
+  "answer": 3,
+  "explain": "Jupiter's moon Ganymede is even bigger than the planet Mercury.",
+  "hint": "It orbits Jupiter and is bigger than Mercury."
  },
  {
   "level": "general",
   "q": "What does Aditya-L1 study?",
   "options": [
-   "The Moon",
-   "Mars",
    "The Sun",
+   "Mars",
+   "The Moon",
    "Saturn"
   ],
-  "answer": 2,
-  "explain": "Aditya-L1 watches the Sun from the L1 point, 1.5 million km from Earth."
+  "answer": 0,
+  "explain": "Aditya-L1 watches the Sun from the L1 point, 1.5 million km from Earth.",
+  "hint": "'Aditya' is a name for it in Sanskrit."
  },
  {
   "level": "general",
   "q": "About how fast must you go to stay in orbit just above Earth?",
   "options": [
-   "0.8 km/s",
+   "780 km/s",
    "7.8 km/s",
    "78 km/s",
-   "780 km/s"
+   "0.8 km/s"
   ],
   "answer": 1,
-  "explain": "About 7.8 km/s, roughly 28,000 km/h. Fast enough that you keep falling around the curve of Earth."
+  "explain": "About 7.8 km/s, roughly 28,000 km/h. Fast enough that you keep falling around the curve of Earth.",
+  "hint": "Much faster than any aeroplane: almost 8 km every second."
  },
  {
   "level": "general",
   "q": "Why do we always see the same side of the Moon?",
   "options": [
+   "It's a coincidence",
    "The Moon doesn't spin",
-   "It spins once for every orbit",
    "Earth blocks the other side",
-   "It's a coincidence"
+   "It spins once for every orbit"
   ],
-  "answer": 1,
-  "explain": "The Moon is tidally locked: it turns once on its axis each time it orbits Earth."
+  "answer": 3,
+  "explain": "The Moon is tidally locked: it turns once on its axis each time it orbits Earth.",
+  "hint": "Its day and its orbit take the same time."
  },
  {
   "level": "general",
   "q": "Which planet has the biggest, brightest rings?",
   "options": [
-   "Jupiter",
    "Uranus",
-   "Saturn",
-   "Neptune"
+   "Jupiter",
+   "Neptune",
+   "Saturn"
   ],
-  "answer": 2,
-  "explain": "Saturn's rings are made of ice and rock, from tiny grains to house-sized chunks."
+  "answer": 3,
+  "explain": "Saturn's rings are made of ice and rock, from tiny grains to house-sized chunks.",
+  "hint": "The rings are made of ice and rock."
  },
  {
   "level": "general",
   "q": "What do astronauts feel in orbit?",
   "options": [
-   "No gravity at all",
-   "Weightless, because they are falling",
    "Heavier than on Earth",
-   "Pushed by the wind"
+   "No gravity at all",
+   "Pushed by the wind",
+   "Weightless, because they are falling"
   ],
-  "answer": 1,
-  "explain": "Gravity is still about 90% as strong in low orbit. Astronauts float because they and their spacecraft are falling together."
+  "answer": 3,
+  "explain": "Gravity is still about 90% as strong in low orbit. Astronauts float because they and their spacecraft are falling together.",
+  "hint": "They are falling all the time, but moving sideways fast enough to miss the ground."
  },
  {
   "level": "earthrise",
   "q": "Which mission took the famous 'Earthrise' photo?",
   "options": [
-   "Apollo 8",
+   "Chandrayaan-1",
    "Apollo 11",
    "Voyager 1",
-   "Chandrayaan-1"
+   "Apollo 8"
   ],
-  "answer": 0,
-  "explain": "Apollo 8, the first crewed flight around the Moon, in December 1968."
+  "answer": 3,
+  "explain": "Apollo 8, the first crewed flight around the Moon, in December 1968.",
+  "hint": "The first crew to orbit the Moon, at Christmas 1968."
  },
  {
   "level": "eagle",
   "q": "What was the Apollo 11 lunar module called?",
   "options": [
-   "Columbia",
    "Eagle",
    "Falcon",
+   "Columbia",
    "Aquarius"
   ],
-  "answer": 1,
-  "explain": "The lunar module was Eagle; the command module that stayed in orbit was Columbia."
+  "answer": 0,
+  "explain": "The lunar module was Eagle; the command module that stayed in orbit was Columbia.",
+  "hint": "A bird that is a symbol of the USA."
  },
  {
   "level": "rohini",
   "q": "Which rocket gave India its first satellite launch from Indian soil?",
   "options": [
+   "LVM3",
    "PSLV",
    "SLV-3",
-   "GSLV",
-   "LVM3"
+   "GSLV"
   ],
-  "answer": 1,
-  "explain": "SLV-3 put Rohini into orbit on 18 July 1980."
+  "answer": 2,
+  "explain": "SLV-3 put Rohini into orbit on 18 July 1980.",
+  "hint": "India's first home-made satellite launcher."
  },
  {
   "level": "cassini",
   "q": "What did Cassini drop onto Saturn's moon Titan?",
   "options": [
-   "A rover",
    "The Huygens probe",
    "A flag",
-   "Nothing"
+   "Nothing",
+   "A rover"
   ],
-  "answer": 1,
-  "explain": "The European Huygens probe landed on Titan in January 2005: the farthest landing ever made."
+  "answer": 0,
+  "explain": "The European Huygens probe landed on Titan in January 2005: the farthest landing ever made.",
+  "hint": "Named after a Dutch astronomer who studied Saturn."
  },
  {
   "level": "mip",
   "q": "What is the Moon Impact Probe's crash site called?",
   "options": [
-   "Shiv Shakti Point",
+   "Vikram Point",
    "Jawahar Point",
    "Tiranga Point",
-   "Vikram Point"
+   "Shiv Shakti Point"
   ],
   "answer": 1,
-  "explain": "Chandrayaan-1's probe hit near Shackleton crater on 14 November 2008, at Jawahar Point."
+  "explain": "Chandrayaan-1's probe hit near Shackleton crater on 14 November 2008, at Jawahar Point.",
+  "hint": "Named after India's first Prime Minister."
  },
  {
   "level": "pluto",
   "q": "What shape is the famous bright region on Pluto?",
   "options": [
-   "A star",
    "A heart",
+   "A triangle",
    "A circle",
-   "A triangle"
+   "A star"
   ],
-  "answer": 1,
-  "explain": "The heart-shaped plain is called Tombaugh Regio, after Pluto's discoverer Clyde Tombaugh."
+  "answer": 0,
+  "explain": "The heart-shaped plain is called Tombaugh Regio, after Pluto's discoverer Clyde Tombaugh.",
+  "hint": "Think of a symbol for love."
  },
  {
   "level": "juno",
   "q": "Juno is named after a goddess who could see through…",
   "options": [
    "Walls",
-   "Clouds",
+   "Mountains",
    "Water",
-   "Mountains"
+   "Clouds"
   ],
-  "answer": 1,
-  "explain": "In myth, Juno saw through the clouds Jupiter hid behind. The spacecraft also peers beneath Jupiter's clouds."
+  "answer": 3,
+  "explain": "In myth, Juno saw through the clouds Jupiter hid behind. The spacecraft also peers beneath Jupiter's clouds.",
+  "hint": "In the myth she saw through the clouds Jupiter hid behind."
  },
  {
   "level": "sats104",
   "q": "How many satellites did PSLV-C37 launch in one flight?",
   "options": [
    "10",
-   "42",
    "104",
-   "1,000"
+   "1,000",
+   "42"
   ],
-  "answer": 2,
-  "explain": "104 satellites on 15 February 2017, a world record at the time."
+  "answer": 1,
+  "explain": "104 satellites on 15 February 2017, a world record at the time.",
+  "hint": "A world record number of satellites at the time."
  },
  {
   "level": "spadex",
   "q": "Why is docking in space tricky?",
   "options": [
+   "It is always dark",
    "There is wind",
-   "Nothing slows you down, so you must brake yourself",
    "Satellites are magnetic",
-   "It is always dark"
+   "Nothing slows you down, so you must brake yourself"
+  ],
+  "answer": 3,
+  "explain": "With no air, a spacecraft keeps moving at the same speed until its thrusters change it. That's Newton's first law.",
+  "hint": "Think about Newton's first law."
+ },
+ {
+  "level": "raise",
+  "q": "What is the far point of an orbit around Earth called?",
+  "options": [
+   "Apogee",
+   "Equator",
+   "Perigee",
+   "Zenith"
+  ],
+  "answer": 0,
+  "explain": "The far point is the apogee and the closest point is the perigee. Chandrayaan-3 raised its apogee step by step.",
+  "hint": "Its partner word for the closest point is perigee."
+ },
+ {
+  "level": "moonshot",
+  "q": "What is the burn that sends a spacecraft from Earth orbit towards the Moon called?",
+  "options": [
+   "Trans-lunar injection",
+   "Lunar landing",
+   "De-orbit burn",
+   "Splashdown"
+  ],
+  "answer": 0,
+  "explain": "Trans-lunar injection (TLI) is the push that stretches the orbit all the way to the Moon. Chandrayaan-3 made it on 1 August 2023.",
+  "hint": "Its short name is TLI."
+ },
+ {
+  "level": "catchmoon",
+  "q": "About how long does the Moon take to go once around Earth?",
+  "options": [
+   "About 7 days",
+   "About 1 day",
+   "About 1 year",
+   "About 27 days"
+  ],
+  "answer": 3,
+  "explain": "The Moon orbits Earth in about 27.3 days, which is why the month is roughly that long.",
+  "hint": "Close to one month."
+ },
+ {
+  "level": "window",
+  "q": "Which rocket launched Mangalyaan?",
+  "options": [
+   "SLV-3",
+   "Falcon 9",
+   "LVM3",
+   "PSLV"
+  ],
+  "answer": 3,
+  "explain": "ISRO’s PSLV-C25 launched Mangalyaan on 5 November 2013.",
+  "hint": "ISRO’s workhorse rocket, which also launched Chandrayaan-1."
+ },
+ {
+  "level": "marscapture",
+  "q": "About how long did Mangalyaan’s braking burn at Mars last?",
+  "options": [
+   "About 3 days",
+   "About 23 minutes",
+   "About 23 hours",
+   "About 23 seconds"
   ],
   "answer": 1,
-  "explain": "With no air, a spacecraft keeps moving at the same speed until its thrusters change it. That's Newton's first law."
+  "explain": "On 24 September 2014 the engine fired for about 23 minutes, slowing Mangalyaan enough for Mars to catch it.",
+  "hint": "Less than half an hour."
+ },
+ {
+  "level": "hop",
+  "q": "About how far sideways did Vikram land after its hop?",
+  "options": [
+   "3–4 m",
+   "30–40 m",
+   "It landed in the same spot",
+   "30–40 cm"
+  ],
+  "answer": 3,
+  "explain": "Vikram rose about 40 cm and landed about 30–40 cm away.",
+  "hint": "About the length of a school ruler."
+ },
+ {
+  "level": "escape",
+  "q": "To leave Earth for Mars, which way did Mangalyaan fire its engine?",
+  "options": [
+   "Straight up, away from Earth",
+   "Straight down at Earth",
+   "Forwards, the way it was moving",
+   "Backwards, against its motion"
+  ],
+  "answer": 2,
+  "explain": "Pushing in the direction you are moving (prograde) adds speed. Near Earth, where you move fastest, that extra speed counts most.",
+  "hint": "To go faster, push the way you are already going."
+ },
+ {
+  "level": "earthrise",
+  "q": "Who took the Earthrise photo?",
+  "options": [
+   "Neil Armstrong",
+   "Rakesh Sharma",
+   "William Anders",
+   "Yuri Gagarin"
+  ],
+  "answer": 2,
+  "explain": "Apollo 8 astronaut William Anders took the photo on 24 December 1968.",
+  "hint": "His surname begins with A."
+ },
+ {
+  "level": "earthrise",
+  "q": "When was the Earthrise photo taken?",
+  "options": [
+   "Christmas Eve 1968",
+   "New Year’s Day 1960",
+   "Summer 1990",
+   "Diwali 1975"
+  ],
+  "answer": 0,
+  "explain": "Apollo 8 orbited the Moon over Christmas 1968, and the photo was taken on 24 December.",
+  "hint": "The day before a big December holiday."
+ },
+ {
+  "level": "eagle",
+  "q": "Who stayed in lunar orbit while Armstrong and Aldrin landed?",
+  "options": [
+   "John Glenn",
+   "Michael Collins",
+   "Jim Lovell",
+   "Buzz Aldrin"
+  ],
+  "answer": 1,
+  "explain": "Michael Collins flew the command module Columbia around the Moon while Eagle landed.",
+  "hint": "His spacecraft was called Columbia."
+ },
+ {
+  "level": "eagle",
+  "q": "In which year did Apollo 11 land on the Moon?",
+  "options": [
+   "1975",
+   "1957",
+   "1969",
+   "1984"
+  ],
+  "answer": 2,
+  "explain": "Eagle landed on 20 July 1969.",
+  "hint": "Exactly 50 years before Chandrayaan-2 was launched."
+ },
+ {
+  "level": "rohini",
+  "q": "Who was the project director of SLV-3?",
+  "options": [
+   "Vikram Sarabhai",
+   "Kalpana Chawla",
+   "A.P.J. Abdul Kalam",
+   "Rakesh Sharma"
+  ],
+  "answer": 2,
+  "explain": "Dr A.P.J. Abdul Kalam led the SLV-3 project, which put Rohini into orbit in 1980.",
+  "hint": "He later became President of India."
+ },
+ {
+  "level": "rohini",
+  "q": "About how heavy was the Rohini RS-1 satellite?",
+  "options": [
+   "About 3 kg",
+   "About 3.5 tonnes",
+   "About 350 kg",
+   "About 35 kg"
+  ],
+  "answer": 3,
+  "explain": "Rohini RS-1 had a mass of about 35 kg.",
+  "hint": "Lighter than most school students."
+ },
+ {
+  "level": "cassini",
+  "q": "How long did Cassini study Saturn?",
+  "options": [
+   "About 13 years",
+   "About 50 years",
+   "About 13 days",
+   "About 1 year"
+  ],
+  "answer": 0,
+  "explain": "Cassini orbited Saturn from 2004 until 2017.",
+  "hint": "From 2004 until 2017."
+ },
+ {
+  "level": "cassini",
+  "q": "How did Cassini’s mission end?",
+  "options": [
+   "It flew off to Neptune",
+   "It dived into Saturn on purpose",
+   "It landed on Titan",
+   "It came back to Earth"
+  ],
+  "answer": 1,
+  "explain": "In 2017, low on fuel, Cassini was steered into Saturn so it could never crash onto a moon that might hold life.",
+  "hint": "Planned so it could never hit a moon that might have life."
+ },
+ {
+  "level": "mip",
+  "q": "What did Chandrayaan-1 help discover on the Moon?",
+  "options": [
+   "Living things",
+   "Liquid lakes",
+   "An atmosphere like Earth’s",
+   "Water molecules"
+  ],
+  "answer": 3,
+  "explain": "Chandrayaan-1’s instruments, including NASA’s M3 on board, found signs of water molecules on the Moon.",
+  "hint": "Something every living thing needs."
+ },
+ {
+  "level": "mip",
+  "q": "Which rocket launched Chandrayaan-1?",
+  "options": [
+   "LVM3",
+   "Saturn V",
+   "PSLV",
+   "SLV-3"
+  ],
+  "answer": 2,
+  "explain": "PSLV-C11 launched Chandrayaan-1 on 22 October 2008.",
+  "hint": "The same rocket family later launched Mangalyaan."
+ },
+ {
+  "level": "pluto",
+  "q": "What is the heart-shaped region on Pluto named after?",
+  "options": [
+   "The New Horizons rocket",
+   "A famous painter",
+   "Clyde Tombaugh, who discovered Pluto",
+   "A Greek goddess"
+  ],
+  "answer": 2,
+  "explain": "It is called Tombaugh Regio, after Clyde Tombaugh, who discovered Pluto in 1930.",
+  "hint": "The astronomer who discovered Pluto."
+ },
+ {
+  "level": "pluto",
+  "q": "Why is Pluto called a dwarf planet?",
+  "options": [
+   "It is made of gas",
+   "It has not cleared its path of other objects",
+   "It does not go round the Sun",
+   "It has no moons"
+  ],
+  "answer": 1,
+  "explain": "Pluto shares its region of space with many icy bodies, so since 2006 it is counted as a dwarf planet.",
+  "hint": "It shares its region of space with many icy bodies."
+ },
+ {
+  "level": "juno",
+  "q": "What powers Juno so far from the Sun?",
+  "options": [
+   "Wind",
+   "Solar panels",
+   "A nuclear reactor",
+   "Car batteries"
+  ],
+  "answer": 1,
+  "explain": "Juno uses three large solar panels, the first solar-powered spacecraft to reach Jupiter.",
+  "hint": "Sunlight, even though it is very dim out there."
+ },
+ {
+  "level": "juno",
+  "q": "Which giant storm on Jupiter does Juno study?",
+  "options": [
+   "The Ring Storm",
+   "The Northern Lights",
+   "The Blue Hurricane",
+   "The Great Red Spot"
+  ],
+  "answer": 3,
+  "explain": "The Great Red Spot is a storm wider than Earth that has raged for centuries.",
+  "hint": "It is red and bigger than Earth."
+ },
+ {
+  "level": "sats104",
+  "q": "What was the main satellite on PSLV-C37?",
+  "options": [
+   "Chandrayaan-2",
+   "INSAT-3DS",
+   "AstroSat",
+   "Cartosat-2D"
+  ],
+  "answer": 3,
+  "explain": "Cartosat-2D, an Earth-observation satellite, flew with 103 smaller satellites.",
+  "hint": "An Indian map-making satellite in the Cartosat series."
+ },
+ {
+  "level": "sats104",
+  "q": "Why were the 104 satellites released in different directions?",
+  "options": [
+   "To save fuel",
+   "To make a pattern",
+   "Because the rocket was spinning by accident",
+   "So they would never bump into each other"
+  ],
+  "answer": 3,
+  "explain": "Each group was pushed off in a planned direction so the satellites drift apart safely.",
+  "hint": "Safety first in a crowded orbit."
+ },
+ {
+  "level": "spadex",
+  "q": "Which rocket launched SpaDeX?",
+  "options": [
+   "PSLV",
+   "SSLV",
+   "LVM3",
+   "Falcon 9"
+  ],
+  "answer": 0,
+  "explain": "PSLV-C60 launched the two SpaDeX satellites on 30 December 2024.",
+  "hint": "Flight number 60 of ISRO’s workhorse."
+ },
+ {
+  "level": "spadex",
+  "q": "With SpaDeX, India became which country to dock in space?",
+  "options": [
+   "The tenth",
+   "The fourth",
+   "The second",
+   "The first"
+  ],
+  "answer": 1,
+  "explain": "India docked in space after the USA, Russia and China.",
+  "hint": "After the USA, Russia and China."
+ },
+ {
+  "level": "sre1",
+  "q": "What did SRE-1 test?",
+  "options": [
+   "Docking two satellites",
+   "Bringing a capsule back safely from orbit",
+   "Launching people",
+   "Landing on Mars"
+  ],
+  "answer": 1,
+  "explain": "SRE-1 (Space capsule Recovery Experiment) was India’s first spacecraft to come back from orbit and be recovered.",
+  "hint": "Its name has the word Recovery in it."
+ },
+ {
+  "level": "sre1",
+  "q": "Where did SRE-1 splash down?",
+  "options": [
+   "Bay of Bengal",
+   "Indian Ocean near Antarctica",
+   "Arabian Sea",
+   "A lake in Kerala"
+  ],
+  "answer": 0,
+  "explain": "It came down on parachutes in the Bay of Bengal, east of Sriharikota.",
+  "hint": "The sea east of Chennai."
+ },
+ {
+  "level": "sre1",
+  "q": "About how fast was SRE-1 moving when it hit the air?",
+  "options": [
+   "About 8 km/s",
+   "About 8 m/s",
+   "About 80 km/h",
+   "About 800 km/s"
+  ],
+  "answer": 0,
+  "explain": "It entered the air at about 8 km/s, close to orbital speed, so it needed a heat shield.",
+  "hint": "Close to orbital speed."
+ },
+ {
+  "level": "astrosat",
+  "q": "What is AstroSat?",
+  "options": [
+   "A weather satellite",
+   "A rocket",
+   "India’s first space observatory",
+   "A Moon lander"
+  ],
+  "answer": 2,
+  "explain": "AstroSat is a telescope in orbit that looks at stars, galaxies and black holes in many kinds of light.",
+  "hint": "It is a telescope in space."
+ },
+ {
+  "level": "astrosat",
+  "q": "Why does a turning satellite keep turning after the push stops?",
+  "options": [
+   "It is magnetic",
+   "Its antenna spins it",
+   "Nothing in space slows it down",
+   "The Sun pulls it round"
+  ],
+  "answer": 2,
+  "explain": "With no air to rub against, a spin continues until a push the other way stops it: Newton’s first law, for turning.",
+  "hint": "There is no air to rub against."
+ },
+ {
+  "level": "astrosat",
+  "q": "Which kinds of light can AstroSat see?",
+  "options": [
+   "Only radio waves",
+   "Only sound",
+   "Ultraviolet, visible light and X-rays",
+   "Only visible light"
+  ],
+  "answer": 2,
+  "explain": "AstroSat observes in ultraviolet, visible and X-ray light at the same time.",
+  "hint": "More than just the colours our eyes see."
+ },
+ {
+  "level": "dodge",
+  "q": "Which NASA spacecraft did Chandrayaan-2’s orbiter move away from?",
+  "options": [
+   "Hubble Space Telescope",
+   "Lunar Reconnaissance Orbiter (LRO)",
+   "Voyager 1",
+   "The Space Shuttle"
+  ],
+  "answer": 1,
+  "explain": "In October 2021 ISRO moved the orbiter so it would not pass too close to NASA’s LRO.",
+  "hint": "Its name says it scouts the Moon."
+ },
+ {
+  "level": "dodge",
+  "q": "Why did both orbiters come close over the Moon’s pole?",
+  "options": [
+   "Both were parked there",
+   "They were docking",
+   "The pole pulls harder",
+   "Both fly in polar orbits"
+  ],
+  "answer": 3,
+  "explain": "Polar orbits pass over the north and south poles every lap, so paths can cross there.",
+  "hint": "Their paths both cross the top and bottom of the Moon."
+ },
+ {
+  "level": "dodge",
+  "q": "A small forward push lifts your orbit the most where?",
+  "options": [
+   "It lifts everywhere equally",
+   "A quarter of an orbit later",
+   "Half an orbit later",
+   "At the same spot"
+  ],
+  "answer": 2,
+  "explain": "A push changes the opposite side of the orbit the most, half an orbit after the burn.",
+  "hint": "On the far side of the Moon from the burn."
+ },
+ {
+  "level": "navic",
+  "q": "What is NavIC?",
+  "options": [
+   "A rocket engine",
+   "India’s satellite navigation system",
+   "A space station",
+   "A Moon rover"
+  ],
+  "answer": 1,
+  "explain": "NavIC (Navigation with Indian Constellation) gives positions over India, like GPS.",
+  "hint": "India’s own version of GPS."
+ },
+ {
+  "level": "navic",
+  "q": "How does a navigation satellite tell you how far away it is?",
+  "options": [
+   "By its size in the sky",
+   "By how long its signal takes to arrive",
+   "By its colour",
+   "By how loud it sounds"
+  ],
+  "answer": 1,
+  "explain": "The signal travels at the speed of light, so its travel time gives the distance.",
+  "hint": "Signals travel at the speed of light."
+ },
+ {
+  "level": "navic",
+  "q": "How many distance circles do you need, at least, to find one spot on a map?",
+  "options": [
+   "Ten",
+   "Two",
+   "One",
+   "Three"
+  ],
+  "answer": 3,
+  "explain": "Two circles usually cross at two places; a third picks the right one. (In 3D, receivers use at least four satellites.)",
+  "hint": "Count the circles in the level."
+ },
+ {
+  "level": "lvm3",
+  "q": "Why do rockets drop empty stages?",
+  "options": [
+   "To steer",
+   "To make a noise",
+   "So they stop carrying useless weight",
+   "To slow down"
+  ],
+  "answer": 2,
+  "explain": "A lighter rocket speeds up more with the same push, so empty tanks and engines are thrown away.",
+  "hint": "A lighter rocket speeds up more."
+ },
+ {
+  "level": "lvm3",
+  "q": "What fuel does LVM3’s C25 cryogenic stage use?",
+  "options": [
+   "Liquid hydrogen and liquid oxygen",
+   "Solid rubber",
+   "Water",
+   "Petrol"
+  ],
+  "answer": 0,
+  "explain": "Cryogenic means super-cold: liquid hydrogen burns with liquid oxygen.",
+  "hint": "Two super-cold liquids."
+ },
+ {
+  "level": "lvm3",
+  "q": "Why does a rocket lean over as it climbs?",
+  "options": [
+   "To build sideways speed for orbit",
+   "To look good",
+   "Because the wind pushes it",
+   "To avoid birds"
+  ],
+  "answer": 0,
+  "explain": "Orbit means falling sideways so fast you keep missing the ground: about 7.8 km/s sideways.",
+  "hint": "Orbit means falling sideways, very fast."
+ },
+ {
+  "level": "hazard",
+  "q": "Why did Vikram hover at about 150 m before landing?",
+  "options": [
+   "To refuel",
+   "To check the ground for a safe spot",
+   "To wait for night",
+   "To take a selfie"
+  ],
+  "answer": 1,
+  "explain": "Its hazard-detection cameras checked for boulders and slopes, then it moved to a safer spot.",
+  "hint": "It looked for boulders and slopes."
+ },
+ {
+  "level": "hazard",
+  "q": "Once you are sliding sideways in space, what stops you?",
+  "options": [
+   "Gravity",
+   "Nothing can ever stop you",
+   "Air resistance",
+   "Only a push the other way"
+  ],
+  "answer": 3,
+  "explain": "With no air, only a thrust in the opposite direction removes sideways speed (Newton’s first law).",
+  "hint": "Newton’s first law."
+ },
+ {
+  "level": "hazard",
+  "q": "About how fast was Vikram falling when its legs touched the Moon?",
+  "options": [
+   "About 10 m/s",
+   "Exactly 0",
+   "About 100 m/s",
+   "About 1 m/s"
+  ],
+  "answer": 3,
+  "explain": "Vikram touched down at about 0.98 m/s, well inside its legs’ 3 m/s limit.",
+  "hint": "Slower than walking pace."
+ },
+ {
+  "level": "pragyan",
+  "q": "About how fast does Pragyan drive?",
+  "options": [
+   "About 100 km/h",
+   "About 1 m per second",
+   "About 1 cm per second",
+   "About 10 km/h"
+  ],
+  "answer": 2,
+  "explain": "Pragyan moves at about 1 cm/s, carefully, on rough ground.",
+  "hint": "About a fingertip’s width every second."
+ },
+ {
+  "level": "pragyan",
+  "q": "Why did Pragyan have to finish its work in about 14 days?",
+  "options": [
+   "Earth moves away",
+   "Its wheels wear out",
+   "It runs out of air",
+   "Then the lunar night begins"
+  ],
+  "answer": 3,
+  "explain": "A day on the Moon lasts about 14 Earth days; then comes a freezing two-week night with no sunlight for power.",
+  "hint": "A day on the Moon lasts about two Earth weeks."
+ },
+ {
+  "level": "pragyan",
+  "q": "Which element did Pragyan confirm in the soil near the Moon’s south pole?",
+  "options": [
+   "Chlorophyll",
+   "Gold",
+   "Sulphur",
+   "Uranium"
+  ],
+  "answer": 2,
+  "explain": "Pragyan’s LIBS instrument confirmed sulphur in the lunar soil near the south pole.",
+  "hint": "A yellow element."
+ },
+ {
+  "level": "aditya",
+  "q": "What is special about the L1 point?",
+  "options": [
+   "It is on the Moon",
+   "The pulls of the Sun and Earth balance there",
+   "It is inside the Sun",
+   "It has no gravity at all"
+  ],
+  "answer": 1,
+  "explain": "At L1 a spacecraft goes round the Sun in step with Earth, because the two pulls (and its motion) balance.",
+  "hint": "A balancing point between two big pulls."
+ },
+ {
+  "level": "aditya",
+  "q": "About how far is L1 from Earth?",
+  "options": [
+   "About 1,500 km",
+   "About 1.5 million km",
+   "About 384,000 km",
+   "About 150 million km"
+  ],
+  "answer": 1,
+  "explain": "L1 is about 1.5 million km from Earth, towards the Sun.",
+  "hint": "About four times as far as the Moon."
+ },
+ {
+  "level": "aditya",
+  "q": "Why does Aditya-L1 need small engine nudges to stay near L1?",
+  "options": [
+   "Its solar panels need cleaning",
+   "L1 is unstable, so small drifts grow",
+   "To take photos",
+   "The Sun pushes it away every day"
+  ],
+  "answer": 1,
+  "explain": "L1 is like a ball on a hilltop: any small drift grows, so small corrections keep it on track.",
+  "hint": "Like a ball balanced on a hilltop."
+ },
+ {
+  "level": "insat",
+  "q": "How long does a geostationary satellite take to go once round Earth?",
+  "options": [
+   "One hour",
+   "One year",
+   "One month",
+   "One day (23 h 56 min)"
+  ],
+  "answer": 3,
+  "explain": "It goes round once for every spin of Earth, so it seems to hang still over one place.",
+  "hint": "The same as one spin of Earth."
+ },
+ {
+  "level": "insat",
+  "q": "About how high is a geostationary orbit?",
+  "options": [
+   "About 3,600 km",
+   "About 36,000 km",
+   "About 400 km",
+   "About 1.5 million km"
+  ],
+  "answer": 1,
+  "explain": "Geostationary orbit is 35,786 km above the equator.",
+  "hint": "Almost a tenth of the way to the Moon."
+ },
+ {
+  "level": "insat",
+  "q": "If a satellite speeds up, its orbit gets higher, and it goes round…",
+  "options": [
+   "Backwards",
+   "Faster",
+   "Slower",
+   "At the same speed"
+  ],
+  "answer": 2,
+  "explain": "Higher orbits take longer, so speeding up actually makes it fall behind and drift west.",
+  "hint": "Higher orbits take longer."
+ },
+ {
+  "level": "pushpak",
+  "q": "What is Pushpak?",
+  "options": [
+   "A weather satellite",
+   "ISRO’s reusable winged spaceplane",
+   "A Moon rover",
+   "A helicopter"
+  ],
+  "answer": 1,
+  "explain": "Pushpak is ISRO’s Reusable Launch Vehicle test craft that lands on a runway like an aeroplane.",
+  "hint": "It lands on a runway like an aeroplane."
+ },
+ {
+  "level": "pushpak",
+  "q": "What lifted Pushpak up for its landing tests?",
+  "options": [
+   "A PSLV rocket",
+   "A hot-air balloon",
+   "A crane",
+   "A Chinook helicopter"
+  ],
+  "answer": 3,
+  "explain": "An Indian Air Force Chinook helicopter carried it up and released it 4.5 km high.",
+  "hint": "A helicopter with two big rotors."
+ },
+ {
+  "level": "pushpak",
+  "q": "Why does a glider pull up just before touching down?",
+  "options": [
+   "To speed up",
+   "To climb back to the clouds",
+   "To slow its sinking for a soft landing",
+   "To turn around"
+  ],
+  "answer": 2,
+  "explain": "Pulling up (the flare) adds lift for a moment, so it sinks gently onto the runway.",
+  "hint": "Pilots call it the flare."
+ },
+ {
+  "level": "general",
+  "q": "Who is known as the father of the Indian space programme?",
+  "options": [
+   "Satish Dhawan",
+   "C.V. Raman",
+   "Vikram Sarabhai",
+   "Homi Bhabha"
+  ],
+  "answer": 2,
+  "explain": "Dr Vikram Sarabhai founded India’s space research; the Vikram lander is named after him.",
+  "hint": "The Vikram lander carries his name."
+ },
+ {
+  "level": "general",
+  "q": "Where was India’s first rocket launched, in 1963?",
+  "options": [
+   "Thumba, Kerala",
+   "Delhi",
+   "Mumbai",
+   "Sriharikota"
+  ],
+  "answer": 0,
+  "explain": "A small sounding rocket was launched from Thumba, near Thiruvananthapuram, on 21 November 1963.",
+  "hint": "Near Thiruvananthapuram."
+ },
+ {
+  "level": "general",
+  "q": "What is the name of India’s human spaceflight programme?",
+  "options": [
+   "Mangalyaan",
+   "Gaganyaan",
+   "Chandrayaan",
+   "Shukrayaan"
+  ],
+  "answer": 1,
+  "explain": "Gaganyaan will carry Indian astronauts into orbit in an Indian spacecraft.",
+  "hint": "‘Gagan’ means sky."
+ },
+ {
+  "level": "general",
+  "q": "Which planet spins on its side?",
+  "options": [
+   "Mars",
+   "Mercury",
+   "Saturn",
+   "Uranus"
+  ],
+  "answer": 3,
+  "explain": "Uranus is tilted about 98°, so it rolls around the Sun on its side.",
+  "hint": "An ice giant visited only by Voyager 2."
+ },
+ {
+  "level": "general",
+  "q": "Roughly how fast does light travel?",
+  "options": [
+   "300,000 km per hour",
+   "3 km per second",
+   "300 km per second",
+   "300,000 km per second"
+  ],
+  "answer": 3,
+  "explain": "Light travels about 300,000 km every second.",
+  "hint": "Light could go round Earth more than 7 times in one second."
+ },
+ {
+  "level": "general",
+  "q": "How long does Earth take to go round the Sun?",
+  "options": [
+   "About 30 days",
+   "About 24 hours",
+   "About 365 days",
+   "About 10 years"
+  ],
+  "answer": 2,
+  "explain": "One trip round the Sun is one year, about 365.25 days.",
+  "hint": "One year."
+ },
+ {
+  "level": "general",
+  "q": "What do we call a space rock that reaches the ground?",
+  "options": [
+   "A planet",
+   "A meteorite",
+   "A comet",
+   "A meteor"
+  ],
+  "answer": 1,
+  "explain": "A meteor is the streak of light; a piece that survives to the ground is a meteorite.",
+  "hint": "If it burns up in the air, it is just a meteor."
+ },
+ {
+  "level": "general",
+  "q": "Which galaxy do we live in?",
+  "options": [
+   "Andromeda",
+   "Orion",
+   "The Milky Way",
+   "The Large Magellanic Cloud"
+  ],
+  "answer": 2,
+  "explain": "Our Solar System is in the Milky Way, a spiral galaxy of hundreds of billions of stars.",
+  "hint": "Its name comes from how it looks in a dark sky."
+ },
+ {
+  "level": "general",
+  "q": "Which star is closest to Earth?",
+  "options": [
+   "The Pole Star",
+   "Sirius",
+   "Proxima Centauri",
+   "The Sun"
+  ],
+  "answer": 3,
+  "explain": "The Sun is a star, about 150 million km away. The next closest is Proxima Centauri.",
+  "hint": "You see it every day."
+ },
+ {
+  "level": "general",
+  "q": "Which Indian-born woman astronaut flew on the Space Shuttle?",
+  "options": [
+   "Ritu Karidhal",
+   "Tessy Thomas",
+   "Kalpana Chawla",
+   "Sunita Williams"
+  ],
+  "answer": 2,
+  "explain": "Kalpana Chawla, born in Karnal, Haryana, flew on the Space Shuttle in 1997 and 2003.",
+  "hint": "She was born in Karnal, Haryana."
+ },
+ {
+  "level": "general",
+  "q": "In 2025, which Indian astronaut flew to the International Space Station?",
+  "options": [
+   "Kalpana Chawla",
+   "Shubhanshu Shukla",
+   "Ravish Malhotra",
+   "Rakesh Sharma"
+  ],
+  "answer": 1,
+  "explain": "Group Captain Shubhanshu Shukla flew to the ISS on the Axiom-4 mission in June 2025.",
+  "hint": "An Indian Air Force pilot chosen for Gaganyaan."
  }
 ]
