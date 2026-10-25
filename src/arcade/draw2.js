@@ -75,6 +75,34 @@ function astro(ctx, W, H, game, skin, view) {
   ctx.lineTo(cx, cy + r + 12);
   ctx.stroke();
   lab(ctx, 'TELESCOPE VIEW', cx, cy - r - 18, '#4cc9f0');
+  // capture window around the target: inside it, slow enough, the star tracker locks on
+  if (tx > -100 && tx < W + 100) {
+    ctx.strokeStyle = game.locked ? '#52d273' : 'rgba(82,210,115,0.7)';
+    ctx.setLineDash([6, 5]);
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.arc(tx, cy, 2.5 * ppd, 0, Math.PI * 2);
+    ctx.stroke();
+    ctx.setLineDash([]);
+  }
+  // where you would stop if you pushed back now
+  if (!game.locked && Math.abs(game.omega) > 0.02 * D) {
+    const sx = cx + ((game.stopAt - th) / D) * ppd;
+    if (sx > 0 && sx < W) {
+      ctx.strokeStyle = '#ffcc4d';
+      ctx.setLineDash([4, 4]);
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.arc(sx, cy, 14, 0, Math.PI * 2);
+      ctx.stroke();
+      ctx.setLineDash([]);
+      lab(ctx, 'stop here', sx, cy - 22, '#ffcc4d', 'center', 10);
+    } else {
+      const right = sx > cx;
+      lab(ctx, `stop point ${right ? '→' : '←'}`, right ? W - 14 : 14, cy + 40, '#ffcc4d', right ? 'right' : 'left', 10);
+    }
+  }
+  if (game.locked) lab(ctx, 'STAR TRACKER LOCKED', cx, cy + r + 30, '#52d273', 'center', 13);
   // reaction wheel spin indicator
   const wy = view.bottom - 24;
   lab(ctx, game.burning ? 'Reaction wheels pushing' : 'Coasting (keeps turning)', cx, wy, game.burning ? '#ffb347' : '#8d9cb5');

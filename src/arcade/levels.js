@@ -247,7 +247,7 @@ function captureLevel({ body, mu, R, vInf, periAlt, startR, dry, wetDv, thrust, 
     dir: 'retro',
     clock: orbitClock(mu, 10),
     clockR: (g) => Math.hypot(g.w.y[0], g.w.y[1]),
-    burnSlow: 0.6,
+    burnSlow: 0.3, // time slows right down while you brake, so you can let go at the right moment
     horizon: () => {
       return 2 * Math.PI * Math.sqrt(startR ** 3 / mu) * 0.6;
     },
@@ -301,14 +301,14 @@ const L3 = {
       mu: MU.moon,
       R: 1737.4e3,
       vInf: 850,
-      periAlt: 300e3,
+      periAlt: 500e3,
       startR: 22000e3,
       dry: 2204,
       wetDv: 900,
       thrust: 440,
       isp: 315,
       apoMax: 20000e3,
-      periMin: 50e3,
+      periMin: 15e3,
       starsBy: (g, apo) => (apo <= 6000e3 ? 3 : apo <= 12000e3 ? 2 : 1),
       info2: (o) => ['Orbit', o.energy < 0 ? 'Caught!' : 'Flying past'],
     }),
@@ -355,6 +355,13 @@ function landerLevel({ g, engine, mass, dry, z0, vz0, speed = 1, holdThrottle, i
       alert: l.altitude < 60 && l.vz < -limits.vz * 1.5 ? 'Too fast! Brake!' : l.fuel <= 0 ? 'Out of fuel!' : null,
     }),
     scene: () => ({ kind: 'lander', surface, z0, crane }),
+    /** height where you would stop if you held the engine from now on (null if you never would) */
+    stopAlt() {
+      const aNet = (engine.thrust * (typeof holdThrottle === 'function' ? holdThrottle(l) : holdThrottle)) / l.mass - g;
+      const v = -l.vz;
+      if (v <= 0.2 || aNet <= 0) return null;
+      return l.altitude - (v * v) / (2 * aNet);
+    },
     telemetry: () => [l.t, Math.max(0, l.altitude), Math.abs(l.vz)],
     bot() {
       // brake when the engine's real stopping distance (with margin) reaches the ground
@@ -362,7 +369,8 @@ function landerLevel({ g, engine, mass, dry, z0, vz0, speed = 1, holdThrottle, i
       const v = -l.vz;
       const stop = v > 0 ? (v * v) / (2 * Math.max(0.05, aNet)) : 0;
       const target = Math.max(0.5, Math.min(limits.vz * 0.5, l.altitude * 0.1));
-      return { hold: (stop + 2 > l.altitude * 0.9 && v > target) || v > 2 + l.altitude * 0.25 };
+      // a careful pilot: start braking early and come down slowly at the end
+      return { hold: (stop + 4 > l.altitude * 0.7 && v > target) || v > 1.5 + l.altitude * 0.18 };
     },
   };
   return game;
@@ -389,7 +397,7 @@ const L4 = {
       dry: 1250,
       z0: 800,
       vz0: -12,
-      speed: 2.2,
+      speed: 1.6,
       holdThrottle: 1,
       limits: { vz: 3, vx: 1, tilt: 15 },
       stars: (v) => (v <= 1 ? 3 : v <= 2 ? 2 : 1),
@@ -601,7 +609,7 @@ const L7 = {
               dry: 1700,
               z0: hs.alt,
               vz0: hs.vz,
-              speed: 2.4,
+              speed: 1.4,
               holdThrottle: (l) => Math.min(1, (l.mass * (3.721 + 3.2)) / 24800),
               idleThrottle: 0.13,
               limits: { vz: 2.5, vx: 2, tilt: 20 },
@@ -870,7 +878,7 @@ const L13 = {
       world,
       dir: 'retro',
       clock: orbitClock(mu, 7),
-      burnClock: 20,
+      burnClock: 6, // slow during the burn: a few m/s decide the entry angle
       clockR: (g) => Math.max(Math.hypot(g.w.y[0], g.w.y[1]), 20000e3),
       horizon: () => 4 * DAY,
       trailStep: 1e6,
@@ -981,7 +989,7 @@ const LA11 = {
       dry: 6930,
       z0: 300,
       vz0: -9,
-      speed: 1.6,
+      speed: 1.0,
       holdThrottle: 0.6,
       limits: { vz: 3, vx: 1.2, tilt: 12 },
       stars: (v) => (v <= 1 ? 3 : v <= 2 ? 2 : 1),
@@ -1405,7 +1413,7 @@ const LDOCK = {
   guide: ['In space nothing slows you down. You will keep drifting forever!', 'Hold BRAKE to slow down, but don’t stop before you touch.'],
   fact: 'On 16 January 2025 ISRO’s two SpaDeX satellites docked in orbit, making India the fourth country to dock spacecraft in space.',
   create() {
-    const brake = 0.004, rate = 6; // m/s² from the small thrusters; time runs 6× faster
+    const brake = 0.004, rate = 3; // m/s² from the small thrusters; time runs 3× faster
     let x = 18, v = -0.24, t = 0, stopped = false, fuel = 1;
     const game = {
       kind: 'dock',
@@ -1453,6 +1461,8 @@ const LDOCK = {
       },
       hud: () => ({ fuel, info: [['Distance', `${Math.max(0, x).toFixed(2)} m`], ['Speed', `${(Math.abs(v) * 100).toFixed(1)} cm/s`]], alert: x < 3 && -v > 0.05 ? 'Too fast!' : null }),
       scene: () => ({ kind: 'dock' }),
+      /** where you would stop if you braked from now on */
+      stopX: () => x - (v * v) / (2 * brake),
       telemetry: () => [t, Math.max(0, x), Math.abs(v)],
       bot() {
         const stop = (v * v) / (2 * brake);

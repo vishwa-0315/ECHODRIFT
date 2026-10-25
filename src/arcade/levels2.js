@@ -120,48 +120,66 @@ export const LASTRO = {
   buttons: ['◀ TURN', 'TURN ▶'],
   button: 'TURN',
   control: 'two',
-  goal: 'Turn the telescope until the Crab Nebula sits in the cross-hairs, and stop the spin there.',
-  guide: ['Spinning wheels inside the satellite turn it. Push once and it keeps turning (nothing stops it in space)!', 'Push towards the target, then push the other way early to stop on it.'],
+  goal: 'Turn the telescope towards the Crab Nebula and slow down near it. When you are close and slow, the star tracker locks on.',
+  guide: ['Spinning wheels inside the satellite turn it. Push once and it keeps turning (nothing stops it in space)!', 'Watch the dashed circle: it shows where you would stop if you pushed back now. Push back when it reaches the target.'],
   fact: 'AstroSat, launched on 28 September 2015 by PSLV-C30, is India’s first space observatory. It looks at stars, galaxies and black holes in ultraviolet and X-ray light.',
   create() {
-    const alpha = 0.6 * deg; // angular acceleration from the reaction wheels, rad/s² (sim time)
-    const rate = 4; // sim seconds per real second
-    let th = 0, w = 0, t = 0, still = 0, effort = 0;
+    const alpha = 0.35 * deg; // angular acceleration from the reaction wheels, rad/s² (sim time)
+    const rate = 3; // sim seconds per real second
+    const capErr = 2.5 * deg, capW = 0.4 * deg; // the star tracker takes over inside this window
+    let th = 0, w = 0, t = 0, effort = 0, lock = 0, locked = false, passes = 0, lastSide = -1;
     const target = 62 * deg;
     const g = shell('astro', {
       get theta() {
         return th;
       },
+      get omega() {
+        return w;
+      },
+      /** where you would stop if you pushed against the spin right now */
+      get stopAt() {
+        return th + (Math.sign(w) * w * w) / (2 * alpha);
+      },
+      get locked() {
+        return locked;
+      },
       target,
       update(dt, input) {
         if (g.status !== 'play') return;
-        const dir = (input.hold ? -1 : 0) + (input.holdB ? 1 : 0);
+        const dir = locked ? 0 : (input.hold ? -1 : 0) + (input.holdB ? 1 : 0);
         g.burning = dir !== 0;
         const n = Math.ceil((dt * rate) / 0.01), h = (dt * rate) / n;
         for (let i = 0; i < n; i++) {
-          w += dir * alpha * h;
+          if (locked) {
+            // fine pointing: the star tracker steers the wheels to the target (a damped controller)
+            const u = Math.max(-alpha, Math.min(alpha, -1.2 * (th - target) - 2.2 * w));
+            w += u * h;
+          } else w += dir * alpha * h;
           th += w * h;
           t += h;
           effort += Math.abs(dir) * h;
         }
-        const err = Math.abs(th - target);
-        if (err < 0.5 * deg && Math.abs(w) < 0.08 * deg) still += dt * rate;
-        else still = 0;
-        if (still > 3) {
-          const e = err / deg;
-          return g.win(e < 0.12 ? 3 : e < 0.25 ? 2 : 1, ['Locked on the Crab Nebula!', `Pointing error: ${e.toFixed(2)}°`, `Wheel pushes: ${effort.toFixed(1)} s`]);
+        const err = th - target;
+        const side = Math.sign(err);
+        if (!locked && side !== lastSide && lastSide !== 0) passes += side > 0 ? 1 : 0;
+        lastSide = side;
+        if (!locked && Math.abs(err) < capErr && Math.abs(w) < capW) locked = true;
+        if (locked) lock += dt * rate;
+        if (locked && lock > 4) {
+          const st = passes === 0 && t < 70 ? 3 : passes <= 1 && t < 110 ? 2 : 1;
+          return g.win(st, ['Star tracker locked on the Crab Nebula!', `Time to point: ${t.toFixed(0)} s`, passes ? `You swung past the target ${passes} time${passes > 1 ? 's' : ''}` : 'Stopped right on target, no overshoot']);
         }
-        if (Math.abs(th - target) > 120 * deg) return g.lose('You spun right past the target and kept going. Push the other way earlier to stop.');
-        if (t > 160) return g.lose('The observing slot is over. Turn faster, then stop on the target.');
+        if (Math.abs(err) > 130 * deg) return g.lose('You spun far past the target and kept going. Push the other way when the dashed circle reaches the target.');
+        if (t > 220) return g.lose('The observing slot is over. Turn towards the target, then slow down near it.');
       },
-      hud: () => ({ fuel: null, info: [['Off target', `${((target - th) / deg).toFixed(1)}°`], ['Turning', `${(w / deg).toFixed(2)}°/s`]], alert: Math.abs(target - th) < 8 * deg && Math.abs(w) > 1.6 * deg ? 'Too fast! Stop!' : null }),
+      hud: () => ({ fuel: null, info: [['Off target', locked ? 'locked' : `${((target - th) / deg).toFixed(1)}°`], ['Turning', `${(w / deg).toFixed(2)}°/s`]], alert: !locked && Math.abs(target - th) < 15 * deg && Math.abs(w) > 2.2 * deg ? 'Too fast: push back!' : null }),
       scene: () => ({ kind: 'astro' }),
       bot() {
+        if (locked) return {};
         const err = target - th;
-        const want = Math.sign(err) * Math.sqrt(2 * alpha * 0.8 * Math.abs(err));
-        if (Math.abs(err) < 0.05 * deg && Math.abs(w) < 0.03 * deg) return {};
-        if (w < want - 0.02 * deg) return { holdB: true };
-        if (w > want + 0.02 * deg) return { hold: true };
+        const want = Math.sign(err) * Math.min(3 * deg, Math.sqrt(2 * alpha * 0.7 * Math.abs(err)));
+        if (w < want - 0.05 * deg) return { holdB: true };
+        if (w > want + 0.05 * deg) return { hold: true };
         return {};
       },
       telemetry: () => [t, Math.abs(target - th) / deg, Math.abs(w) / deg],
@@ -597,7 +615,7 @@ export const LL1 = {
     const tEnd = (2 * Math.PI) / om; // one loop
     const kick = 0.0006; // velocity change per nudge, normalised (≈ 1.8 m/s)
     const toMs = (L * n); // normalised velocity → m/s
-    const box = [0.5, 0.75];
+    const box = [0.6, 0.9];
     const predict = (st, T = 1.1) => {
       const out = [];
       let y = st.slice();
@@ -629,7 +647,7 @@ export const LL1 = {
         if (input.tap) ((s[2] -= kick), (dv += kick));
         if (input.tapB) ((s[2] += kick), (dv += kick));
         g.burning = !!(input.tap || input.tapB);
-        const h = dt * 0.25; // ≈ 14.5 days per real second
+        const h = dt * 0.12; // ≈ 7 days per real second
         const m = 8;
         for (let i = 0; i < m; i++) s = rk4(f, s, h / m);
         t += h;
@@ -685,8 +703,8 @@ export const LGEO = {
     const mu = MU.earth, aG = Math.cbrt(mu / (7.2921159e-5) ** 2); // geostationary radius
     const we = 7.2921159e-5, slot = 82;
     let a = aG - 70e3, lon = 74, t = 0, dv = 0, still = 0;
-    const acc = 0.0004 * 40; // m/s² (small thrusters), already scaled for game time below
-    const rate = 0.7 * DAY; // sim seconds per real second
+    const acc = 0.0002 * 40; // m/s² (small thrusters), already scaled for game time below
+    const rate = 0.5 * DAY; // sim seconds per real second
     const drift = () => ((Math.sqrt(mu / a ** 3) - we) * DAY) / deg; // °/day, + = east
     const g = shell('geo', {
       slot,
@@ -711,9 +729,9 @@ export const LGEO = {
         lon += (drift() * h) / DAY;
         t += h;
         const err = Math.abs(lon - slot);
-        if (err < 0.25 && Math.abs(drift()) < 0.05) still += h;
+        if (err < 0.3 && Math.abs(drift()) < 0.08) still += h;
         else still = 0;
-        if (still > 2 * DAY) return g.win(dv <= 3.6 && err < 0.12 ? 3 : dv <= 5.5 && err < 0.2 ? 2 : 1, [`Parked over ${lon.toFixed(2)}°E!`, `Drift: ${Math.abs(drift()).toFixed(3)}° per day`, `Fuel used: ${dv.toFixed(1)} m/s of Δv`]);
+        if (still > 2 * DAY) return g.win(dv <= 3.8 && err < 0.2 ? 3 : dv <= 6 && err < 0.3 ? 2 : 1, [`Parked over ${lon.toFixed(2)}°E!`, `Drift: ${Math.abs(drift()).toFixed(3)}° per day`, `Fuel used: ${dv.toFixed(1)} m/s of Δv`]);
         if (lon > slot + 6) return g.lose('You drifted far past India to the east. Remember: speeding up makes you drift west!');
         if (lon < slot - 14) return g.lose('You drifted too far west. Slowing down lowers the orbit and makes you drift east.');
         if (t > 30 * DAY) return g.lose('A month has passed and you are still drifting. Stop the drift right over 82°E.');
@@ -775,11 +793,11 @@ export const LRLV = {
       update(dt, input) {
         if (g.status !== 'play') return;
         g.burning = !!input.hold;
-        const rate = hgt > 350 ? 10 : 1.2;
+        const rate = hgt > 350 ? 16 : hgt > 120 ? 1.6 : 0.6; // slow motion for the flare
         const target = input.hold ? clPull : clGlide;
         const n = Math.ceil((dt * rate) / 0.01), h = (dt * rate) / n;
         for (let i = 0; i < n; i++) {
-          cl += clamp(target - cl, -0.9 * h, 0.9 * h);
+          cl += clamp(target - cl, -1.6 * h, 1.6 * h); // the elevons respond quickly
           const q = 0.5 * rho(hgt) * v * v * S;
           const lift = q * Math.min(cl, clMax), drag = q * (cd0 + k * cl * cl);
           const st = rk4(
@@ -795,13 +813,13 @@ export const LRLV = {
           if (v < 50) return g.lose('Stalled! You pulled up too early, too slow to make lift. Keep diving until just above the runway.');
           if (hgt <= 0) {
             const sink = -v * Math.sin(gam);
-            if (sink > 3) return g.lose(`Hit the runway sinking at ${sink.toFixed(1)} m/s: too hard. Pull up a little earlier.`);
+            if (sink > 3.5) return g.lose(`Hit the runway sinking at ${sink.toFixed(1)} m/s: too hard. Pull up a little earlier.`);
             return g.win(sink <= 1.2 ? 3 : sink <= 2.2 ? 2 : 1, ['Touchdown on the runway!', `Sinking at ${sink.toFixed(2)} m/s, rolling at ${Math.round(v * 3.6)} km/h`]);
           }
           if (gam > 8 * deg && hgt > 30) return g.lose('Climbing away! Pushpak has no engine, so pulling up too hard wastes your speed.');
         }
       },
-      hud: () => ({ fuel: null, info: [['Height', `${Math.max(0, hgt).toFixed(0)} m`], ['Sinking', `${Math.max(0, -v * Math.sin(gam)).toFixed(1)} m/s`]], alert: hgt < 40 && -v * Math.sin(gam) > 6 ? 'Pull up!' : null }),
+      hud: () => ({ fuel: null, info: [['Height', `${Math.max(0, hgt).toFixed(0)} m`], ['Sinking', `${Math.max(0, -v * Math.sin(gam)).toFixed(1)} m/s`]], alert: hgt < 55 && hgt > 3 && -v * Math.sin(gam) > 4 ? 'Flare: pull up!' : null }),
       scene: () => ({ kind: 'glide' }),
       bot() {
         const sink = -v * Math.sin(gam);

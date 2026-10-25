@@ -465,6 +465,20 @@ export function createRenderer() {
     ctx.stroke();
     ctx.setLineDash([]);
     label(ctx, `${game.x.toFixed(2)} m`, (tx + cxp) / 2, cy + 76, '#c9d4e6', true);
+    // where you would stop if you braked from now on
+    if (game.stopX && game.status === 'play' && game.v < -0.003) {
+      const sxp = tx + 16 + Math.max(-1, game.stopX()) * ppm;
+      const late = game.stopX() < 0.05;
+      ctx.strokeStyle = late ? 'rgba(255,92,92,0.9)' : 'rgba(255,204,77,0.8)';
+      ctx.setLineDash([5, 4]);
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.moveTo(sxp, cy - 30);
+      ctx.lineTo(sxp, cy + 30);
+      ctx.stroke();
+      ctx.setLineDash([]);
+      label(ctx, late ? 'brake now!' : 'stop point', sxp, cy + 44, late ? '#ff5c5c' : '#ffcc4d', true);
+    }
     label(ctx, 'Target', tx - 18, cy - 54, '#e8c15a', true);
     label(ctx, 'Chaser (you)', cxp + 18, cy - 54, '#ffffff', true);
     void dt;
@@ -536,6 +550,21 @@ export function createRenderer() {
     ctx.moveTo(W / 2 - 8 * ppm - 10, groundY + 1);
     ctx.lineTo(W / 2 + 8 * ppm + 10, groundY + 1);
     ctx.stroke();
+    // where you would stop if you held the engine from now on: below the ground = brake now!
+    const sa = game.stopAlt?.();
+    if (sa != null && game.status === 'play') {
+      const yS = groundY - Math.max(-8, sa) * ppm;
+      const danger = sa < 2;
+      ctx.strokeStyle = danger ? 'rgba(255,92,92,0.9)' : 'rgba(255,204,77,0.75)';
+      ctx.setLineDash([6, 5]);
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.moveTo(W / 2 - 46, Math.min(yS, groundY + 6));
+      ctx.lineTo(W / 2 + 46, Math.min(yS, groundY + 6));
+      ctx.stroke();
+      ctx.setLineDash([]);
+      label(ctx, danger ? 'brake now!' : 'you could stop here', W / 2 + 52, Math.min(yS, groundY + 6) + 4, danger ? '#ff5c5c' : '#ffcc4d', false);
+    }
     // lander
     const x = W / 2, y = groundY - alt * ppm;
     const size = sc.span ? Math.min(64, 4.2 * ppm * 0.35) : Math.max(44, Math.min(72, 4.2 * ppm));
