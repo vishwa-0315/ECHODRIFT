@@ -33,19 +33,21 @@ export async function checkForUpdates(app) {
     const apk = (rel.assets || []).find((a) => /\.apk$/i.test(a.name));
     const apkUrl = apk?.browser_download_url || RELEASES;
     const when = rel.published_at ? new Date(rel.published_at).toISOString().slice(0, 10) : '';
-    const yours = BUILD ? `build ${BUILD}` : 'a test build';
+    const ver = (n) => `version 1.0.${n} (build ${n})`;
+    const yours = BUILD ? ver(BUILD) : 'a test build';
     if (!isApp()) {
       panel.replaceChildren(
         h('p', 'You are playing the web version, which is always the newest.'),
-        h('p.small.muted', `Newest Android app: build ${latest}${when ? ` (${when})` : ''}.`),
-        h('div.row.wrap', { style: { marginTop: '12px', justifyContent: 'flex-end' } }, close, h('button.btn.primary', { onclick: () => openExternal(apkUrl), 'data-testid': 'update-download' }, `Download the Android app (build ${latest})`)),
+        h('p.small.muted', `Newest Android app: ${ver(latest)}${when ? `, ${when}` : ''}.`),
+        h('div.row.wrap', { style: { marginTop: '12px', justifyContent: 'flex-end' } }, close, h('button.btn.primary', { onclick: () => openExternal(apkUrl), 'data-testid': 'update-download' }, `Download the Android app (v1.0.${latest})`)),
       );
     } else if (latest > BUILD) {
       face.innerHTML = vyomSVG('happy', 64);
       panel.replaceChildren(
-        h('p', h('b', `A new version is ready: build ${latest}`), when ? ` (${when})` : '', `. You have ${yours}.`),
+        h('p', h('b', `A new version is ready: ${ver(latest)}`), when ? `, ${when}` : '', `. You have ${yours}.`),
         h('p.small', 'Tap Download. When it finishes, open the file and tap Install. Your stars and badges are kept.'),
-        h('div.row.wrap', { style: { marginTop: '12px', justifyContent: 'flex-end' } }, close, h('button.btn.primary', { onclick: () => openExternal(apkUrl), 'data-testid': 'update-download' }, `Download build ${latest}`)),
+        BUILD && BUILD < 9 ? h('p.small.muted', 'One-time step: if Android says the app "conflicts with an existing package", uninstall this version first, then install the new one. From version 1.0.9 on, updates install straight over the top.') : null,
+        h('div.row.wrap', { style: { marginTop: '12px', justifyContent: 'flex-end' } }, close, h('button.btn.primary', { onclick: () => openExternal(apkUrl), 'data-testid': 'update-download' }, `Download v1.0.${latest}`)),
       );
     } else {
       face.innerHTML = vyomSVG('happy', 64);

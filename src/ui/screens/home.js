@@ -197,7 +197,7 @@ export function homeScreen(app, params = {}) {
     h(
       'div.hero',
       sky,
-      h('div.inner', h('div.label', 'Real missions · real physics'), h('h1', 'Launch Window'), h('p.tagline', 'Fly India’s and NASA’s real space missions. Every orbit and landing follows the real laws of physics.'), h('div.home-toggles', musicBtn, soundBtn, voiceBtn, tipsBtn)),
+      h('div.inner', h('div.label', 'Real missions · real physics', h('span.ver-chip', { 'data-testid': 'version' }, `v1.0.${BUILD || 0}`)), h('h1', 'Launch Window'), h('p.tagline', 'Fly India’s and NASA’s real space missions. Every orbit and landing follows the real laws of physics.'), h('div.home-toggles', musicBtn, soundBtn, voiceBtn, tipsBtn)),
     ),
     g.el,
     h(
