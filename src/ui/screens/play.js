@@ -8,12 +8,14 @@ import { sfx, boostOn, boostOff, setMood, unlockAudio } from '../audio.js';
 import quiz from '../../../content/quiz.json';
 import { BODY } from '../levelIcons.js';
 import { drawBody, starField } from '../render.js';
+import { autoHelp } from '../tour.js';
+import { emblemSVG, rankStars, rankUpShow } from '../rankBadge.js';
 import { flightRecorder, flightGraph, starTargets, coachTip, briefFor } from '../debrief.js';
 
 const CHEERS = ['Brilliant flying!', 'Wow, just like the real mission!', 'You are a natural!', 'Mission control is cheering!'];
 const OOPS = ['Oops! Space is tricky.', 'Close one! Let’s try again.', 'Even real missions need practice.'];
 
-export function playScreen(app, { id, demo = false }) {
+export function playScreen(app, { id, demo = false, auto = '' }) {
   const L = levelById(id);
   const prog = progress(app);
   const skin = prog.skin();
@@ -22,6 +24,7 @@ export function playScreen(app, { id, demo = false }) {
   const rec = flightRecorder();
   const renderer = createRenderer();
   let running = false, raf = 0, last = 0, ended = false;
+  const timers = [];
   let hold = false, tapQueued = false, aim = L.aimMin ?? 0, holdB = false, tapB = false, point = null;
   let demoMode = demo;
 
@@ -67,7 +70,12 @@ export function playScreen(app, { id, demo = false }) {
     else if (coach.wrongAim > 2) coachSay(`Slide ${L.aimLabel || 'AIM'} further right.`);
     else if (coach.wrongAim < -2) coachSay(`Slide ${L.aimLabel || 'AIM'} back a little to the left.`);
   }
-  const demoBanner = h('div.demo-banner', { style: { display: demoMode ? '' : 'none' } }, 'Vyom is flying. Watch the button!');
+  const demoBanner = h(
+    'div.demo-banner',
+    { style: { display: demoMode ? '' : 'none' } },
+    h('span', auto === 'first' ? 'Demo: watch Vyom fly it first' : auto === 'loss' ? 'Demo: Vyom shows you how' : 'Vyom is flying. Watch the button!'),
+    h('button.btn.sm.demo-skip', { 'data-testid': 'demo-skip', onclick: () => (sfx.tap(), app.go('play', { id })) }, 'Skip demo'),
+  );
   const mainBtn = h('button.big-btn', { 'data-testid': 'main-btn' }, h('span.big-label', L.buttons ? L.buttons[0] : L.button));
   // levels with two controls (e.g. TILT and STAGE, or LEFT and RIGHT)
   const btnB = L.buttons ? h('button.big-btn.btn-b', { 'data-testid': 'btn-b' }, h('span.big-label', L.buttons[1])) : null;
@@ -250,8 +258,15 @@ export function playScreen(app, { id, demo = false }) {
     );
   }
   function intro() {
+    // first time on a mission: Vyom flies it once first (Skip any time)
+    const seen = app.settings.demosSeen || {};
+    if (!demoMode && autoHelp(app) && !(prog.data.tries[id] || 0) && !prog.stars(id) && !seen[id]) {
+      app.setSetting('demosSeen', { ...seen, [id]: true });
+      setTimeout(() => app.current === self && app.go('play', { id, demo: true, auto: 'first' }), 0);
+      return;
+    }
     if (demoMode) {
-      g.say(['Watch me fly it! Look at when I press the button.'], 'happy');
+      g.say([auto === 'first' ? 'This is your first time here, so watch me fly it once. Press Skip demo to fly it yourself.' : 'Watch me fly it! Look at when I press the button.'], 'happy');
       setTimeout(() => {
         g.hide();
         start();
@@ -320,7 +335,7 @@ export function playScreen(app, { id, demo = false }) {
 
   function showWin({ newBadges, newSkins, improved, firstWin, streak, daily, rankUp, newCerts = [] }) {
     const praise = rankUp
-      ? `Promoted! You are now a ${rankUp.name}.`
+      ? `Rank up! You reached ${rankUp.name}.`
       : daily
         ? `Today’s mission complete! Daily streak: ${daily} day${daily > 1 ? 's' : ''}.`
         : improved
@@ -330,14 +345,14 @@ export function playScreen(app, { id, demo = false }) {
             : firstWin
               ? 'First time flying this mission. Well done!'
               : null;
-    if (rankUp) setTimeout(() => sfx.unlock(), 1200);
+    if (rankUp) setTimeout(() => el.isConnected && rankUpShow(el, rankUp, { sound: (i) => (i ? sfx.star(Math.min(2, i - 1)) : sfx.unlock()) }), 1400);
     if (praise) setTimeout(() => speak(praise), 900);
     confetti(el);
     if (newBadges.length || newSkins.length) setTimeout(() => sfx.unlock(), 1600);
     const next = LEVELS[ri + 1];
     const ov = overlay([
       h('div.result-head', h('div.vyom-big', { innerHTML: vyomSVG('happy', 84) }), h('div', h('h2.ok', CHEERS[Math.floor(Math.random() * CHEERS.length)]), starRow(game.stars))),
-      praise ? h('div.praise', praise) : null,
+      rankUp ? h('button.rank-card.rank-up', { style: { '--tier': rankUp.color }, onclick: () => app.go('profile'), 'data-testid': 'rank-up' }, h('div.emblem', { innerHTML: emblemSVG(rankUp, 56) }), h('div.grow', h('div.small.muted', 'Rank up!'), h('div.rk-name', rankUp.name), rankStars(rankUp))) : praise ? h('div.praise', praise) : null,
       h('ul.result-lines', game.result.map((r) => h('li', r))),
       badgeChips(newBadges, newSkins),
       newCerts.length ? h('div.unlocks', newCerts.map((c) => h('button.unlock.cert-unlock', { onclick: () => app.go('certs'), 'data-testid': 'cert-new' }, h('span.medal', { style: { background: c.color } }, '★'), h('div', h('b', `New certificate: ${c.tier} · ${c.title}`), h('div.small.muted', 'Tap to see it with your name on it'))))) : null,
@@ -411,17 +426,48 @@ export function playScreen(app, { id, demo = false }) {
       tries >= 2 ? h('p.small.muted', 'Stuck? Let Vyom show you how, then try again.') : null,
       h(
         'div.row.wrap.result-btns',
-        h('button.btn', { onclick: () => app.go('home') }, 'Levels'),
+        h('button.btn', { onclick: () => app.go('levels') }, 'Levels'),
         h('button.btn', { onclick: () => app.go('play', { id, demo: true }), 'data-testid': 'watch' }, 'Watch Vyom'),
         h('button.btn.primary.grow', { onclick: () => replay(), 'data-testid': 'retry' }, '↺ Try again'),
       ),
     ]);
+    // after a miss on a level not yet won, Vyom offers to show how (Skip to try again yourself)
+    if (autoHelp(app) && !prog.stars(id)) {
+      let n = 6;
+      const num = h('b', String(n));
+      const bar = h('div.auto-demo-fill');
+      const strip = h(
+        'div.auto-demo',
+        { role: 'status', 'aria-live': 'polite' },
+        h('div.grow', h('div', 'Vyom will show you how in ', num, ' s'), h('div.auto-demo-bar', bar)),
+        h('button.btn.sm', { 'data-testid': 'demo-now', onclick: () => go() }, 'Watch now'),
+        h('button.btn.sm.ghost', { 'data-testid': 'demo-skip-loss', onclick: () => stop() }, 'Skip demo'),
+      );
+      const card = el.querySelector('.result-card');
+      card?.insertBefore(strip, card.firstChild?.nextSibling || null);
+      requestAnimationFrame(() => (bar.style.transition = `width ${n}s linear`, (bar.style.width = '0%')));
+      const t = setInterval(() => {
+        n--;
+        num.textContent = String(n);
+        if (n <= 0) go();
+      }, 1000);
+      function stop() {
+        clearInterval(t);
+        strip.remove();
+        sfx.tap();
+      }
+      function go() {
+        clearInterval(t);
+        if (strip.isConnected) app.go('play', { id, demo: true, auto: 'loss' });
+      }
+      timers.push(t);
+    }
   }
 
   function showDemoEnd() {
     overlay([
       h('div.result-head', h('div.vyom-big', { innerHTML: vyomSVG('happy', 84) }), h('div', h('h2', 'Your turn!'), h('p', game.status === 'won' ? 'See how I timed the button? Now you try.' : 'Hmm, even I missed that time. Try it yourself!'))),
-      h('div.row.wrap.result-btns', h('button.btn', { onclick: () => app.go('home') }, 'Levels'), h('button.btn.primary.grow', { onclick: () => app.go('play', { id }), 'data-testid': 'retry' }, 'Let me fly ▸')),
+      h('div.row.wrap.result-btns', h('button.btn', { onclick: () => app.go('levels') }, 'Levels'), h('button.btn.primary.grow', { onclick: () => app.go('play', { id }), 'data-testid': 'retry' }, 'Let me fly ▸')),
     ]);
   }
 
@@ -508,17 +554,29 @@ export function playScreen(app, { id, demo = false }) {
     app.go('play', { id });
   }
   function leave() {
-    app.go('home');
+    app.go('levels');
   }
 
-  return {
+  const self = {
     el,
+    tourKey: 'play',
+    tourDelay: 900,
+    tour: demoMode
+      ? null
+      : () => [
+          { sel: '.play-title', title: 'Your mission', text: 'The level number, the real mission and what to do. Vyom’s bubble below tells you the goal.' },
+          { sel: '.play-hud', title: 'Flight numbers', text: 'Height, speed and fuel, live. Watch them as you fly.' },
+          { sel: '.play-canvas', title: 'The dotted line', text: 'It shows where you will go if you do nothing. Use the engine to move it onto the target.' },
+          { sel: '.dual-btns, [data-testid="main-btn"]', title: 'Your controls', text: 'Hold or tap the big button at the right moment. Some missions have two buttons or a slider.' },
+          { sel: '.play-top .btn', title: 'Back', text: 'Leave the mission any time. Tap Vyom’s bubble to start the flight.' },
+        ],
     mounted() {
       raf = requestAnimationFrame(frame);
       intro();
     },
     destroy() {
       cancelAnimationFrame(raf);
+      timers.forEach(clearInterval);
       boostOff();
       window.removeEventListener('keydown', key);
       window.removeEventListener('keyup', key);
@@ -532,6 +590,7 @@ export function playScreen(app, { id, demo = false }) {
     },
     startNow: () => (g.hide(), start(true)),
   };
+  return self;
 }
 
 /** Celebration confetti (lightweight canvas overlay). */

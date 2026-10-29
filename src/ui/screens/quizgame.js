@@ -214,6 +214,12 @@ export function quizGameScreen(app) {
   paintMeter();
   return {
     el,
+    tourDelay: 300,
+    tour: [
+      { sel: '.qg-meter, .qg-bar', title: 'Speed meter', text: 'Every right answer is a burn that adds speed. Reach 7.8 km/s to be in orbit.' },
+      { sel: '.qg-hearts', title: 'Lives', text: 'A wrong answer costs a life. Lose them all and the rocket falls back.' },
+      { sel: '.hint-btn', title: 'Hints', text: 'You get 3 hints for every 6 questions. They refresh after every six.' },
+    ],
     mounted() {
       setMood('play');
       raf = requestAnimationFrame(frame);

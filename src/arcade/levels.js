@@ -233,7 +233,7 @@ const L2 = {
 /* ------------------------------------------------------------------ */
 /* Capture helper: brake at closest approach to be caught (Moon, Mars) */
 /* ------------------------------------------------------------------ */
-function captureLevel({ body, mu, R, vInf, periAlt, startR, dry, wetDv, thrust, isp, apoMax, periMin, starsBy, info2, botApo = 0.25 }) {
+function captureLevel({ body, mu, R, vInf, periAlt, startR, dry, wetDv, thrust, isp, apoMax, periMin, starsBy, info2, botApo = 0.25, burnSlow = 0.3 }) {
   const rp = R + periAlt;
   const e = 1 + (rp * vInf * vInf) / mu;
   const p = rp * (1 + e);
@@ -247,7 +247,7 @@ function captureLevel({ body, mu, R, vInf, periAlt, startR, dry, wetDv, thrust, 
     dir: 'retro',
     clock: orbitClock(mu, 10),
     clockR: (g) => Math.hypot(g.w.y[0], g.w.y[1]),
-    burnSlow: 0.3, // time slows right down while you brake, so you can let go at the right moment
+    burnSlow, // time slows right down while you brake, so you can let go at the right moment
     horizon: () => {
       return 2 * Math.PI * Math.sqrt(startR ** 3 / mu) * 0.6;
     },
@@ -308,7 +308,8 @@ const L3 = {
       thrust: 440,
       isp: 315,
       apoMax: 20000e3,
-      periMin: 15e3,
+      periMin: 10e3,
+      burnSlow: 0.2,
       starsBy: (g, apo) => (apo <= 5500e3 ? 3 : apo <= 10000e3 ? 2 : 1),
       info2: (o) => ['Orbit', o.energy < 0 ? 'Caught!' : 'Flying past'],
     }),
@@ -332,8 +333,9 @@ function landerLevel({ g, engine, mass, dry, z0, vz0, speed = 1, holdThrottle, i
     update(dt, input) {
       if (game.status !== 'play') return;
       const thr = typeof holdThrottle === 'function' ? holdThrottle(l) : holdThrottle;
-      l.throttleCmd = input.hold && l.fuel > 0 ? thr : idleThrottle;
-      game.burning = l.thrust() > 0;
+      const idle = typeof idleThrottle === 'function' ? idleThrottle(l) : idleThrottle;
+      l.throttleCmd = l.fuel > 0 ? (input.hold ? thr : idle) : 0;
+      game.burning = !!input.hold && l.thrust() > 0;
       const steps = Math.ceil((dt * speed) / 0.01);
       for (let i = 0; i < steps && l.status === 'flying'; i++) l.step((dt * speed) / steps);
       if (l.status === 'landed') {
@@ -397,8 +399,9 @@ const L4 = {
       dry: 1250,
       z0: 800,
       vz0: -12,
-      speed: 1.6,
+      speed: 1.15,
       holdThrottle: 1,
+      idleThrottle: 0.4, // the real engines stay lit at their lowest setting
       limits: { vz: 3, vx: 1, tilt: 15 },
       stars: (v) => (v <= 0.8 ? 3 : v <= 1.6 ? 2 : 1),
       surface: 'moon',
@@ -587,7 +590,7 @@ const L7 = {
               return;
             }
           }
-          const speed = phase === 'entry' ? 22 : 8;
+          const speed = phase === 'entry' ? 28 : 10;
           const n = Math.ceil((dt * speed) / 0.05);
           for (let i = 0; i < n; i++) e.step((dt * speed) / n);
           if (phase === 'entry' && e.chuteWindow().why === 'tooSlow') {
@@ -609,9 +612,10 @@ const L7 = {
               dry: 1700,
               z0: hs.alt,
               vz0: hs.vz,
-              speed: 1.4,
-              holdThrottle: (l) => Math.min(1, (l.mass * (3.721 + 3.2)) / 24800),
-              idleThrottle: 0.13,
+              speed: 1.2,
+              // near the ground the descent engines throttle gently: holding pushes up softly, letting go falls slowly
+              holdThrottle: (l) => Math.min(1, (l.mass * (3.721 + (l.altitude < 150 && -l.vz < 6 ? 1.6 : 3.2))) / 24800),
+              idleThrottle: (l) => (l.altitude < 150 && -l.vz < 6 ? Math.max(0.13, (l.mass * (3.721 - 1.2)) / 24800) : 0.13),
               limits: { vz: 2.5, vx: 2, tilt: 20 },
               stars: (v) => (v <= 0.9 ? 3 : v <= 1.6 ? 2 : 1),
               surface: 'mars',
@@ -771,7 +775,7 @@ const LHOP = {
   fact: 'On 3 September 2023 Vikram fired its engines, rose about 40 cm and landed 30–40 cm away: a test for future missions that must lift off from the Moon.',
   create() {
     const g = 1.62, engine = { thrust: 3200, isp: 300, minThrottle: 0.4 }, mass = 1300, dry = 1250;
-    const l = new Lander({ g, engine, mass, dryMass: dry, x: 0, z: 0, vx: 0, vz: 0, pitch: 0, pitchRate: 0, maxPitch: 0, limits: { vz: 2, vx: 1, tilt: 15 }, terrain: { base: 0 }, footprint: 2 });
+    const l = new Lander({ g, engine, mass, dryMass: dry, x: 0, z: 0, vx: 0, vz: 0, pitch: 0, pitchRate: 0, maxPitch: 0, limits: { vz: 3, vx: 1, tilt: 15 }, terrain: { base: 0 }, footprint: 2 });
     let lifted = false, peak = 0;
     const game = {
       kind: 'lander',
@@ -1413,7 +1417,7 @@ const LDOCK = {
   guide: ['In space nothing slows you down. You will keep drifting forever!', 'Hold BRAKE to slow down, but don’t stop before you touch.'],
   fact: 'On 16 January 2025 ISRO’s two SpaDeX satellites docked in orbit, making India the fourth country to dock spacecraft in space.',
   create() {
-    const brake = 0.004, rate = 3; // m/s² from the small thrusters; time runs 3× faster
+    const brake = 0.004, rate = 2.5; // m/s² from the small thrusters; time runs 2.5× faster
     let x = 18, v = -0.24, t = 0, stopped = false, fuel = 1;
     const game = {
       kind: 'dock',
@@ -1442,9 +1446,9 @@ const LDOCK = {
           t += h;
           if (x <= 0) {
             const sp = -v;
-            if (sp > 0.05) {
+            if (sp > 0.07) {
               game.status = 'lost';
-              game.reason = `Bump! You touched at ${(sp * 100).toFixed(1)} cm/s. Docking needs under 5 cm/s. Brake earlier.`;
+              game.reason = `Bump! You touched at ${(sp * 100).toFixed(1)} cm/s. Docking needs under 7 cm/s. Brake earlier.`;
             } else {
               game.status = 'won';
               game.stars = sp <= 0.015 ? 3 : sp <= 0.03 ? 2 : 1;
@@ -1459,7 +1463,7 @@ const LDOCK = {
           game.reason = `You stopped ${x.toFixed(1)} m short. Nothing pushes you again in space! Brake a little less.`;
         }
       },
-      hud: () => ({ fuel, info: [['Distance', `${Math.max(0, x).toFixed(2)} m`], ['Speed', `${(Math.abs(v) * 100).toFixed(1)} cm/s`]], alert: x < 3 && -v > 0.05 ? 'Too fast!' : null }),
+      hud: () => ({ fuel, info: [['Distance', `${Math.max(0, x).toFixed(2)} m`], ['Speed', `${(Math.abs(v) * 100).toFixed(1)} cm/s`]], alert: x < 3 && -v > 0.07 ? 'Too fast!' : null }),
       scene: () => ({ kind: 'dock' }),
       /** where you would stop if you braked from now on */
       stopX: () => x - (v * v) / (2 * brake),

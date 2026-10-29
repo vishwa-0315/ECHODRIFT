@@ -1,18 +1,27 @@
-/** Home: Vyom says hello, one big PLAY button, the level tiles, badges and extras. */
+/** Menu (home): Vyom, PLAY, rank, today's mission, Quiz to Orbit and a tile for every page. */
 import { h, fitCanvas } from '../dom.js';
 import { starField, drawBody } from '../render.js';
 import { helioState } from '../../core/ephem.js';
 import { AU } from '../../core/constants.js';
 import { LEVELS } from '../../arcade/levels.js';
-import { progress, rankFor, nextRank, dailyLevel } from '../../game/progress.js';
-import { guide, voiceAvailable } from '../guide.js';
-import { checkForUpdates, BUILD } from '../update.js';
-import { setAudio, setMood, startMusic, sfx, unlockAudio } from '../audio.js';
-import { briefFor } from '../debrief.js';
+import { progress, dailyLevel, CERTS } from '../../game/progress.js';
+import { rankCard } from '../rankBadge.js';
+import { guide } from '../guide.js';
+import { BUILD } from '../update.js';
+import { setMood, sfx, unlockAudio } from '../audio.js';
 
-import { BODY } from '../levelIcons.js';
 import { profileForm } from './certs.js';
-const LOCK = '<svg width="14" height="16" viewBox="0 0 14 16" aria-hidden="true"><rect x="1" y="7" width="12" height="8" rx="2" fill="currentColor"/><path d="M4 7V5a3 3 0 0 1 6 0v2" stroke="currentColor" stroke-width="2" fill="none"/></svg>';
+const ICONS = {
+  levels: '<svg viewBox="0 0 24 24"><circle cx="5" cy="18" r="2.5"/><circle cx="12" cy="11" r="2.5"/><circle cx="19" cy="5" r="2.5"/><path d="M6.8 16.2l3.4-3.4M13.8 9.2l3.4-2.4" fill="none" stroke="currentColor" stroke-width="2"/></svg>',
+  expert: '<svg viewBox="0 0 24 24"><path d="M12 2c3 3 4 7 3 11l-3 3-3-3c-1-4 0-8 3-11z"/><path d="M9 15l-3 4 4-1M15 15l3 4-4-1"/></svg>',
+  explorer: '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3.2"/><ellipse cx="12" cy="12" rx="10" ry="4" fill="none" stroke="currentColor" stroke-width="1.8"/></svg>',
+  profile: '<svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7z"/></svg>',
+  hangar: '<svg viewBox="0 0 24 24"><circle cx="12" cy="9" r="6"/><path d="M8 14l-2 8 6-3 6 3-2-8z"/></svg>',
+  certs: '<svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="13" rx="2"/><circle cx="16" cy="17" r="3" fill="#0b1020" stroke="currentColor" stroke-width="1.6"/></svg>',
+  settings2: '<svg viewBox="0 0 24 24"><path d="M12 8.5a3.5 3.5 0 1 0 0 7 3.5 3.5 0 0 0 0-7zm9 4.7v-2.4l-2.4-.6a7 7 0 0 0-.7-1.7l1.3-2.1-1.7-1.7-2.1 1.3a7 7 0 0 0-1.7-.7L13.2 3h-2.4l-.6 2.4a7 7 0 0 0-1.7.7L6.4 4.8 4.7 6.5 6 8.6a7 7 0 0 0-.7 1.7L3 10.8v2.4l2.4.6c.2.6.4 1.2.7 1.7l-1.3 2.1 1.7 1.7 2.1-1.3c.5.3 1.1.5 1.7.7l.6 2.4h2.4l.6-2.4c.6-.2 1.2-.4 1.7-.7l2.1 1.3 1.7-1.7-1.3-2.1c.3-.5.5-1.1.7-1.7z" fill-rule="evenodd"/></svg>',
+  about: '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 10.5v6M12 7.2v.1" stroke="#0b1020" stroke-width="2.4" stroke-linecap="round"/></svg>',
+  tour: '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M10 8l6 4-6 4z" fill="#0b1020"/></svg>',
+};
 
 export function homeScreen(app, params = {}) {
   const prog = progress(app);
@@ -62,143 +71,13 @@ export function homeScreen(app, params = {}) {
   };
   const g = guide({ compact: true, persist: true, onTap: () => g.say(['Did you know? ' + nextFact(), 'Tap me for another fact!'], 'wow') });
 
-  const ERAS = [
-    { to: 1990, key: 'classic', title: '1968–1980 · The first giant leaps' },
-    { to: 2020, key: 'explorer', title: '2004–2017 · New explorers' },
-    { to: 9999, key: 'modern', title: '2021–2025 · Mars rovers and India on the Moon' },
-  ];
-  const isNasa = (L) => /NASA/.test(L.agency);
-  const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-  const fmtDate = (d) => `${+d.slice(8, 10)} ${MONTHS[+d.slice(5, 7) - 1]}`;
-  const node = (L, i, era) => {
-    const open = prog.unlocked(L.id);
-    const st = prog.stars(L.id);
-    const cls = (open ? '' : '.locked') + (next?.id === L.id ? '.next' : '') + (st ? '.done' : '');
-    const row = h(
-      'div.tl-row',
-      { 'data-era': era, 'data-agency': isNasa(L) ? 'nasa' : 'isro', 'data-stars': String(st) },
-      h(
-      'button.tl-node' + cls,
-      { 'data-testid': 'level-' + L.id, disabled: !open, onclick: () => (sfx.tap(), app.go('play', { id: L.id })), 'aria-label': `${L.year}, level ${i + 1}: ${L.title}${open ? `, ${st} stars` : ', locked'}` },
-      h('div.tl-when', h('div.tl-year', String(L.year)), h('div.tl-day', fmtDate(L.date))),
-      open ? h('div.tl-dot', { 'aria-hidden': 'true' }, String(i + 1)) : h('div.tl-dot', { 'aria-hidden': 'true', innerHTML: LOCK }),
-      h(
-        'div.tl-card',
-        h('canvas.tl-icon', { 'aria-hidden': 'true', 'data-body': BODY[L.id] || 'earth' }),
-        h('div.tl-text', h('div.tl-title', L.title, dailyLevel().id === L.id ? h('span.daily-chip', 'Today') : null), h('div.tl-mission', `${L.mission} · ${L.agency}`), h('div.tl-stars', open ? '★'.repeat(st) + '☆'.repeat(3 - st) : 'Finish the one before')),
-      ),
-      ),
-      briefFor(L.id) ? h('button.tl-info', { 'aria-label': `Mission card: ${L.title}`, 'data-testid': 'info-' + L.id, onclick: () => (sfx.tap(), missionCard(L, i)) }, 'i') : null,
-    );
-    return row;
-  };
-
-  /** Pre-flight mission card: rocket, goal in numbers, what earns each star, history card. */
-  function missionCard(L, i) {
-    const b = briefFor(L.id);
-    const st = prog.stars(L.id);
-    const close = () => ov.remove();
-    const ov = h(
-      'div.overlay.mission-card-ov',
-      { role: 'dialog', 'aria-modal': 'true', 'aria-label': `Mission card: ${L.title}`, onclick: (e) => e.target === ov && close() },
-      h(
-        'div.modal.mission-card',
-        h('div.mc-head', h('div', h('div.label', `Level ${i + 1} · ${L.year} · ${L.agency}`), h('h2', L.title), h('div.muted', L.mission)), h('button.btn.icon.sm.ghost', { 'aria-label': 'Close', onclick: close }, '×')),
-        h('div.mc-sec', h('div.mc-k', 'Rocket and spacecraft'), h('div.mc-v', b.vehicle)),
-        h('div.mc-sec', h('div.mc-k', 'Mission goal'), h('div.mc-v', L.goal), h('dl.mc-params', b.params.map(([k, v]) => [h('dt', k), h('dd', v)]))),
-        h('div.mc-sec', h('div.mc-k', `Stars · you have ${st} of 3`), h('ol.star-targets', b.stars.map((t, k) => h('li' + (k < st ? '.got' : ''), h('span.st', { 'aria-hidden': 'true' }, '★'.repeat(k + 1) + '☆'.repeat(2 - k)), h('span', t))))),
-        h('div.mc-sec', h('div.mc-k', 'Controls'), h('div.mc-v', L.buttons ? `${L.buttons[0]} and ${L.buttons[1]}` : L.tapCanvas ? 'Tap the map' : L.control === 'aim+tap' ? `Slide ${L.aimLabel || 'AIM'}, tap ${L.button}` : `${L.control === 'hold' ? 'Hold' : 'Tap'} ${L.button}`), b.note ? h('div.small.muted', { style: { marginTop: '4px' } }, 'Simplified: ' + b.note) : null),
-        prog.card(L.id)
-          ? h('div.fact', h('b', 'History card: '), b.history)
-          : h('div.fact.locked-card', h('b', 'History card locked. '), 'Answer this mission’s quiz question right to unlock it.'),
-        h('div.row.wrap.result-btns', h('button.btn', { onclick: close }, 'Close'), h('button.btn.primary.grow', { 'data-testid': 'mc-play', onclick: () => (sfx.tap(), app.go('play', { id: L.id })) }, 'Launch ▸')),
-      ),
-    );
-    el.appendChild(ov);
-  }
-  const timeline = h('div.timeline');
-  {
-    let era = -1;
-    LEVELS.forEach((L, i) => {
-      const e = ERAS.findIndex((x) => L.year < x.to);
-      if (e !== era) {
-        era = e;
-        timeline.appendChild(h('div.tl-era', { 'data-era': ERAS[e].key }, ERAS[e].title));
-      }
-      timeline.appendChild(node(L, i, ERAS[e].key));
-    });
-    // missions still to come: shown on the timeline, playable in a future update
-    const FUTURE = [
-      ['earth', 'Gaganyaan', 'ISRO', 'India’s first crewed spaceflight'],
-      ['moon', 'Chandrayaan-4', 'ISRO', 'Bring Moon rocks back to Earth'],
-      ['moon', 'Artemis', 'NASA', 'Astronauts return to the Moon'],
-      ['venus', 'Shukrayaan', 'ISRO', 'An orbiter for Venus'],
-      ['earth', 'Bharatiya Antariksh Station', 'ISRO', 'India’s own space station'],
-    ];
-    timeline.appendChild(h('div.tl-era', { 'data-era': 'future' }, 'Coming soon · the next missions'));
-    for (const [ic, name, ag, what] of FUTURE)
-      timeline.appendChild(
-        h('div.tl-node.future', { 'aria-label': `Coming soon: ${name}`, 'data-era': 'future', 'data-agency': ag.toLowerCase() }, h('div.tl-when', h('div.tl-year', 'Soon'), h('div.tl-day', 'planned')), h('div.tl-dot', { 'aria-hidden': 'true' }, '…'), h('div.tl-card', h('canvas.tl-icon', { 'aria-hidden': 'true', 'data-body': ic }), h('div.tl-text', h('div.tl-title', name), h('div.tl-mission', `${ag} · ${what}`), h('div.tl-stars', 'Level coming in a future update')))),
-      );
-  }
-
-  /* ---------- quick filters ---------- */
-  const FILTERS = [['all', 'All'], ['isro', 'ISRO'], ['nasa', 'NASA'], ['needs', 'Needs stars']];
-  let filter = 'all';
-  const counter = h('div.filter-count.small.muted', { 'aria-live': 'polite' });
-  const pills = h('div.filters', { role: 'group', 'aria-label': 'Filter missions' });
-  const applyFilter = () => {
-    let shown = 0;
-    for (const r of timeline.querySelectorAll('.tl-row')) {
-      const ok = filter === 'all' || (filter === 'needs' ? +r.dataset.stars < 3 : r.dataset.agency === filter);
-      r.hidden = !ok;
-      if (ok) shown++;
-    }
-    for (const f of timeline.querySelectorAll('.tl-node.future')) f.hidden = !(filter === 'all' || f.dataset.agency === filter);
-    for (const e of timeline.querySelectorAll('.tl-era')) {
-      const k = e.dataset.era;
-      e.hidden = ![...timeline.querySelectorAll(`[data-era="${k}"]:not(.tl-era)`)].some((x) => !x.hidden);
-    }
-    for (const b of pills.children) b.setAttribute('aria-pressed', String(b.dataset.f === filter));
-    counter.textContent =
-      filter === 'all' ? `Showing all ${shown} missions` : filter === 'needs' ? (shown ? `${shown} missions still need stars` : 'Every mission has 3 stars. Legend!') : `Showing ${shown} ${filter.toUpperCase()} missions`;
-  };
-  for (const [k, label] of FILTERS)
-    pills.appendChild(h('button.pill', { 'data-f': k, 'data-testid': 'filter-' + k, 'aria-pressed': 'false', onclick: () => ((filter = k), sfx.tap(), applyFilter()) }, label));
-  applyFilter();
-
-  const musicBtn = h('button.btn.sm.ghost.toggle-btn', { 'aria-label': 'Music on or off', onclick: () => toggle('music') });
-  const soundBtn = h('button.btn.sm.ghost.toggle-btn', { 'aria-label': 'Sound effects on or off', onclick: () => toggle('sound') });
-  const voiceBtn = voiceAvailable() ? h('button.btn.sm.ghost.toggle-btn', { 'aria-label': 'Vyom’s voice on or off', 'data-testid': 'voice', onclick: () => (app.setSetting('voice', app.settings.voice !== true), paintToggles(), sfx.tap(), app.settings.voice && g.say(['Hello! Now I can talk too.'], 'happy')) }) : null;
-  const tipsBtn = h('button.btn.sm.ghost.toggle-btn', { 'aria-label': 'Vyom’s tips during flights on or off', 'data-testid': 'tips', onclick: () => (app.setSetting('coach', app.settings.coach === false), paintToggles(), sfx.tap()) });
-  const paintToggles = () => {
-    tipsBtn.textContent = app.settings.coach === false ? 'Tips off' : 'Tips on';
-    tipsBtn.classList.toggle('off', app.settings.coach === false);
-    if (voiceBtn) {
-      voiceBtn.textContent = app.settings.voice === true ? 'Voice on' : 'Voice off';
-      voiceBtn.classList.toggle('off', app.settings.voice !== true);
-    }
-    musicBtn.textContent = app.settings.music === false ? 'Music off' : 'Music on';
-    musicBtn.classList.toggle('off', app.settings.music === false);
-    soundBtn.textContent = app.settings.sound === false ? 'Sound off' : 'Sound on';
-    soundBtn.classList.toggle('off', app.settings.sound === false);
-  };
-  function toggle(k) {
-    unlockAudio();
-    app.setSetting(k, app.settings[k] === false);
-    setAudio({ music: app.settings.music !== false, sounds: app.settings.sound !== false });
-    if (k === 'music' && app.settings.music !== false) startMusic('menu');
-    paintToggles();
-    sfx.tap();
-  }
-  paintToggles();
-
+  const tile = (screen, title, sub, ic) => h('button.menu-tile', { 'data-testid': 'tile-' + screen, onclick: () => (unlockAudio(), sfx.tap(), app.go(screen)) }, h('span.mt-ic', { 'aria-hidden': 'true', innerHTML: ICONS[ic] }), h('b', title), h('span.small.muted', sub));
   const el = h(
     'div.screen.home',
     h(
       'div.hero',
       sky,
-      h('div.inner', h('div.label', 'Real missions · real physics', h('span.ver-chip', { 'data-testid': 'version' }, `v1.0.${BUILD || 0}`)), h('h1', 'Launch Window'), h('p.tagline', 'Fly India’s and NASA’s real space missions. Every orbit and landing follows the real laws of physics.'), h('div.home-toggles', musicBtn, soundBtn, voiceBtn, tipsBtn)),
+      h('div.inner', h('div.label', 'Real missions · real physics', h('span.ver-chip', { 'data-testid': 'version' }, `v1.0.${BUILD || 0}`)), h('h1', 'Launch Window'), h('p.tagline', 'Fly India’s and NASA’s real space missions. Every orbit and landing follows the real laws of physics.'), h('button.btn.sm.ghost.settings-chip', { 'data-testid': 'settings', 'aria-label': 'Settings', onclick: () => (sfx.tap(), app.go('settings')) }, 'Settings')),
     ),
     g.el,
     h(
@@ -208,11 +87,7 @@ export function homeScreen(app, params = {}) {
         : h('button.btn.primary.play-btn', { onclick: () => app.go('play', { id: LEVELS[0].id }) }, h('span', 'PLAY AGAIN'), h('span.small', 'Can you get 3 stars everywhere?')),
       h('div.star-total', { 'aria-label': `${total} stars collected` }, h('span.big', `★ ${total}`), h('span.small.muted', 'stars')),
     ),
-    (() => {
-      const rk = rankFor(total), nx = nextRank(total);
-      const pct = nx ? ((total - rk.need) / (nx.need - rk.need)) * 100 : 100;
-      return h('div.rank-card', { 'aria-label': `Rank: ${rk.name}` }, h('div.medal', '★'), h('div.grow', h('div.rk-name', rk.name), h('div.small.muted', nx ? `${nx.need - total} more stars to become ${nx.name}` : 'Top rank! Every mission mastered.'), h('div.rank-bar', h('div', { style: { width: pct + '%' } }))));
-    })(),
+    rankCard(prog.rank(), total, { onclick: () => (sfx.tap(), app.go('profile')) }),
     (() => {
       const D = dailyLevel(), done = prog.dailyDoneToday(), streak = prog.dailyStreak();
       return h(
@@ -224,30 +99,34 @@ export function homeScreen(app, params = {}) {
       );
     })(),
     h('button.btn.quiz-play', { 'data-testid': 'quizgame', onclick: () => (unlockAudio(), sfx.tap(), app.go('quizgame')) }, h('span.qp-ic', { 'aria-hidden': 'true' }), h('span', h('b', 'Quiz to Orbit'), h('span.small.muted', ' · answer right to fly to orbital speed'))),
-    pills,
-    h('div.section', h('h3', 'Mission timeline'), counter),
-    timeline,
     h(
-      'div.home-more',
-      h('button.btn', { onclick: () => app.go('certs'), 'data-testid': 'certs' }, prog.profile().name ? `Certificates · ${prog.profile().name.split(' ')[0]}` : 'Profile & certificates'),
-      h('button.btn', { onclick: () => app.go('hangar'), 'data-testid': 'hangar' }, `Badges & rockets (${Object.keys(prog.data.badges).length})`),
-      h('button.btn', { onclick: () => app.go('explorer') }, 'Solar System now'),
-      h('button.btn', { onclick: () => app.go('expert'), 'data-testid': 'expert' }, 'Expert missions & labs'),
-      h('button.btn.ghost', { onclick: () => app.go('about') }, 'How the physics works'),
-      h('button.btn', { onclick: () => checkForUpdates(app), 'data-testid': 'updates' }, 'Check for updates'),
+      'nav.menu-grid',
+      { 'aria-label': 'Main menu' },
+      tile('levels', 'Levels', `${prog.levelsDone()} of ${LEVELS.length} missions flown`, 'levels'),
+      tile('expert', 'Expert & labs', 'Full missions on real dates', 'expert'),
+      tile('explorer', 'Solar System', 'Where the planets are today', 'explorer'),
+      tile('profile', 'Profile & rank', prog.profile().name ? prog.profile().name.split(' ')[0] + ' · ' + prog.rank().name : 'Your pilot card and rank', 'profile'),
+      tile('hangar', 'Badges & rockets', `${Object.keys(prog.data.badges).length} badges earned`, 'hangar'),
+      tile('certs', 'Certificates', `${CERTS.filter((c) => prog.certEarned(c.id)).length} of ${CERTS.length} unlocked`, 'certs'),
+      tile('settings', 'Settings', 'Sound, voice, tips, tutorials', 'settings2'),
+      tile('about', 'How it works', 'The physics inside the game', 'about'),
+      h('button.menu-tile.tour-tile', { 'data-testid': 'tile-tour', onclick: () => (sfx.tap(), app.go('intro', { replay: true })) }, h('span.mt-ic', { 'aria-hidden': 'true', innerHTML: ICONS.tour }), h('b', 'How to play'), h('span.small.muted', 'Watch the intro again')),
     ),
     h('p.small.muted', { style: { marginTop: '14px' } }, `Version 1.0.${BUILD || 0} (build ${BUILD || 'test'}). `, 'For all ages. Every level uses real gravity, real engines and real mission data. Stuck? Vyom can show you how.'),
   );
 
   return {
     el,
+    tour: [
+      { title: 'Welcome to the Menu', text: 'This is your mission control. Here is a quick look around. You can skip any time.' },
+      { sel: '[data-testid="play"], .play-btn', title: 'PLAY', text: 'Starts your next mission straight away.' },
+      { sel: '.rank-card', title: 'Your rank', text: 'Stars from missions raise your rank, from Bronze to Grandmaster. Tap it to see the whole ladder.' },
+      { sel: '.daily-card', title: 'Today’s mission', text: 'One mission a day. Win it on days in a row to build a streak.' },
+      { sel: '.quiz-play', title: 'Quiz to Orbit', text: 'Every right answer is a burn. Reach the real orbital speed of 7.8 km/s.' },
+      { sel: '.menu-grid', title: 'Every page', text: 'Levels, Profile, Certificates, Settings and more. Each page has its own short tour the first time.' },
+    ],
     mounted() {
       draw();
-      // small real-looking planet or moon for each mission on the timeline
-      for (const c of el.querySelectorAll('canvas.tl-icon')) {
-        const { w, h: hh, ctx } = fitCanvas(c);
-        drawBody(ctx, c.dataset.body, w / 2, hh / 2, Math.min(w, hh) * 0.42, -2.3, { dpr: 2 });
-      }
       raf = setInterval(draw, 1000);
       setMood('menu');
       const first = !total && !Object.keys(prog.data.tries).length;

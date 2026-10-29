@@ -31,25 +31,50 @@ export const BADGES = [
   { id: 'historian', icon: '', name: 'Mission historian', desc: 'Unlock all 30 mission history cards' },
 ];
 
-/** Pilot ranks, earned with stars (30 levels × 3 = 90 stars). */
-export const RANKS = [
-  { need: 0, name: 'Space Cadet' },
-  { need: 8, name: 'Trainee Pilot' },
-  { need: 20, name: 'Pilot' },
-  { need: 35, name: 'Flight Engineer' },
-  { need: 50, name: 'Mission Specialist' },
-  { need: 65, name: 'Flight Director' },
-  { need: 80, name: 'Mission Commander' },
+/**
+ * Pilot ranks, earned with stars (30 levels × 3 = 90 stars). Each rank has
+ * divisions (I, II, III…); inside a division you fill rank stars, like a
+ * ranked ladder in a sports game. The top rank, Grandmaster, is for
+ * professionals: every level perfect AND every Expert mission flown.
+ */
+const TIERS = [
+  { tier: 'Bronze', color: '#c8834f', divs: [0, 2, 4] },
+  { tier: 'Silver', color: '#b8c2cf', divs: [6, 8, 10] },
+  { tier: 'Gold', color: '#f2c14e', divs: [12, 15, 18, 21] },
+  { tier: 'Platinum', color: '#7fe0d6', divs: [24, 27, 30, 33] },
+  { tier: 'Diamond', color: '#8ab4ff', divs: [36, 40, 44, 48] },
+  { tier: 'Space Walker', color: '#c49bff', divs: [52, 56, 60] },
+  { tier: 'Elite Space Walker', color: '#e48bff', divs: [64, 67, 70] },
+  { tier: 'Space Master', color: '#ff9e5e', divs: [73, 76, 79] },
+  { tier: 'Elite Space Master', color: '#ff6b6b', divs: [82, 85, 88] },
 ];
-/** Certificates, unlocked by levels completed and stars (see certs.js for the design). */
+const ROMAN = ['I', 'II', 'III', 'IV'];
+/** Every rung of the ladder, lowest first. */
+export const RANKS = [
+  ...TIERS.flatMap((t, ti) => t.divs.map((need, di) => ({ tier: t.tier, div: ROMAN[di], name: `${t.tier} ${ROMAN[di]}`, need, color: t.color, ti }))),
+  { tier: 'Grandmaster', div: '', name: 'Grandmaster', need: 90, color: '#ffd700', ti: TIERS.length, pro: true },
+];
+export const RANK_TIERS = [...TIERS.map((t) => ({ tier: t.tier, color: t.color, from: t.divs[0] })), { tier: 'Grandmaster', color: '#ffd700', from: 90, pro: true }];
+/** Current rank. expertDone = Expert missions completed (Grandmaster needs all of them). */
+export function rankFor(stars, expertDone = 0, expertTotal = 8) {
+  const pro = stars >= 90 && expertDone >= expertTotal;
+  const ladder = RANKS.filter((r) => !r.pro || pro);
+  const i = ladder.filter((r) => stars >= r.need).length - 1;
+  const r = ladder[Math.max(0, i)];
+  const nx = ladder[i + 1] || null;
+  // rank stars inside this division (filled / slots), like a ranked ladder
+  const slots = nx ? Math.max(1, nx.need - r.need) : 1;
+  const filled = nx ? stars - r.need : 1;
+  return { ...r, next: nx, slots: Math.min(slots, 5), filled: Math.min(filled, 5), index: RANKS.indexOf(r) };
+}
+export const nextRank = (stars, expertDone = 0) => rankFor(stars, expertDone).next;
+
 export const CERTS = [
   { id: 'bronze', tier: 'Bronze', title: 'Space Explorer', levels: 10, stars: 0, color: '#b87333' },
   { id: 'silver', tier: 'Silver', title: 'Mission Pilot', levels: 20, stars: 45, color: '#9aa4b2' },
   { id: 'gold', tier: 'Gold', title: 'Mission Commander', levels: 30, stars: 75, color: '#d4a017' },
   { id: 'platinum', tier: 'Platinum', title: 'Space Legend', levels: 30, stars: 90, color: '#4cc9f0' },
 ];
-export const rankFor = (stars) => RANKS.filter((r) => stars >= r.need).pop();
-export const nextRank = (stars) => RANKS.find((r) => r.need > stars) || null;
 
 /** Today's mission: one level a day, the same for everyone on that date. */
 const dayKey = (d = new Date()) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
@@ -71,6 +96,8 @@ export function progress(app) {
       const i = LEVELS.findIndex((l) => l.id === id);
       return i <= 0 || p.stars(id) > 0 || p.stars(LEVELS[i - 1].id) > 0;
     },
+    expertDone: () => Object.values(app.save.missions || {}).filter((m) => m.done).length,
+    rank: () => rankFor(p.total(), p.expertDone(), (app.content?.missions || []).length || 8),
     levelsDone: () => LEVELS.filter((l) => p.stars(l.id) > 0 && (s.proof || {})[l.id]?.n > 0).length,
     /** Stars backed by a recorded flight (stars without a flight record don't count for certificates). */
     verifiedStars: () => LEVELS.reduce((a, l) => a + Math.min(p.stars(l.id), (s.proof || {})[l.id]?.s || 0), 0),
@@ -78,6 +105,8 @@ export function progress(app) {
     /** Wipe quick-play progress (used after the save was changed outside the game). */
     resetProgress() {
       app.save.arcade = { stars: {}, tries: {}, badges: {}, quizRight: 0, quizSeen: [], skin: 'classic' };
+      app.save.missions = {};
+      app.save.labs = {};
       app.persist();
     },
     certEarned: (id) => (s.certs || {})[id] || 0,
@@ -143,7 +172,8 @@ export function progress(app) {
       const done = p.levelsDone();
       const newCerts = s.tampered ? [] : CERTS.filter((c) => !(s.certs ||= {})[c.id] && done >= c.levels && p.verifiedStars() >= c.stars);
       for (const c of newCerts) s.certs[c.id] = Date.now();
-      const rankUp = rankFor(after).need > rankFor(before).need ? rankFor(after) : null;
+      const ex = Object.values(app.save.missions || {}).filter((m) => m.done).length;
+      const rankUp = rankFor(after, ex).index > rankFor(before, ex).index ? { ...rankFor(after, ex), from: rankFor(before, ex) } : null;
       return { newBadges: p.award(earn), newSkins, improved: prevBest > 0 && stars > prevBest, firstWin: prevBest === 0, streak: s.streak, daily, rankUp, newCerts };
     },
     /** Finished a Quiz to Orbit game with `stars` (0 = did not reach orbit). */

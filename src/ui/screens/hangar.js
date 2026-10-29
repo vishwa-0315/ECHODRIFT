@@ -64,6 +64,11 @@ export function hangarScreen(app) {
   );
   return {
     el,
+    tour: [
+      { sel: '.badge-grid', title: 'Badges', text: 'Badges are earned for special feats: first win, soft landings, streaks and more.' },
+      { sel: '.skin-grid', title: 'Rocket colours', text: 'Stars unlock new rocket colours. Tap an unlocked one to fly it.' },
+      { sel: '.card-grid', title: 'History cards', text: 'Answer a mission’s quiz question right to unlock its real history card.' },
+    ],
     mounted() {
       for (const [c, k] of previews) {
         const { w, h: H, ctx } = fitCanvas(c);

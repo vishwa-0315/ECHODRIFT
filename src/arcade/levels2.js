@@ -125,8 +125,8 @@ export const LASTRO = {
   fact: 'AstroSat, launched on 28 September 2015 by PSLV-C30, is India’s first space observatory. It looks at stars, galaxies and black holes in ultraviolet and X-ray light.',
   create() {
     const alpha = 0.35 * deg; // angular acceleration from the reaction wheels, rad/s² (sim time)
-    const rate = 3; // sim seconds per real second
-    const capErr = 2.5 * deg, capW = 0.4 * deg; // the star tracker takes over inside this window
+    const rate = 2.5; // sim seconds per real second
+    const capErr = 3.5 * deg, capW = 0.6 * deg; // the star tracker takes over inside this window
     let th = 0, w = 0, t = 0, effort = 0, lock = 0, locked = false, passes = 0, lastSide = -1;
     const target = 62 * deg;
     const g = shell('astro', {
@@ -456,9 +456,9 @@ export const LHAZARD = {
   fact: 'At about 150 m above the Moon, Vikram paused to scan the ground, saw it was not safe below and moved sideways to a safer spot before landing on 23 August 2023.',
   create() {
     const acc = 0.3; // m/s² sideways from the thrusters
-    const sink = 1.6, rate = 4; // m/s down, sim speed
+    const sink = 1.6, rate = 3; // m/s down, sim speed
     const side = Math.random() < 0.5 ? -1 : 1;
-    const safe = side * (34 + Math.random() * 18), safeW = 10;
+    const safe = side * (34 + Math.random() * 18), safeW = 12;
     let x = 0, vx = 0, z = 150, t = 0, used = 0;
     const g = shell('hazard', {
       get x() {
@@ -487,7 +487,7 @@ export const LHAZARD = {
         if (z <= 0) {
           const off = Math.abs(x - safe);
           if (off > safeW / 2) return g.lose(`Touched down ${off.toFixed(0)} m from the safe spot, among boulders! Slide over sooner.`);
-          if (Math.abs(vx) > 0.5) return g.lose(`Still sliding at ${Math.abs(vx).toFixed(1)} m/s when the legs touched. Push the other way earlier to stop.`);
+          if (Math.abs(vx) > 0.8) return g.lose(`Still sliding at ${Math.abs(vx).toFixed(1)} m/s when the legs touched. Push the other way earlier to stop.`);
           return g.win(Math.abs(vx) < 0.15 && off < 2 ? 3 : Math.abs(vx) < 0.3 && off < 3.5 ? 2 : 1, ['Safe touchdown between the boulders!', `Sideways speed: ${Math.abs(vx).toFixed(2)} m/s`, `Distance from the centre of the safe spot: ${off.toFixed(1)} m`]);
         }
       },
@@ -703,7 +703,7 @@ export const LGEO = {
     const mu = MU.earth, aG = Math.cbrt(mu / (7.2921159e-5) ** 2); // geostationary radius
     const we = 7.2921159e-5, slot = 82;
     let a = aG - 70e3, lon = 74, t = 0, dv = 0, still = 0;
-    const acc = 0.0002 * 40; // m/s² (small thrusters), already scaled for game time below
+    const acc = 0.0002 * 15; // m/s² (small thrusters), already scaled for game time below
     const rate = 0.5 * DAY; // sim seconds per real second
     const drift = () => ((Math.sqrt(mu / a ** 3) - we) * DAY) / deg; // °/day, + = east
     const g = shell('geo', {
@@ -729,9 +729,9 @@ export const LGEO = {
         lon += (drift() * h) / DAY;
         t += h;
         const err = Math.abs(lon - slot);
-        if (err < 0.3 && Math.abs(drift()) < 0.08) still += h;
+        if (err < 0.5 && Math.abs(drift()) < 0.05) still += h;
         else still = 0;
-        if (still > 2 * DAY) return g.win(dv <= 3.8 && err < 0.2 ? 3 : dv <= 6 && err < 0.3 ? 2 : 1, [`Parked over ${lon.toFixed(2)}°E!`, `Drift: ${Math.abs(drift()).toFixed(3)}° per day`, `Fuel used: ${dv.toFixed(1)} m/s of Δv`]);
+        if (still > 1.5 * DAY) return g.win(dv <= 3.8 && err < 0.2 ? 3 : dv <= 6 && err < 0.35 ? 2 : 1, [`Parked over ${lon.toFixed(2)}°E!`, `Drift: ${Math.abs(drift()).toFixed(3)}° per day`, `Fuel used: ${dv.toFixed(1)} m/s of Δv`]);
         if (lon > slot + 6) return g.lose('You drifted far past India to the east. Remember: speeding up makes you drift west!');
         if (lon < slot - 14) return g.lose('You drifted too far west. Slowing down lowers the orbit and makes you drift east.');
         if (t > 30 * DAY) return g.lose('A month has passed and you are still drifting. Stop the drift right over 82°E.');
@@ -813,7 +813,7 @@ export const LRLV = {
           if (v < 50) return g.lose('Stalled! You pulled up too early, too slow to make lift. Keep diving until just above the runway.');
           if (hgt <= 0) {
             const sink = -v * Math.sin(gam);
-            if (sink > 3.5) return g.lose(`Hit the runway sinking at ${sink.toFixed(1)} m/s: too hard. Pull up a little earlier.`);
+            if (sink > 4) return g.lose(`Hit the runway sinking at ${sink.toFixed(1)} m/s: too hard. Pull up a little earlier.`);
             return g.win(sink <= 1.2 ? 3 : sink <= 2.2 ? 2 : 1, ['Touchdown on the runway!', `Sinking at ${sink.toFixed(2)} m/s, rolling at ${Math.round(v * 3.6)} km/h`]);
           }
           if (gam > 8 * deg && hgt > 30) return g.lose('Climbing away! Pushpak has no engine, so pulling up too hard wastes your speed.');

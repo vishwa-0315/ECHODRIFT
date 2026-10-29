@@ -20,6 +20,10 @@
     "measure": [
       "Height above the Moon",
       "Speed"
+    ],
+    "learn": [
+      "A spacecraft close to the Moon circles it in about 2 hours, so the view changes fast.",
+      "Timing: acting at exactly the right moment in a moving scene."
     ]
   },
   "eagle": {
@@ -43,6 +47,10 @@
     "measure": [
       "Height",
       "Falling speed"
+    ],
+    "learn": [
+      "Landing on an airless world: only the engine can slow you, and the Moon adds 1.6 m/s of falling speed every second.",
+      "Stopping distance grows with the square of speed, so braking must start high up."
     ]
   },
   "home13": {
@@ -66,6 +74,10 @@
     "measure": [
       "Height above Earth",
       "Speed"
+    ],
+    "learn": [
+      "A tiny burn far away makes a big change later: aiming for a narrow re-entry corridor.",
+      "Too steep and the air heats you too much; too shallow and you skip off the atmosphere."
     ]
   },
   "slingshot": {
@@ -89,6 +101,10 @@
     "measure": [
       "Distance from the Sun",
       "Speed"
+    ],
+    "learn": [
+      "A gravity assist: a moving planet bends your path and changes your speed without fuel.",
+      "Aiming the closest pass decides where you go next."
     ]
   },
   "rohini": {
@@ -112,6 +128,10 @@
     "measure": [
       "Height",
       "Speed"
+    ],
+    "learn": [
+      "An orbit is falling around Earth: you need about 7.8 km/s sideways to keep missing the ground.",
+      "How India first reached orbit with its own rocket (SLV-3, 1980)."
     ]
   },
   "cassini": {
@@ -135,6 +155,10 @@
     "measure": [
       "Height above Saturn",
       "Speed"
+    ],
+    "learn": [
+      "Capture: brake at the closest point and a planet’s gravity can hold you in orbit.",
+      "The Oberth effect: a burn changes your energy most where you move fastest."
     ]
   },
   "mip": {
@@ -158,6 +182,10 @@
     "measure": [
       "Height above the Moon",
       "Speed"
+    ],
+    "learn": [
+      "A released probe follows its own path under gravity alone: aim, then let go.",
+      "How the Moon Impact Probe helped confirm water on the Moon."
     ]
   },
   "window": {
@@ -181,6 +209,10 @@
     "measure": [
       "Distance from the Sun",
       "Speed"
+    ],
+    "learn": [
+      "Planets move: to reach Mars you aim at where it will be, not where it is.",
+      "Why Mars launch windows open only about every 26 months (a Hohmann transfer)."
     ]
   },
   "escape": {
@@ -204,6 +236,10 @@
     "measure": [
       "Height above Earth",
       "Speed"
+    ],
+    "learn": [
+      "Escape speed: going fast enough that Earth’s gravity can never pull you back.",
+      "Burning repeatedly at the closest point stretches the orbit step by step."
     ]
   },
   "marscapture": {
@@ -227,6 +263,10 @@
     "measure": [
       "Height above Mars",
       "Speed"
+    ],
+    "learn": [
+      "Orbit insertion: braking just enough to be caught by Mars, using little fuel.",
+      "Elliptical orbits: a near point and a far point."
     ]
   },
   "pluto": {
@@ -250,6 +290,10 @@
     "measure": [
       "Distance from Pluto",
       "Speed"
+    ],
+    "learn": [
+      "A flyby gives one chance: closest approach is when you are fastest.",
+      "Distances in the outer Solar System are huge; signals take hours."
     ]
   },
   "juno": {
@@ -273,6 +317,10 @@
     "measure": [
       "Height above Jupiter",
       "Speed"
+    ],
+    "learn": [
+      "Jupiter’s gravity is so strong you fall in very fast; capture needs a well-timed burn.",
+      "Comparing gravity of different planets."
     ]
   },
   "sats104": {
@@ -296,6 +344,10 @@
     "measure": [
       "Time",
       "Gap to the last group"
+    ],
+    "learn": [
+      "Separating satellites gently so they drift apart and never collide.",
+      "Relative speed: small differences grow into large gaps over time."
     ]
   },
   "terror": {
@@ -319,6 +371,10 @@
     "measure": [
       "Height",
       "Speed"
+    ],
+    "learn": [
+      "Entering the thin Martian air: heat shield, then a supersonic parachute in its safe window (Mach 2.2 to 1.1).",
+      "Powered descent: engines finish what the air cannot."
     ]
   },
   "raise": {
@@ -342,6 +398,10 @@
     "measure": [
       "Height above Earth",
       "Speed"
+    ],
+    "learn": [
+      "Raising an orbit: burn at the closest point to lift the far point.",
+      "How Chandrayaan-3 climbed towards the Moon in steps to save fuel."
     ]
   },
   "moonshot": {
@@ -365,6 +425,10 @@
     "measure": [
       "Height above Earth",
       "Speed"
+    ],
+    "learn": [
+      "Trans-lunar injection: aiming at a moving Moon several days ahead.",
+      "The dotted line as a prediction of the future path."
     ]
   },
   "catchmoon": {
@@ -388,6 +452,10 @@
     "measure": [
       "Height above the Moon",
       "Speed"
+    ],
+    "learn": [
+      "Lunar orbit insertion: braking near the Moon so its gravity captures you.",
+      "Braking too much makes the orbit dip into the surface."
     ]
   },
   "vikram": {
@@ -411,6 +479,10 @@
     "measure": [
       "Height",
       "Falling speed"
+    ],
+    "learn": [
+      "A soft landing in vacuum: balancing engine thrust against the Moon’s gravity.",
+      "Why India’s south-pole landing in 2023 was historic."
     ]
   },
   "hop": {
@@ -422,7 +494,7 @@
       ],
       [
         "Safe touchdown",
-        "under 2 m/s"
+        "under 3 m/s"
       ]
     ],
     "stars": [
@@ -434,6 +506,10 @@
     "measure": [
       "Height",
       "Speed"
+    ],
+    "learn": [
+      "To rise, thrust must be greater than weight; to land, it must slow the fall.",
+      "Why lifting off from the Moon again matters for sample-return missions."
     ]
   },
   "spadex": {
@@ -445,11 +521,11 @@
       ],
       [
         "Safe contact",
-        "under 5 cm/s"
+        "under 7 cm/s"
       ]
     ],
     "stars": [
-      "Dock under 5 cm/s",
+      "Dock under 7 cm/s",
       "Under 3 cm/s",
       "Under 1.5 cm/s"
     ],
@@ -457,6 +533,10 @@
     "measure": [
       "Distance",
       "Closing speed"
+    ],
+    "learn": [
+      "Docking: in space nothing slows you, so you must brake yourself, gently.",
+      "Relative speed: what matters is how fast you close in, in centimetres per second."
     ]
   },
   "sre1": {
@@ -485,7 +565,11 @@
       "Height",
       "Speed"
     ],
-    "note": "The target is drawn where it will be when you arrive (Earth turns a little during the fall)."
+    "note": "The target is drawn where it will be when you arrive (Earth turns a little during the fall).",
+    "learn": [
+      "Braking lowers the far side of an orbit and brings a capsule back into the air.",
+      "Where you brake decides where you land (splash down)."
+    ]
   },
   "astrosat": {
     "vehicle": "PSLV-C30 · AstroSat observatory",
@@ -496,7 +580,7 @@
       ],
       [
         "Star tracker locks",
-        "within 2.5°, turning under 0.4°/s"
+        "within 3.5°, turning under 0.6°/s"
       ]
     ],
     "stars": [
@@ -508,6 +592,10 @@
     "measure": [
       "Off target",
       "Turning speed"
+    ],
+    "learn": [
+      "Newton’s first law for turning: once spinning, a satellite keeps turning until something stops it.",
+      "Reaction wheels, and planning when to start slowing a turn."
     ]
   },
   "dodge": {
@@ -535,6 +623,10 @@
     "measure": [
       "Height above the Moon",
       "Speed"
+    ],
+    "learn": [
+      "Predicting two orbits ahead of time to avoid a collision.",
+      "A small, early burn moves the meeting point a lot."
     ]
   },
   "navic": {
@@ -558,6 +650,10 @@
     "measure": [
       "Guesses",
       "Guesses left"
+    ],
+    "learn": [
+      "Satellite navigation: signals travel at the speed of light, so timing gives distance.",
+      "Trilateration: three distance circles meet at one place."
     ]
   },
   "lvm3": {
@@ -586,7 +682,11 @@
       "Height",
       "Speed"
     ],
-    "note": "Air drag is left out to keep the level short."
+    "note": "Air drag is left out to keep the level short.",
+    "learn": [
+      "Rocket staging: dropping empty tanks lets the rest go faster.",
+      "A gravity turn: going up, then tilting sideways to gain orbital speed."
+    ]
   },
   "hazard": {
     "vehicle": "LVM3-M4 · Vikram lander",
@@ -597,7 +697,7 @@
       ],
       [
         "Safe touchdown",
-        "sideways under 0.5 m/s"
+        "sideways under 0.8 m/s"
       ]
     ],
     "stars": [
@@ -609,6 +709,10 @@
     "measure": [
       "Height",
       "Sideways speed"
+    ],
+    "learn": [
+      "Newton’s first law sideways: once moving, you keep sliding until you push the other way.",
+      "Choosing a safe landing site and stopping exactly above it."
     ]
   },
   "pragyan": {
@@ -632,6 +736,10 @@
     "measure": [
       "Distance to the spot",
       "Distance driven"
+    ],
+    "learn": [
+      "Driving a rover slowly and carefully around craters on limited power.",
+      "Planning a short path to a science target."
     ]
   },
   "aditya": {
@@ -656,7 +764,11 @@
       "Off the loop",
       "Speed"
     ],
-    "note": "Shown flat (in 2D); the real halo orbit also loops above and below."
+    "note": "Shown flat (in 2D); the real halo orbit also loops above and below.",
+    "learn": [
+      "The L1 balance point between the Sun and Earth, and why staying there needs small corrections.",
+      "An unstable balance: like a ball on a hilltop."
+    ]
   },
   "insat": {
     "vehicle": "GSLV-F14 · INSAT-3DS",
@@ -676,13 +788,17 @@
     ],
     "stars": [
       "Park over 82°E",
-      "Within 0.2° using under 5.5 m/s",
-      "Within 0.12° using under 3.6 m/s"
+      "Within 0.35° using under 6 m/s",
+      "Within 0.2° using under 3.8 m/s"
     ],
     "history": "INSAT-3DS launched on 17 February 2024 on GSLV-F14. From its slot at 82°E it watches India’s weather, cyclones and clouds day and night.",
     "measure": [
       "Off the slot",
       "Drift"
+    ],
+    "learn": [
+      "Geostationary orbit: one turn every 24 hours, so a satellite seems to hang still.",
+      "A higher orbit is slower: speeding up makes you drift backwards."
     ]
   },
   "pushpak": {
@@ -694,7 +810,7 @@
       ],
       [
         "Safe touchdown",
-        "sinking under 3 m/s"
+        "sinking under 4 m/s"
       ]
     ],
     "stars": [
@@ -706,6 +822,10 @@
     "measure": [
       "Height",
       "Speed"
+    ],
+    "learn": [
+      "Gliding: wings trade height for speed; lift and drag set the path.",
+      "Flaring: pulling up just before touchdown for a soft landing."
     ]
   }
 }

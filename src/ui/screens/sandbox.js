@@ -228,6 +228,7 @@ export function sandboxScreen(app) {
 
   return {
     el,
+    tour: [{ title: 'Orbit Sandbox', text: 'Pick a world, set the height and speed, and launch. Find the speed that gives a perfect circle, or the one that escapes.' }],
     mounted() {
       controls.hidden = true;
       launch();

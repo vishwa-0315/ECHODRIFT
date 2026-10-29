@@ -20,5 +20,5 @@ export function aboutScreen(app) {
     sec('Credits', h('ul.small', h('li', 'Earth: NASA Blue Marble (public domain). Moon: NASA LRO / Clementine mosaic (public domain).'), h('li', 'Ephemerides: astronomy-engine by Don Cross (MIT licence).'), h('li', 'Font: Inter by Rasmus Andersson (SIL Open Font License).'), h('li', 'Mission facts: ISRO, NASA/JPL and the sources listed on each mission.'))),
     h('p.small.muted', `Launch Window v${VERSION} · offline · no ads · no data collected`),
   );
-  return { el };
+  return { el, tour: [{ title: 'How it works', text: 'Here is the real science behind every level, and the few things we made simpler. Scroll to read.' }] };
 }

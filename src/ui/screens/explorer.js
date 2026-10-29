@@ -211,5 +211,12 @@ export function explorerScreen(app) {
     h('button.btn', { onclick: () => app.busy('Searching real launch windows…', nextWindow) }, 'When is the next Mars launch window?'),
     winOut,
   );
-  return { el, mounted: () => (draw(), panel()) };
+  return {
+    el,
+    mounted: () => (draw(), panel()),
+    tour: [
+      { sel: 'canvas', title: 'The Solar System today', text: 'The planets are drawn where they really are right now.' },
+      { sel: '.sx-chips, .sx-select', title: 'Pick a world', text: 'Choose a planet to see its facts, moons and distance from the others.' },
+    ],
+  };
 }

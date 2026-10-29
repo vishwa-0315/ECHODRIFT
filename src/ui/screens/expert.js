@@ -100,6 +100,10 @@ export function expertScreen(app) {
   );
   return {
     el,
+    tour: [
+      { sel: '.cards', title: 'Expert missions', text: 'Full missions on their real dates, with step-by-step guides. Fly all of them to reach Grandmaster.' },
+      { sel: '.cards ~ .cards, .section ~ .cards', title: 'Discovery labs', text: 'Labs and the Orbit Sandbox let you change gravity, speed and height and see what happens.' },
+    ],
     mounted() {
       const loop = () => {
         draw();

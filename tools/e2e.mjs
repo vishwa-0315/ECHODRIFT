@@ -79,7 +79,7 @@ if (!ONLY || ONLY === 'quick') {
   result['history-cards'] = await page.evaluate(() => document.querySelectorAll('.hcard.got').length);
   log('history cards unlocked', result['history-cards']);
   // home: filters and a mission card
-  await page.evaluate(() => window.__LW.go('home'));
+  await page.evaluate(() => window.__LW.go('levels'));
   await page.waitForSelector('[data-testid=filter-isro]');
   await page.click('[data-testid=filter-isro]');
   result['filter-isro'] = await page.textContent('.filter-count');

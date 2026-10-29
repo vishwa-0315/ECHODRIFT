@@ -2,6 +2,7 @@
 import { h, clear, put } from './dom.js';
 import { vyomSVG, setVoice } from './guide.js';
 import { checkSeal, sealOf } from '../game/integrity.js';
+import { runTour } from './tour.js';
 
 export const VERSION = '1.0.0';
 const KEY = 'launchwindow.save.v1';
@@ -80,6 +81,8 @@ export function createApp(root, content, screens) {
       if (s.el) root.appendChild(s.el);
       s.mounted?.();
       window.scrollTo(0, 0);
+      // first visit to a page: a short tour with a Skip button
+      if (s.tour) setTimeout(() => app.current === s && runTour(app, s.tourKey || name, typeof s.tour === 'function' ? s.tour() : s.tour), s.tourDelay ?? 700);
     },
     toast(msg, ms = 3200, mood = 'normal') {
       // hints are spoken by Vyom

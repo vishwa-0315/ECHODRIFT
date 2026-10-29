@@ -10,6 +10,7 @@ import { LEVELS } from '../../arcade/levels.js';
 import { vyomSVG, vyomNote } from '../guide.js';
 import { sfx } from '../audio.js';
 import { certCode, readCertCode } from '../../game/integrity.js';
+import { cautionReset } from '../caution.js';
 
 const FOOTER = 'Launch Window was selected for the State-Level Youth Astronomy & Space Science Congress (YASSC 2026), organised by the Tamilnadu Astronomy & Science Society (TASS).';
 
@@ -196,7 +197,7 @@ function certInfo(app, cert) {
     city: pf.city,
     levels,
     stars: total,
-    rank: rankFor(total).name,
+    rank: rankFor(total, prog.expertDone(), (app.content?.missions || []).length || 8).name,
     quiz: prog.data.quizRight || 0,
     cards: prog.cardCount(),
     date: when.toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' }),
@@ -225,7 +226,7 @@ async function saveImage(app, canvas, name) {
 export function certsScreen(app) {
   const prog = progress(app);
   const body = h('div.certs-body');
-  const el = h('div.screen', h('div.topbar', h('button.btn.icon.ghost', { 'aria-label': 'Back', onclick: () => app.go('home') }, '←'), h('h2', 'Profile & certificates')), body);
+  const el = h('div.screen', h('div.topbar', h('button.btn.icon.ghost', { 'aria-label': 'Back', onclick: () => app.go('home') }, '←'), h('h2', 'Certificates')), body);
 
   function show(cert) {
     const canvas = h('canvas.cert-canvas', { role: 'img', 'aria-label': `${cert.tier} certificate for ${prog.profile().name}` });
@@ -265,7 +266,7 @@ export function certsScreen(app) {
       put(
         body,
         vyomNote('Your saved progress was changed outside the game, so I can’t issue certificates for it. Start fresh and fly the missions yourself!', 'sad'),
-        h('button.btn.primary.block', { 'data-testid': 'reset', onclick: () => (prog.resetProgress(), sfx.tap(), app.go('home')) }, 'Reset progress and start again'),
+        h('button.btn.primary.block', { 'data-testid': 'reset', onclick: () => cautionReset(app, () => (prog.resetProgress(), app.go('home'))) }, 'Reset progress and start again'),
         verifyPanel(),
       );
       return;
@@ -302,5 +303,11 @@ export function certsScreen(app) {
     );
   }
   render();
-  return { el };
+  return {
+    el,
+    tour: [
+      { sel: '.cert-grid, .pf-form', title: 'Certificates', text: 'Bronze, Silver, Gold and Platinum certificates unlock as you complete missions with enough stars. Your name from your profile is printed on them.' },
+      { sel: '.vf', title: 'Verify', text: 'Anyone can check a certificate here with the name and the verify code printed on it.' },
+    ],
+  };
 }
